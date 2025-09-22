@@ -10,6 +10,13 @@ from typing import List, Literal, Optional, Dict, Any
 import uuid
 from datetime import datetime
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # LLM Integrations (Emergent)
 try:
     from emergentintegrations.llm.openai import LlmChat
