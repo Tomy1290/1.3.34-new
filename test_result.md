@@ -101,3 +101,70 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Clone and replace with https://github.com/Tomy1290/1.3.13-new in root; fully replace app"
+backend:
+  - task: "Replace backend server with repo backend/server.py (adds /api/chat)"
+    implemented: true
+    working: NA
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: NA
+        agent: "main"
+        comment: "Copied backend/server.py from repo and integrated Emergent LLM fallback."
+  - task: "Install emergentintegrations and update requirements.txt"
+    implemented: true
+    working: NA
+    file: "/app/backend/requirements.txt"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: NA
+        agent: "main"
+        comment: "Will install emergentintegrations and pip-freeze, then restart backend."
+  - task: "Set EMERGENT_LLM_KEY in backend env"
+    implemented: true
+    working: NA
+    file: "/app/backend/.env"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: NA
+        agent: "main"
+        comment: "Added EMERGENT_LLM_KEY to enable LLM; if not present, endpoint uses fallback."
+frontend:
+  - task: "Frontend replacement (Expo) in this environment"
+    implemented: false
+    working: NA
+    file: "N/A"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: NA
+        agent: "main"
+        comment: "Expo frontend cannot run under current supervisor/web ingress. Kept existing web frontend for service availability. Repo's frontend is available under /app/_external_1_3_13_new/frontend for reference."
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Backend /api root returns Hello World"
+    - "POST /api/status inserts and returns object"
+    - "GET /api/status returns list"
+    - "POST /api/chat works with and without EMERGENT_LLM_KEY"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Please test backend endpoints per test_plan. Frontend remains CRA due to platform; do not test web UI yet."
