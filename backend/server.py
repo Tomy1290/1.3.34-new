@@ -38,8 +38,6 @@ try:
 except Exception as e:  # pragma: no cover – fallback if lib not present
     logger.error(f"Failed to initialize LLM client: {e}")
     llm_client = None
-load_dotenv(ROOT_DIR / '.env')
-
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
