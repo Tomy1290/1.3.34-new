@@ -17,22 +17,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
+
 # LLM Integrations (Emergent)
 try:
     from emergentintegrations.llm.openai import LlmChat
     emergent_api_key = os.environ.get('EMERGENT_LLM_KEY')
+    logger.info(f"EMERGENT_LLM_KEY found: {bool(emergent_api_key)}")
     if emergent_api_key:
         llm_client = LlmChat(
             api_key=emergent_api_key,
             session_id="health-tracker-backend",
             system_message="You are Gugi, a friendly health coach."
         )
+        logger.info("LLM client initialized successfully")
     else:
         llm_client = None
-except Exception:  # pragma: no cover – fallback if lib not present
+        logger.warning("No EMERGENT_LLM_KEY found, LLM client set to None")
+except Exception as e:  # pragma: no cover – fallback if lib not present
+    logger.error(f"Failed to initialize LLM client: {e}")
     llm_client = None
-
-ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
