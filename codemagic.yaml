@@ -7,6 +7,7 @@ workflows:
         NODE_VERSION: 20
         CI: 1
         EXPO_NO_TELEMETRY: 1
+        EXPO_DEBUG: 1
       node: 20
       java: 17
       xcode: 15.1
@@ -67,18 +68,40 @@ workflows:
           export CI=1
           cd frontend
           npx --yes expo@latest prebuild --platform android --clean
+      - name: Pre-bundle JS (debug to surface Metro errors)
+        script: |
+          set -e
+          cd frontend
+          mkdir -p android/app/build/generated/assets/createBundleReleaseJsAndAssets
+          mkdir -p android/app/build/generated/res/createBundleReleaseJsAndAssets
+          mkdir -p android/app/build/intermediates/sourcemaps/react/release
+          npx --yes expo@latest export:embed \
+            --platform android \
+            --dev false \
+            --reset-cache \
+            --entry-file node_modules/expo-router/entry.js \
+            --bundle-output android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle \
+            --assets-dest android/app/build/generated/res/createBundleReleaseJsAndAssets \
+            --sourcemap-output android/app/build/intermediates/sourcemaps/react/release/index.android.bundle.packager.map \
+            --minify false \
+            --verbose
       - name: Build APK (with logs)
         script: |
           set -o pipefail
           cd frontend/android
-          ./gradlew assembleRelease --no-daemon --stacktrace --info | tee gradle-build.log
+          ./gradlew assembleRelease --no-daemon --stacktrace --info --warning-mode all | tee gradle-build.log
           echo "Problems report (if any):"
           if [ -f build/reports/problems/problems-report.html ]; then
             ls -la build/reports/problems
+            echo "---- Extracting errors from problems-report.html ----"
+            sed -n '1,200p' build/reports/problems/problems-report.html | sed -n '1,200p'
           fi
+          echo "---- Tail gradle-build.log ----"
+          tail -n 200 gradle-build.log || true
     artifacts:
       - frontend/android/app/build/outputs/apk/release/*.apk
       - frontend/android/gradle-build.log
+      - frontend/android/build/reports/problems/problems-report.html
     publishing:
       email:
         recipients:
