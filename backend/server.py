@@ -161,7 +161,7 @@ async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
         logger.info(f"Sending message to LLM: {user_message[:50]}...")
         
         # Switch to Google Gemini Flash as requested
-        provider = 'google'
+        provider = 'gemini'
         model_name = model or 'gemini-1.5-flash'
         client_with_model = llm_client.with_model(provider, model_name)
         # Wrap plain text into a minimal message object to satisfy library expectations
