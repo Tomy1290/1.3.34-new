@@ -53,6 +53,31 @@ export default function AnalysisScreen() {
 
   const last14 = useMemo(() => weightArrAll.slice(-14), [weightArrAll]);
 
+  // BMI (from profile)
+  const heightM = useMemo(() => {
+    const cm = state.profile.heightCm;
+    return cm && cm > 0 ? (cm / 100) : undefined;
+  }, [state.profile.heightCm]);
+
+  const lastWeight = useMemo(() => {
+    const vals = Object.values(state.days).filter((d:any)=> typeof d.weight === 'number').sort((a:any,b:any)=> a.date.localeCompare(b.date));
+    return vals.length ? Number((vals as any[])[vals.length-1].weight) : undefined;
+  }, [state.days]);
+
+  const bmi = useMemo(() => {
+    if (!heightM || !lastWeight) return undefined;
+    return lastWeight / (heightM * heightM);
+  }, [heightM, lastWeight]);
+
+  const bmiCategory = useMemo(() => {
+    const v = bmi || 0;
+    if (!bmi) return undefined;
+    if (v < 18.5) return { label: 'Untergewicht', color: '#2196F3' } as const;
+    if (v < 25) return { label: 'Normalgewicht', color: '#4CAF50' } as const;
+    if (v < 30) return { label: 'Übergewicht', color: '#FFC107' } as const;
+    return { label: 'Adipositas', color: '#F44336' } as const;
+  }, [bmi]);
+
   const t = (key: string) => { const de: Record<string, string> = { analysis: 'Analyse', weight: 'Gewichtsanalyse', app: 'Scarletts Gesundheitstracking', range7: '7 Tage', range14: '14 Tage', range30: '30 Tage', custom: 'Eigener Zeitraum', from: 'Von', to: 'Bis', weight_help: 'Wähle den Zeitraum und betrachte Trends.', insights: 'Premium Insights', insights_help: 'Letzte 14 Einträge mit Tagesdifferenz.', aiultra: 'KI Pro+++ (Zyklus & Korrelationen)', aiultra_help: 'Heatmap nach Zyklustagen und Korrelationen zwischen Metriken.' }; const en: Record<string, string> = { analysis: 'Analysis', weight: 'Weight analysis', app: "Scarlett’s Health Tracking", range7: '7 days', range14: '14 days', range30: '30 days', custom: 'Custom', from: 'From', to: 'To', weight_help: 'Select a range and see trends.', insights: 'Premium Insights', insights_help: 'Last 14 entries with daily difference.', aiultra: 'AI Pro+++ (cycle & correlations)', aiultra_help: 'Heatmap by cycle days and correlations between metrics.' }; return (state.language === 'de' ? de : en)[key] || key; };
 
   // ===== Pro+++ computations =====
