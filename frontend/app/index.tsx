@@ -429,11 +429,7 @@ export default function Home() {
             <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/chat'); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel='Chat'>
               <Ionicons name="chatbubbles" size={18} color={colors.primary} />
               <Text style={{ color: colors.text, marginTop: 6 }}>{language==='de'?'Chat':(language==='pl'?'Czat':'Chat')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/settings'); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel='Einstellungen'>
-              <Ionicons name="settings" size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, marginTop: 6 }}>{language==='de'?'Einstellungen':(language==='pl'?'Ustawienia':'Settings')}</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>            
             <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/saved'); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel='Gespeichert'>
               <Ionicons name="bookmark" size={18} color={colors.primary} />
               <Text style={{ color: colors.text, marginTop: 6 }}>{language==='de'?'Gespeichert':(language==='pl'?'Zapisane':'Saved')}</Text>
@@ -441,6 +437,10 @@ export default function Home() {
             <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/faq'); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel='FAQ'>
               <Ionicons name="help-circle" size={18} color={colors.primary} />
               <Text style={{ color: colors.text, marginTop: 6 }}>FAQ</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/settings'); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel='Einstellungen'>
+              <Ionicons name="settings" size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, marginTop: 6 }}>{language==='de'?'Einstellungen':(language==='pl'?'Ustawienia':'Settings')}</Text>
             </TouchableOpacity>
           </View>
         </View>
