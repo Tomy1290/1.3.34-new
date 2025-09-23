@@ -455,7 +455,7 @@ export default function SettingsScreen() {
           <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Version':(state.language==='pl'?'Wersja':'Version')}: {version}</Text>
           <Text style={{ color: colors.muted, marginTop: 2 }}>created by Gugi</Text>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
