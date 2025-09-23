@@ -334,7 +334,7 @@ export default function Home() {
                 <Text style={{ color: '#fff', marginLeft: 6 }}>{language==='de'?'Beginn Periode':(language==='pl'?'Start cyklu':'Start cycle')}</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={() => router.push('/cycle')} style={[styles.cta, { backgroundColor: colors.primary }]>
+            <TouchableOpacity onPress={() => router.push('/cycle')} style={[styles.cta, { backgroundColor: colors.primary }]}>
               <Ionicons name='calendar' size={16} color={'#fff'} />
               <Text style={{ color: '#fff', marginLeft: 6 }}>{t('Kalender', 'Calendar', 'Kalendarz')}</Text>
             </TouchableOpacity>
