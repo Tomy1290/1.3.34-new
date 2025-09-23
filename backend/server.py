@@ -143,9 +143,9 @@ SYSTEM_PROMPT_PL = (
 # Minimal message wrapper to satisfy emergentintegrations expectations
 class _SimpleUserMessage:
     def __init__(self, text: str, file_contents=None):
-        # Library checks for attribute 'file_contents' existence; keep as None or list
+        # Library checks for attribute 'file_contents' existence; keep as empty list if None
         self.text = text
-        self.file_contents = file_contents
+        self.file_contents = file_contents or []
 
 async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
     logger.info(f"_call_llm called with model: {model}, llm_client is None: {llm_client is None}")
