@@ -180,10 +180,20 @@ async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
         # Switch to Google Gemini Flash as requested
         provider = 'gemini'
         model_name = _normalize_gemini_model(model)
+        logger.info(f"Using provider={provider}, model={model_name}")
         client_with_model = llm_client.with_model(provider, model_name)
         # Wrap plain text into a minimal message object to satisfy library expectations
         user_msg_obj = _SimpleUserMessage(text=user_message)
-        resp = await client_with_model.send_message(user_msg_obj)
+        try:
+            resp = await client_with_model.send_message(user_msg_obj)
+        except Exception as e:
+            logger.warning(f"Primary LLM call failed ({e}); retrying with gemini-2.0-flash")
+            try:
+                client_with_model = llm_client.with_model('gemini', 'gemini-2.0-flash')
+                resp = await client_with_model.send_message(user_msg_obj)
+            except Exception as e2:
+                logger.exception("Retry LLM call failed: %s", e2)
+                raise
         
         logger.info(f"LLM response type: {type(resp)}, content: {str(resp)[:100]}...")
         
