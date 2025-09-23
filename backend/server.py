@@ -38,10 +38,20 @@ try:
 except Exception as e:  # pragma: no cover – fallback if lib not present
     logger.error(f"Failed to initialize LLM client: {e}")
     llm_client = None
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# MongoDB connection (graceful if env missing)
+mongo_url = os.environ.get('MONGO_URL')
+db_name = os.environ.get('DB_NAME')
+client = None
+db = None
+if mongo_url and db_name:
+    try:
+        client = AsyncIOMotorClient(mongo_url)
+        db = client[db_name]
+        logger.info("Connected to MongoDB")
+    except Exception as e:
+        logger.exception("Failed to initialize MongoDB client: %s", e)
+else:
+    logger.warning("MONGO_URL or DB_NAME not set; database features disabled")
 
 # Create the main app without a prefix
 app = FastAPI()
