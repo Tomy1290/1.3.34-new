@@ -113,7 +113,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     mode: Literal['greeting','chat'] = 'chat'
     language: Literal['de','en','pl'] = 'de'
-    model: Optional[str] = None  # e.g., 'gemini-1.5-flash'
+    model: Optional[str] = None  # e.g., 'gemini-2.0-flash'
     summary: Optional[Dict[str, Any]] = None
     messages: Optional[List[ChatMessage]] = None
 
