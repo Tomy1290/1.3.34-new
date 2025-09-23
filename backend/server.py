@@ -179,7 +179,7 @@ async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
         
         # Switch to Google Gemini Flash as requested
         provider = 'gemini'
-        model_name = model or 'gemini-2.0-flash'
+        model_name = _normalize_gemini_model(model)
         client_with_model = llm_client.with_model(provider, model_name)
         # Wrap plain text into a minimal message object to satisfy library expectations
         user_msg_obj = _SimpleUserMessage(text=user_message)
