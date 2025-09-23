@@ -60,6 +60,8 @@ workflows:
           # Verify
           node -e "console.log('expo=', require('expo/package.json').version); console.log('router=', require('expo-router/package.json').version)"
           test -f babel.config.js || (echo "Missing frontend/babel.config.js" && exit 1)
+          # Fix: remove deprecated expo-router/babel plugin if present
+          node -e "const fs=require('fs'); const p='babel.config.js'; let t=fs.readFileSync(p,'utf8'); if(t.includes('expo-router/babel')){ t=t.replace(/\s*require\.resolve\('expo-router\/babel'\),?/,''); t=t.replace(/['\"]expo-router\/babel['\"],?/,''); fs.writeFileSync(p,t); console.log('Removed expo-router/babel plugin'); } else { console.log('No expo-router/babel plugin to remove'); }"
       - name: Expo prebuild (Android)
         script: |
           export CI=1
