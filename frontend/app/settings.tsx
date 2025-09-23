@@ -271,7 +271,147 @@ export default function SettingsScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        {/* Language */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={{ color: colors.text, fontWeight: '700', marginBottom: 8 }}>{state.language==='de'?'Sprache':(state.language==='pl'?'Język':'Language')}</Text>
+          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => state.setLanguage('de')} accessibilityLabel='Deutsch' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='de'?colors.primary:colors.muted }}>
+              <FlagDE width={40} height={26} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => state.setLanguage('en')} accessibilityLabel='English' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='en'?colors.primary:colors.muted }}>
+              <FlagUK width={40} height={26} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => state.setLanguage('pl')} accessibilityLabel='Polski' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='pl'?colors.primary:colors.muted }}>
+              <FlagPL width={40} height={26} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Theme */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Theme':(state.language==='pl'?'Motyw':'Theme')}</Text>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Wähle ein App-Theme. „Golden Pink“ ab Level 75.':(state.language==='pl'?'Wybierz motyw aplikacji. „Golden Pink” od poziomu 75.':'Choose an app theme. "Golden Pink" unlocks at level 75.')}</Text>
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+            {(['pink_default','pink_pastel','pink_vibrant','golden_pink'] as const).map((t) => (
+              <TouchableOpacity key={t} onPress={() => state.setTheme(t)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: state.theme===t?colors.primary:'transparent' }]}>
+                <Text style={{ color: state.theme===t?'#fff':colors.text }}>{themeLabel(t, state.language as any)}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Quick link: Profil */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='person-circle' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'Profil':(state.language==='pl'?'Profil':'Profile')}</Text>
+            </View>
+            <TouchableOpacity onPress={() => router.push('/profile')} style={[styles.badge, { borderColor: colors.muted }]}>
+              <Text style={{ color: colors.text }}>{state.language==='de'?'Öffnen':(state.language==='pl'?'Otwórz':'Open')}</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Avatar, persönliche Daten und BMI verwalten.':(state.language==='pl'?'Zarządzaj avatarem, danymi i BMI.':'Manage avatar, personal data and BMI.')}</Text>
+        </View>
+
+        {/* Drinks settings */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='cafe' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'Trinken':(state.language==='pl'?'Napoje':'Drinks')}</Text>
+          </View>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Bechergröße für Wasser (ml). Fortschrittsbalken berechnet Tagesziel automatisch aus Gewicht (35 ml/kg) und +500 ml bei Sport.':(state.language==='pl'?'Rozmiar kubka wody (ml). Pasek postępu oblicza cel dzienny automatycznie z wagi (35 ml/kg) i +500 ml przy sporcie.':'Cup size for water (ml). Progress bar computes daily target automatically from weight (35 ml/kg) and +500 ml if sport.')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+            <Text style={{ color: colors.text, width: 160 }}>{state.language==='de'?'Bechergröße':(state.language==='pl'?'Rozmiar kubka':'Cup size')}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+              <TextInput keyboardType='number-pad' value={cupInput} onChangeText={setCupInput} onBlur={() => { const n = parseInt((cupInput||'').replace(/[^0-9]/g,'' )||'0',10); const v = Math.max(0, Math.min(1000, isNaN(n)?0:n)); state.setWaterCupMl(v); setCupInput(String(v)); }} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }} />
+              <Text style={{ color: colors.muted, marginLeft: 8 }}>ml</Text>
+            </View>
+          </View>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Bereich: 0–1000 ml.':(state.language==='pl'?'Zakres: 0–1000 ml.':'Range: 0–1000 ml.')}</Text>
+        </View>
+
+        {/* Reminders */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Erinnerungen':(state.language==='pl'?'Przypomnienia':'Reminders')}</Text>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <TouchableOpacity onPress={seedDefaults} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{state.language==='de'?'Standard anlegen':(state.language==='pl'?'Utwórz domyślne':'Seed defaults')}</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => setCustomMode((v)=>!v)} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{state.language==='de'?'Eigene':(state.language==='pl'?'Własne':'Custom')}</Text></TouchableOpacity>
+            </View>
+          </View>
+          {customMode ? (
+            <View style={{ marginTop: 10 }}>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <TextInput placeholder={state.language==='de'?'Label':(state.language==='pl'?'Etykieta':'Label')} placeholderTextColor={colors.muted} value={customLabel} onChangeText={setCustomLabel} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }} />
+                <View style={{ width: 100 }}>
+                  <TimePicker
+                    time={customTime}
+                    onTimeChange={setCustomTime}
+                    colors={colors}
+                    style={{ borderWidth: 1, borderColor: colors.muted, borderRadius: 8, backgroundColor: colors.input }}
+                  />
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+                <TouchableOpacity onPress={() => { setCustomMode(false); setCustomLabel(''); setCustomTime('08:00'); }} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{state.language==='de'?'Abbrechen':(state.language==='pl'?'Anuluj':'Cancel')}</Text></TouchableOpacity>
+                <TouchableOpacity onPress={saveCustomReminder} style={[styles.badge, { borderColor: colors.muted, backgroundColor: colors.primary }]}><Text style={{ color: '#fff' }}>{state.language==='de'?'Speichern':(state.language==='pl'?'Zapisz':'Save')}</Text></TouchableOpacity>
+              </View>
+            </View>
+          ) : null}
+          {sortedReminders.length === 0 ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Keine Erinnerungen angelegt.':(state.language==='pl'?'Brak przypomnień.':'No reminders yet.')}</Text>) : null}
+          {sortedReminders.map((r) => (
+            <View key={r.id} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>
+                  {reminderLabel(r.type, state.language as any, r.label)}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+                  <View style={{ flex: 1 }}>
+                    <TimePicker
+                      time={reminderTimes[r.id] || '08:00'}
+                      onTimeChange={(str) => updateTime(r.id, str)}
+                      colors={colors}
+                      style={{ width: 120, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, backgroundColor: colors.input }}
+                    />
+                  </View>
+                  <View style={{ width: 8 }} />
+                  <Switch value={r.enabled} onValueChange={(v)=>toggleReminder(r.id, v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} />
+                </View>
+              </View>
+              <TouchableOpacity onPress={async ()=>{ const meta = state.notificationMeta[r.id]; if (meta?.id) await cancelNotification(meta.id); state.deleteReminder(r.id); }} style={{ padding: 8 }}>
+                <Ionicons name='trash' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
+        {/* KI Insights */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='sparkles' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'KI‑Insights':(state.language==='pl'?'Wskazówki KI':'AI insights')}</Text>
+            </View>
+            <Switch value={state.aiInsightsEnabled} onValueChange={(v)=> state.setAiInsightsEnabled(v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} />
+          </View>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Aktiviert kurze, lokale Tipps im Chat und in Analysen.':(state.language==='pl'?'Aktywuje krótkie, lokalne wskazówki na czacie i w analizach.':'Enables short, local tips in chat and analyses.')}</Text>
+        </View>
+
+        {/* Wöchentliche Events */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='calendar' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'Wöchentliche Events':(state.language==='pl'?'Wydarzenia tygodniowe':'Weekly events')}</Text>
+            </View>
+            <Switch value={state.eventsEnabled} onValueChange={(v)=> state.setEventsEnabled(v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} />
+          </View>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Schaltet die wöchentlichen Herausforderungen ein/aus.':(state.language==='pl'?'Włącza/wyłącza cotygodniowe wyzwania.':'Enable/disable weekly challenges.')}</Text>
+        </View>
+
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* Backend URL */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <Text style={{ color: colors.text, fontWeight: '700', marginBottom: 8 }}>Backend URL</Text>
@@ -297,24 +437,24 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Language */}
+        {/* Backup */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700', marginBottom: 8 }}>{state.language==='de'?'Sprache':(state.language==='pl'?'Język':'Language')}</Text>
-          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => state.setLanguage('de')} accessibilityLabel='Deutsch' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='de'?colors.primary:colors.muted }}>
-              <FlagDE width={40} height={26} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => state.setLanguage('en')} accessibilityLabel='English' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='en'?colors.primary:colors.muted }}>
-              <FlagUK width={40} height={26} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => state.setLanguage('pl')} accessibilityLabel='Polski' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='pl'?colors.primary:colors.muted }}>
-              <FlagPL width={40} height={26} />
-            </TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='cloud-upload' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'Backup & Wiederherstellung':(state.language==='pl'?'Kopia zapasowa i przywracanie':'Backup & restore')}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+            <TouchableOpacity onPress={exportData} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{state.language==='de'?'Export':(state.language==='pl'?'Eksport':'Export')}</Text></TouchableOpacity>
+            <TouchableOpacity onPress={importData} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{state.language==='de'?'Import':(state.language==='pl'?'Import':'Import')}</Text></TouchableOpacity>
           </View>
         </View>
 
-        {/* ... rest unchanged ... */}
-
+        {/* App info */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'App':(state.language==='pl'?'Aplikacja':'App')}</Text>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Version':(state.language==='pl'?'Wersja':'Version')}: {version}</Text>
+          <Text style={{ color: colors.muted, marginTop: 2 }}>created by Gugi</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
