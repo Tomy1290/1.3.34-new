@@ -1,0 +1,86 @@
+workflows:
+  android-apk:
+    name: Android APK (Expo prebuild)
+    max_build_duration: 60
+    environment:
+      vars:
+        NODE_VERSION: 20
+        CI: 1
+        EXPO_NO_TELEMETRY: 1
+      node: 20
+      java: 17
+      xcode: 15.1
+    cache:
+      cache_paths:
+        - ~/.gradle/caches
+        - ~/.gradle/wrapper
+        - $CM_BUILD_DIR/frontend/node_modules
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: ".*"
+          include: true
+          source: true
+    scripts:
+      - name: Show environment
+        script: |
+          node -v
+          npm -v || true
+          yarn -v || true
+          java -version
+          echo "Working dir: $CM_BUILD_DIR"
+          ls -la
+          echo "Frontend dir contents:" && ls -la frontend
+      - name: Clean caches (Metro & Gradle)
+        script: |
+          cd frontend
+          rm -rf .metro-cache || true
+          rm -rf node_modules/.cache || true
+          cd android
+          ./gradlew clean --no-daemon || true
+      - name: Install dependencies (force expo if missing)
+        script: |
+          cd frontend
+          corepack enable || true
+          rm -f package-lock.json
+          if [ -f yarn.lock ]; then
+            yarn install --non-interactive --frozen-lockfile || yarn install --non-interactive
+          else
+            npm ci || npm i
+          fi
+          # Force install critical deps if resolver doesn't find them
+          node -e "require.resolve('expo/package.json')" 2>/dev/null || yarn add expo@~53.0.22 --exact
+          node -e "require.resolve('expo-router/package.json')" 2>/dev/null || yarn add expo-router@~5.1.6 --exact
+          node -e "require.resolve('react-native/package.json')" 2>/dev/null || yarn add react-native@0.79.5 --exact
+          node -e "require.resolve('react-native-reanimated/package.json')" 2>/dev/null || yarn add react-native-reanimated@~3.17.4 --exact
+          # Re-run install to ensure lockfile consistency and peer deps
+          yarn install --non-interactive --frozen-lockfile || true
+          # Verify
+          node -e "console.log('expo=', require('expo/package.json').version); console.log('router=', require('expo-router/package.json').version)"
+          test -f babel.config.js || (echo "Missing frontend/babel.config.js" && exit 1)
+      - name: Expo prebuild (Android)
+        script: |
+          export CI=1
+          cd frontend
+          npx --yes expo@latest prebuild --platform android --clean
+      - name: Build APK (with logs)
+        script: |
+          set -o pipefail
+          cd frontend/android
+          ./gradlew assembleRelease --no-daemon --stacktrace --info | tee gradle-build.log
+          echo "Problems report (if any):"
+          if [ -f build/reports/problems/problems-report.html ]; then
+            ls -la build/reports/problems
+          fi
+    artifacts:
+      - frontend/android/app/build/outputs/apk/release/*.apk
+      - frontend/android/gradle-build.log
+    publishing:
+      email:
+        recipients:
+          - thomas1290@gmx.net
+        notify:
+          success: true
+          failure: true
