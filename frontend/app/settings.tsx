@@ -411,7 +411,7 @@ export default function SettingsScreen() {
           <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Schaltet die wöchentlichen Herausforderungen ein/aus.':(state.language==='pl'?'Włącza/wyłącza cotygodniowe wyzwania.':'Enable/disable weekly challenges.')}</Text>
         </View>
 
-        <View style={{ padding: 16, gap: 12 }}>
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* Backend URL */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <Text style={{ color: colors.text, fontWeight: '700', marginBottom: 8 }}>Backend URL</Text>
