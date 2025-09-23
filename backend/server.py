@@ -164,7 +164,9 @@ async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
         provider = 'google'
         model_name = model or 'gemini-1.5-flash'
         client_with_model = llm_client.with_model(provider, model_name)
-        resp = await client_with_model.send_message(user_message)
+        # Wrap plain text into a minimal message object to satisfy library expectations
+        user_msg_obj = _SimpleUserMessage(text=user_message)
+        resp = await client_with_model.send_message(user_msg_obj)
         
         logger.info(f"LLM response type: {type(resp)}, content: {str(resp)[:100]}...")
         
