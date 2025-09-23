@@ -140,6 +140,23 @@ SYSTEM_PROMPT_PL = (
 )
 
 
+# Normalize/Map incoming model names to supported Gemini models
+_SUPPORTED_GEMINI = {
+    'gemini-2.0-flash': 'gemini-2.0-flash',
+    'gemini-1.5-flash': 'gemini-2.0-flash',
+    'flash': 'gemini-2.0-flash',
+    'default': 'gemini-2.0-flash',
+    '': 'gemini-2.0-flash',
+    None: 'gemini-2.0-flash',
+}
+
+def _normalize_gemini_model(name: Optional[str]) -> str:
+    try:
+        return _SUPPORTED_GEMINI.get(name, 'gemini-2.0-flash')
+    except Exception:
+        return 'gemini-2.0-flash'
+
+
 # Minimal message wrapper to satisfy emergentintegrations expectations
 class _SimpleUserMessage:
     def __init__(self, text: str, file_contents=None):
