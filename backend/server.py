@@ -185,7 +185,7 @@ async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
 async def chat(req: ChatRequest):
     lang = req.language or 'de'
     # default to gemini flash if not provided
-    model = req.model or 'gemini-1.5-flash'
+    model = req.model or 'gemini-2.0-flash'
     system = SYSTEM_PROMPT_DE if lang=='de' else (SYSTEM_PROMPT_PL if lang=='pl' else SYSTEM_PROMPT_EN)
 
     # Build base messages
