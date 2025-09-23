@@ -56,6 +56,11 @@ else:
 # Create the main app without a prefix
 app = FastAPI()
 
+# Root route to help health checks and human checks
+@app.get("/")
+async def root_ok():
+    return {"status": "ok", "service": "backend", "docs": "/docs", "api": "/api/"}
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
@@ -75,6 +80,8 @@ async def root():
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database not configured")
     status_dict = input.dict()
     status_obj = StatusCheck(**status_dict)
     _ = await db.status_checks.insert_one(status_obj.dict())
@@ -82,8 +89,21 @@ async def create_status_check(input: StatusCheckCreate):
 
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database not configured")
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
+
+# DB health endpoint
+@api_router.get("/health/db")
+async def health_db():
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database not configured")
+    try:
+        await db.command("ping")
+        return {"connected": True}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Database ping failed: {e}")
 
 # ====== Gugi AI (LLM-Light via Emergent) ======
 class ChatMessage(BaseModel):
@@ -93,7 +113,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     mode: Literal['greeting','chat'] = 'chat'
     language: Literal['de','en','pl'] = 'de'
-    model: Optional[str] = None  # e.g., 'gpt-4o-mini'
+    model: Optional[str] = None  # e.g., 'gemini-1.5-flash'
     summary: Optional[Dict[str, Any]] = None
     messages: Optional[List[ChatMessage]] = None
 
@@ -132,8 +152,10 @@ async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
         user_message = messages[-1].get('content', '') if messages else ''
         logger.info(f"Sending message to LLM: {user_message[:50]}...")
         
-        # Use the OpenAI LlmChat with provider, model and async send_message
-        client_with_model = llm_client.with_model('openai', model)
+        # Switch to Google Gemini Flash as requested
+        provider = 'google'
+        model_name = model or 'gemini-1.5-flash'
+        client_with_model = llm_client.with_model(provider, model_name)
         resp = await client_with_model.send_message(user_message)
         
         logger.info(f"LLM response type: {type(resp)}, content: {str(resp)[:100]}...")
@@ -152,7 +174,8 @@ async def _call_llm(messages: List[Dict[str,str]], model: str) -> str:
 @api_router.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
     lang = req.language or 'de'
-    model = req.model or 'gpt-4o-mini'
+    # default to gemini flash if not provided
+    model = req.model or 'gemini-1.5-flash'
     system = SYSTEM_PROMPT_DE if lang=='de' else (SYSTEM_PROMPT_PL if lang=='pl' else SYSTEM_PROMPT_EN)
 
     # Build base messages
@@ -191,4 +214,5 @@ app.add_middleware(
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    if client:
+        client.close()
