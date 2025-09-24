@@ -38,6 +38,8 @@ const en = {
     after: "After",
     notCompleted: "Not completed",
     response: "Response:",
+    showMore: "Show more",
+    showLess: "Show less",
   },
   settings: {
     title: "Settings",
@@ -125,6 +127,22 @@ const en = {
     sport: "Sport",
     levelUp: "Level {level}",
     newAchievement: "New achievement!",
+  },
+  achievements: {
+    title: "Achievements",
+    search: "Search…",
+    filter: "Filter",
+    filters: { all: "All", progress: "In progress", done: "Done" },
+    completed: "Completed",
+    step: "Step {step}/{total}",
+    unlocks: {
+      title: "Unlocks",
+      extStats: "Extended stats (Level {level})",
+      premiumInsights: "Premium Insights (Level {level})",
+      vipChat: "VIP chat (Level {level})",
+      goldenPinkTheme: "Golden Pink Theme (Level {level})",
+      legendaryStatus: "Legendary status (Level {level})"
+    }
   },
   analysis: {
     analysis: "Analysis",

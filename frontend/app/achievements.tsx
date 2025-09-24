@@ -7,6 +7,7 @@ import { useAppStore } from "../src/store/useStore";
 import { computeAchievements, getAchievementConfigById } from "../src/achievements";
 import { BadgeIcon } from "../src/components/BadgeIcon";
 import { computeChains } from "../src/gamification/chains";
+import { useI18n } from "../src/i18n";
 
 function useThemeColors(theme: string) {
   if (theme === "pink_pastel") return { bg: "#fff0f5", card: "#ffe4ef", primary: "#d81b60", text: "#3a2f33", muted: "#8a6b75" };
@@ -19,6 +20,7 @@ export default function AchievementsScreen() {
   const router = useRouter();
   const state = useAppStore();
   const colors = useThemeColors(state.theme);
+  const t = useI18n();
   const [filter, setFilter] = useState<'all'|'progress'|'done'>('all');
   const [query, setQuery] = useState("");
 
@@ -40,7 +42,6 @@ export default function AchievementsScreen() {
     let arr = chainsRaw;
     if (filter === 'progress') arr = arr.filter(c => c.completed < c.total);
     if (filter === 'done') arr = arr.filter(c => c.completed >= c.total);
-    // sort by progress (descending), completed chains sent to bottom by default unless filtering done
     const sorted = [...arr].sort((a,b) => {
       const aDone = a.completed >= a.total; const bDone = b.completed >= b.total;
       if (aDone && !bDone) return 1; if (!aDone && bDone) return -1;
@@ -55,36 +56,46 @@ export default function AchievementsScreen() {
   const [showChains, setShowChains] = useState(false);
   const [showUnlocks, setShowUnlocks] = useState(false);
 
-  const appTitle = state.language === 'en' ? "Scarlett’s Health Tracking" : (state.language==='pl'? 'Zdrowie Scarlett' : 'Scarletts Gesundheitstracking');
+  const appTitle = t('common.appTitle');
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}> 
-        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={state.language==='de'?'Zurück':'Back'}>
+      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={{ alignItems: 'center' }}>
           <Text style={[styles.appTitle, { color: colors.text }]}>{appTitle}</Text>
-          <Text style={[styles.title, { color: colors.muted }]}>{state.language==='de'?'Erfolge':'Achievements'}</Text>
+          <Text style={[styles.title, { color: colors.muted }]}>{t('achievements.title')}</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* Search & filters at top */}
-        <TextInput placeholder={state.language==='de'?"Suchen…":"Search…"} placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} style={[styles.input, { borderColor: colors.muted, color: colors.text }]} />
+        <TextInput
+          placeholder={t('achievements.search')}
+          placeholderTextColor={colors.muted}
+          value={query}
+          onChangeText={setQuery}
+          style={[styles.input, { borderColor: colors.muted, color: colors.text }]} />
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {(['all','progress','done'] as const).map((f) => (
-            <TouchableOpacity key={f} onPress={() => setFilter(f)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: filter===f ? colors.primary : 'transparent' }]} accessibilityLabel={`Filter ${f}`}>
-              <Text style={{ color: filter===f ? '#fff' : colors.text }}>{f==='all'?(state.language==='de'?'Alle':(state.language==='pl'?'Wszystkie':'All')):f==='progress'?(state.language==='de'?'In Arbeit':(state.language==='pl'?'W trakcie':'In progress')):(state.language==='de'?'Erreicht':(state.language==='pl'?'Zdobyte':'Done'))}</Text>
+            <TouchableOpacity
+              key={f}
+              onPress={() => setFilter(f)}
+              style={[styles.badge, { borderColor: colors.muted, backgroundColor: filter===f ? colors.primary : 'transparent' }]}
+              accessibilityLabel={`${t('achievements.filter')} ${t(`achievements.filters.${f}`)}`}
+            >
+              <Text style={{ color: filter===f ? '#fff' : colors.text }}>{t(`achievements.filters.${f}`)}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Achievements list – collapsible, show first 3 by default */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Erfolge':'Achievements'}</Text>
+            <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.title')}</Text>
             <TouchableOpacity onPress={() => setShowAch(v=>!v)}>
               <Ionicons name={showAch?'chevron-up':'chevron-down'} size={18} color={colors.muted} />
             </TouchableOpacity>
@@ -103,22 +114,22 @@ export default function AchievementsScreen() {
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                   <Ionicons name={a.completed ? 'trophy' : 'medal'} size={18} color={a.completed ? colors.primary : colors.muted} />
-                  <Text style={{ color: colors.text }}>{a.xp} XP</Text>
+                  <Text style={{ color: colors.text }}>{a.xp} {t('common.xp')}</Text>
                 </View>
               </TouchableOpacity>
             );
           })}
           {filtered.length > 3 ? (
             <TouchableOpacity onPress={() => setShowAch(v=>!v)} style={{ alignSelf: 'center', marginTop: 6 }}>
-              <Text style={{ color: colors.primary }}>{showAch ? (state.language==='de'?'Weniger anzeigen':(state.language==='pl'?'Pokaż mniej':'Show less')) : (state.language==='de'?'Mehr anzeigen':(state.language==='pl'?'Pokaż więcej':'Show more'))}</Text>
+              <Text style={{ color: colors.primary }}>{showAch ? t('common.showLess') : t('common.showMore')}</Text>
             </TouchableOpacity>
           ) : null}
         </View>
 
         {/* Chains – collapsible, first 3; filter and sort by progress */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Ketten':'Chains'}</Text>
+            <Text style={{ color: colors.text, fontWeight: '700' }}>{t('index.chainsTitle')}</Text>
             <TouchableOpacity onPress={() => setShowChains(v=>!v)}>
               <Ionicons name={showChains?'chevron-up':'chevron-down'} size={18} color={colors.muted} />
             </TouchableOpacity>
@@ -126,30 +137,31 @@ export default function AchievementsScreen() {
           {(showChains ? chains : chains.slice(0,3)).map((c) => {
             const done = c.completed >= c.total;
             const pct = done ? 100 : Math.round(c.nextPercent);
+            const statusText = done ? t('achievements.completed') : t('achievements.step', { step: c.completed + 1, total: c.total });
             return (
               <View key={c.id} style={{ marginTop: 8 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ color: colors.text }}>{c.title} {done ? '· '+(state.language==='de'?'Abgeschlossen':(state.language==='pl'?'Ukończone':'Completed')) : `· ${(state.language==='de'?'Schritt':(state.language==='pl'?'Krok':'Step'))} ${c.completed+1}/${c.total}`}</Text>
+                  <Text style={{ color: colors.text }}>{c.title} · {statusText}</Text>
                   <Text style={{ color: colors.muted }}>{pct}%</Text>
                 </View>
                 <View style={{ height: 6, backgroundColor: colors.bg, borderRadius: 3, overflow: 'hidden', marginTop: 4 }}>
                   <View style={{ width: `${pct}%`, height: 6, backgroundColor: done ? '#2bb673' : colors.primary }} />
                 </View>
-                {!done && c.nextTitle ? <Text style={{ color: colors.muted, marginTop: 4 }}>{state.language==='de'?'Als Nächstes':(state.language==='pl'?'Następne':'Next')}: {c.nextTitle}</Text> : null}
+                {!done && c.nextTitle ? <Text style={{ color: colors.muted, marginTop: 4 }}>{t('index.next')}: {c.nextTitle}</Text> : null}
               </View>
             );
           })}
           {chains.length > 3 ? (
             <TouchableOpacity onPress={() => setShowChains(v=>!v)} style={{ alignSelf: 'center', marginTop: 6 }}>
-              <Text style={{ color: colors.primary }}>{showChains ? (state.language==='de'?'Weniger anzeigen':(state.language==='pl'?'Pokaż mniej':'Show less')) : (state.language==='de'?'Mehr anzeigen':(state.language==='pl'?'Pokaż więcej':'Show more'))}</Text>
+              <Text style={{ color: colors.primary }}>{showChains ? t('common.showLess') : t('common.showMore')}</Text>
             </TouchableOpacity>
           ) : null}
         </View>
 
-        {/* Unlock previews – collapsible, order with L25 before L50 */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+        {/* Unlock previews – collapsible */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Freischaltungen':'Unlocks'}</Text>
+            <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.unlocks.title')}</Text>
             <TouchableOpacity onPress={() => setShowUnlocks(v=>!v)}>
               <Ionicons name={showUnlocks?'chevron-up':'chevron-down'} size={18} color={colors.muted} />
             </TouchableOpacity>
@@ -157,26 +169,26 @@ export default function AchievementsScreen() {
           {showUnlocks ? (
             <>
               <View style={{ marginTop: 6 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Erweiterte Statistiken':'Extended stats'} (Level 10)</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.unlocks.extStats', { level: 10 })}</Text>
               </View>
               <View style={{ marginTop: 6 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>Premium Insights (Level 25)</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.unlocks.premiumInsights', { level: 25 })}</Text>
               </View>
               <View style={{ marginTop: 6 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>VIP-Chat (Level 50)</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.unlocks.vipChat', { level: 50 })}</Text>
               </View>
               <View style={{ marginTop: 6 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>Golden Pink Theme (Level 75)</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.unlocks.goldenPinkTheme', { level: 75 })}</Text>
               </View>
               <View style={{ marginTop: 6 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Legendärer Status':'Legendary status'} (Level 100)</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.unlocks.legendaryStatus', { level: 100 })}</Text>
               </View>
             </>
           ) : (
             <>
-              <Text style={{ color: colors.text, marginTop: 6 }}>• {state.language==='de'?'Erweiterte Statistiken':'Extended stats'} (Level 10)</Text>
-              <Text style={{ color: colors.text, marginTop: 6 }}>• Premium Insights (Level 25)</Text>
-              <Text style={{ color: colors.text, marginTop: 6 }}>• VIP-Chat (Level 50)</Text>
+              <Text style={{ color: colors.text, marginTop: 6 }}>• {t('achievements.unlocks.extStats', { level: 10 })}</Text>
+              <Text style={{ color: colors.text, marginTop: 6 }}>• {t('achievements.unlocks.premiumInsights', { level: 25 })}</Text>
+              <Text style={{ color: colors.text, marginTop: 6 }}>• {t('achievements.unlocks.vipChat', { level: 50 })}</Text>
             </>
           )}
         </View>

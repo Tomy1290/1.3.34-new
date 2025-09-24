@@ -38,6 +38,8 @@ const pl = {
     after: "Po",
     notCompleted: "Nieukończone",
     response: "Odpowiedź:",
+    showMore: "Pokaż więcej",
+    showLess: "Pokaż mniej",
   },
   settings: {
     title: "Ustawienia",
@@ -125,6 +127,22 @@ const pl = {
     sport: "Sport",
     levelUp: "Poziom {level}",
     newAchievement: "Nowe osiągnięcie!",
+  },
+  achievements: {
+    title: "Osiągnięcia",
+    search: "Szukaj…",
+    filter: "Filtr",
+    filters: { all: "Wszystkie", progress: "W trakcie", done: "Zdobyte" },
+    completed: "Ukończone",
+    step: "Krok {step}/{total}",
+    unlocks: {
+      title: "Odblokowania",
+      extStats: "Rozszerzone statystyki (Poziom {level})",
+      premiumInsights: "Premium Insights (Poziom {level})",
+      vipChat: "VIP czat (Poziom {level})",
+      goldenPinkTheme: "Motyw Golden Pink (Poziom {level})",
+      legendaryStatus: "Legendarny status (Poziom {level})"
+    }
   },
   analysis: {
     analysis: "Analiza",
