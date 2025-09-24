@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useAppStore } from '../src/store/useStore';
 import { LineChart } from 'react-native-gifted-charts';
 import { toKey } from '../src/utils/date';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 function useThemeColors(theme: string) {
   if (theme === 'pink_pastel') return { bg: '#fff0f5', card: '#ffe4ef', primary: '#d81b60', text: '#3a2f33', muted: '#8a6b75' };
@@ -29,6 +30,8 @@ export default function GoalsScreen() {
 
   const [targetWInput, setTargetWInput] = useState(state.goal?.targetWeight ? String(state.goal.targetWeight) : (lastW?String(lastW):''));
   const [targetDateInput, setTargetDateInput] = useState(state.goal?.targetDate || '');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const selectedTargetDate = useMemo(() => { try { return targetDateInput ? new Date(targetDateInput) : null; } catch { return null; } }, [targetDateInput]);
 
   const effectiveStartDateKey = state.goal?.startDate || (firstDate ? toKey(firstDate) : toKey(new Date()));
   const effectiveStartDate = useMemo(()=> { const [y,m,d] = effectiveStartDateKey.split('-').map(n=>parseInt(n,10)); return new Date(y, m-1, d); }, [effectiveStartDateKey]);
@@ -316,8 +319,19 @@ export default function GoalsScreen() {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
             <Text style={{ color: colors.text, width: 120 }}>Zieldatum</Text>
-            <TextInput value={targetDateInput} onChangeText={setTargetDateInput} placeholder='YYYY-MM-DD' placeholderTextColor={colors.muted} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text }} />
+            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: colors.text }}>{selectedTargetDate ? selectedTargetDate.toLocaleDateString() : 'Datum wählen'}</Text>
+              <Ionicons name='calendar' size={18} color={colors.muted} />
+            </TouchableOpacity>
           </View>
+          {showDatePicker ? (
+            <DateTimePicker
+              value={selectedTargetDate || new Date()}
+              mode='date'
+              display='calendar'
+              onChange={(e, d) => { setShowDatePicker(false); if (d) setTargetDateInput(toKey(d)); }}
+            />
+          ) : null}
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
             {state.goal ? (
               <TouchableOpacity onPress={()=> state.removeGoal()} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted }}>
@@ -535,7 +549,7 @@ export default function GoalsScreen() {
                             <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
                             <Text style={{ color: colors.text }}>Soll: {typeof soll==='number'? soll.toFixed(1): '—'} kg</Text>
                           </View>
-                          <Text style={{ color: colors.muted, marginTop: 4 }}>Band (±1σ): {typeof low==='number' &amp;&amp; typeof up==='number' ? `${low.toFixed(1)}–${up.toFixed(1)} kg` : '—'}</Text>
+                          <Text style={{ color: colors.muted, marginTop: 4 }}>Band (±1σ): {typeof low==='number' && typeof up==='number' ? `${low.toFixed(1)}–${up.toFixed(1)} kg` : '—'}</Text>
                         </View>
                       );
                     } catch { return <View />; }
@@ -565,7 +579,7 @@ export default function GoalsScreen() {
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Ionicons name='bulb' size={18} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Analyse &amp; Kurztipps</Text>
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Analyse & Kurztipps</Text>
           </View>
           {tips.map((t)=> (
             <Text key={t} style={{ color: colors.muted, marginTop: 4 }}>• {t}</Text>
