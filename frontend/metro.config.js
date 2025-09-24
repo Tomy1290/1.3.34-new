@@ -22,4 +22,20 @@ config.cacheStores = [
 // Reduce the number of workers to decrease resource usage
 config.maxWorkers = 2;
 
+// Aliases for problematic native deps without installing them
+const ALIASES = {
+  "react-native-linear-gradient": path.join(__dirname, "src/shims/LinearGradientShim.tsx"),
+  "@react-native-masked-view/masked-view": path.join(__dirname, "src/shims/MaskedViewShim.tsx"),
+};
+
+const originalResolveRequest = config.resolver?.resolveRequest;
+config.resolver = config.resolver || {};
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const redirected = ALIASES[moduleName] || moduleName;
+  if (originalResolveRequest) {
+    return originalResolveRequest(context, redirected, platform);
+  }
+  return context.resolveRequest(context, redirected, platform);
+};
+
 module.exports = config;
