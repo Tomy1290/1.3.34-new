@@ -97,8 +97,6 @@ export default function GalleryScreen() {
     .onEnd(() => { /* keep scale */ });
   const imageStyle = useAnimatedStyle(() => ({ transform: [{ scale: scaleSv.value }] }));
 
-  const daysWithPhotosSet = new Set(Object.keys(state.gallery));
-
   // A/B compare
   const photosDays = Object.keys(state.gallery).sort();
   const [aDay, setADay] = useState<string | undefined>(undefined);
@@ -119,7 +117,7 @@ export default function GalleryScreen() {
             <Text style={{ color: colors.text, fontWeight: '800', marginHorizontal: 6 }}>{state.language==='de'?'Galerie':(state.language==='pl'?'Galeria':'Gallery')}</Text>
             <Ionicons name='star' size={16} color={colors.primary} />
           </View>
-          <Text style={{ color: colors.muted, marginTop: 2 }}>{state.language==='de'?'Fotos vergleichen & Meilensteine':(state.language==='pl'?'Porównuj zdjęcia i kamienie milowe':'Compare photos & milestones')}</Text>
+          <Text style={{ color: colors.muted, marginTop: 2 }}>{state.language==='de'?'Fotos vergleichen &amp; Meilensteine':(state.language==='pl'?'Porównuj zdjęcia i kamienie milowe':'Compare photos &amp; milestones')}</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
@@ -128,7 +126,10 @@ export default function GalleryScreen() {
         {/* Info */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>Info</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='information-circle' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Info</Text>
+            </View>
             <TouchableOpacity onPress={()=> setInfo(v=>!v)}>
               <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
             </TouchableOpacity>
@@ -170,13 +171,13 @@ export default function GalleryScreen() {
                   {blanks.map((_, i) => (<View key={`b${i}`} style={{ width: `${100/7}%`, height: 44 }} />))}
                   {days.map((dayDate, i) => {
                     const key = toKey(dayDate);
-                    const has = daysWithPhotosSet.has(key);
-                    const isFuture = +dayDate > +new Date();
+                    const has = ((state.gallery[key]||[]).length &gt; 0);
+                    const isFuture = +dayDate &gt; +new Date();
                     const selected = key === selectedDateKey;
                     const onDayPress = () => {
                       setSelectedDateKey(key);
                       if (compareMode === 'selectingA') { setADay(key); setCompareMode('selectingB'); }
-                      else if (compareMode === 'selectingB') { if (aDay && key === aDay) return; setBDay(key); setCompareMode('show'); }
+                      else if (compareMode === 'selectingB') { if (aDay &amp;&amp; key === aDay) return; setBDay(key); setCompareMode('show'); }
                     };
                     return (
                       <TouchableOpacity key={key} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={onDayPress} accessibilityLabel={`Tag ${key}`}>
@@ -195,7 +196,7 @@ export default function GalleryScreen() {
           {/* Compare controls under calendar */}
           <View style={{ marginTop: 10 }}>
             {compareMode === 'idle' ? (
-              <TouchableOpacity disabled={Object.keys(state.gallery).length < 2} onPress={() => { setADay(undefined); setBDay(undefined); setAIdx(0); setBIdx(0); setCompareMode('selectingA'); }} style={{ alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: colors.primary, opacity: Object.keys(state.gallery).length < 2 ? 0.5 : 1 }}>
+              <TouchableOpacity disabled={Object.keys(state.gallery).length &lt; 2} onPress={() => { setADay(undefined); setBDay(undefined); setAIdx(0); setBIdx(0); setCompareMode('selectingA'); }} style={{ alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: colors.primary, opacity: Object.keys(state.gallery).length &lt; 2 ? 0.5 : 1 }}>
                 <Text style={{ color: colors.text }}>{state.language==='de'?'Vergleich starten':'Start compare'}</Text>
               </TouchableOpacity>
             ) : null}
@@ -225,7 +226,10 @@ export default function GalleryScreen() {
         {/* Add photo */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>Fotos ({selectedPhotos.length}/5)</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='images' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Fotos ({selectedPhotos.length}/5)</Text>
+            </View>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <TouchableOpacity onPress={()=> addPhoto('camera')} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.muted }}>
                 <Text style={{ color: colors.text }}>Kamera</Text>
@@ -258,7 +262,10 @@ export default function GalleryScreen() {
 
         {/* Stats under calendar */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={{ color: colors.text, fontWeight: '700' }}>Statistik</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='stats-chart' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Statistik</Text>
+          </View>
           <Text style={{ color: colors.muted, marginTop: 6 }}>Erstes Foto vom: {firstPhotoDate || '—'}</Text>
           <Text style={{ color: colors.muted, marginTop: 2 }}>Letztes Foto vom: {lastPhotoDate || '—'}</Text>
           <View style={{ marginTop: 6 }}>
@@ -271,7 +278,7 @@ export default function GalleryScreen() {
         {/* A/B compare */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Vorher/Nachher':'Before/After'}</Text>
-          {photosDays.length<1 ? (
+          {photosDays.length&lt;1 ? (
             <Text style={{ color: colors.muted, marginTop: 6 }}>Zu wenige Daten</Text>
           ) : (
             <View style={{ marginTop: 6 }}>
@@ -315,12 +322,12 @@ export default function GalleryScreen() {
 
               <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'space-between' }}>
                 <View style={{ flex: 1, alignItems: 'center' }}>
-                  {aDay && (state.gallery[aDay]||[])[aIdx] ? (
+                  {aDay &amp;&amp; (state.gallery[aDay]||[])[aIdx] ? (
                     <Image source={{ uri: (state.gallery[aDay]||[])[aIdx].base64 }} style={{ width: '100%', height: 260, borderRadius: 8 }} resizeMode='cover' />
                   ) : <Text style={{ color: colors.muted }}>{state.language==='de'?'Vorher —':'Before —'}</Text>}
                 </View>
                 <View style={{ flex: 1, alignItems: 'center' }}>
-                  {bDay && (state.gallery[bDay]||[])[bIdx] ? (
+                  {bDay &amp;&amp; (state.gallery[bDay]||[])[bIdx] ? (
                     <Image source={{ uri: (state.gallery[bDay]||[])[bIdx].base64 }} style={{ width: '100%', height: 260, borderRadius: 8 }} resizeMode='cover' />
                   ) : <Text style={{ color: colors.muted }}>{state.language==='de'?'Nachher —':'After —'}</Text>}
                 </View>

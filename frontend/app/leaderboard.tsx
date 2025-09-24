@@ -17,7 +17,6 @@ export default function LeaderboardScreen() {
   const router = useRouter();
   const state = useAppStore();
   const colors = useThemeColors(state.theme);
-  const [alias, setAlias] = useState(state.profileAlias || '');
 
   const week = useMemo(() => getWeekRange(new Date()), []);
   const weeklyXp = useMemo(() => {
@@ -25,11 +24,9 @@ export default function LeaderboardScreen() {
     return (state.xpLog||[]).filter(e => e.ts >= start && e.ts <= end).reduce((a,b)=>a+b.amount,0);
   }, [state.xpLog]);
 
-  function saveAlias() {
-    state.setProfileAlias(alias.trim() || '');
-  }
-
   const appTitle = state.language==='en' ? "Scarlett’s Health Tracking" : 'Scarletts Gesundheitstracking';
+
+  const profileName = (state.profile?.name || '').trim();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -45,18 +42,7 @@ export default function LeaderboardScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Profil':'Profile'}</Text>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Alias':'Alias'}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
-            <TextInput value={alias} onChangeText={setAlias} placeholder={state.language==='de'?'Dein Name':'Your name'} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text, borderColor: colors.muted, backgroundColor: colors.input }]} />
-            <TouchableOpacity onPress={saveAlias} style={[styles.primaryBtn, { backgroundColor: colors.primary }]}> 
-              <Ionicons name='save' size={16} color={'#fff'} />
-              <Text style={{ color: '#fff', marginLeft: 6 }}>{state.language==='de'?'Speichern':'Save'}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
+        {/* My points */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Meine Punkte':'My points'}</Text>
           <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Diese Woche':'This week'}: {weeklyXp} XP</Text>
@@ -67,7 +53,7 @@ export default function LeaderboardScreen() {
           <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Bestenliste':'Leaderboard'}</Text>
           <View style={{ marginTop: 6 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 }}>
-              <Text style={{ color: colors.text, fontWeight: '700' }}>{state.profileAlias || (state.language==='de'?'Du':'You')}</Text>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{profileName || (state.language==='de'?'Du':'You')}</Text>
               <Text style={{ color: colors.muted }}>{weeklyXp} XP ({state.language==='de'?'Woche':'Week'}) · {state.xp} XP ({state.language==='de'?'Gesamt':'Total'})</Text>
             </View>
             <Text style={{ color: colors.muted, marginTop: 8 }}>{state.language==='de'?'Offline‑Modus: Nur eigene Werte. Online‑Sync kann später ergänzt werden.':'Offline mode: Only your own stats. Online sync can be added later.'}</Text>
