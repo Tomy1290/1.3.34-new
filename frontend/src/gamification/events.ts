@@ -12,8 +12,9 @@ export type WeeklyEvent = {
 
 export function getWeekRange(date: Date) {
   const d0 = new Date(date);
-  const day = d0.getDay();
-  const start = new Date(d0); start.setDate(d0.getDate() - day); start.setHours(0,0,0,0);
+  // Use Monday as the first day of the week (ISO-like)
+  const weekdayMon0 = (d0.getDay() + 6) % 7; // Mon=0 .. Sun=6
+  const start = new Date(d0); start.setDate(d0.getDate() - weekdayMon0); start.setHours(0,0,0,0);
   const days: string[] = []; for (let i=0;i<7;i++){ const di = new Date(start); di.setDate(start.getDate()+i); days.push(toKey(di)); }
   const year = start.getFullYear();
   const weekIndexInYear = Math.floor(((+start - +new Date(year,0,1)) / (1000*60*60*24)) / 7);

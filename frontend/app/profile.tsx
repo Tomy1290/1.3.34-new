@@ -4,7 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAppStore } from '../src/store/useStore';
+import { toKey } from '../src/utils/date';
 
 function useThemeColors(theme: string) {
   if (theme === 'pink_pastel') return { bg: '#fff0f5', card: '#ffe4ef', primary: '#d81b60', text: '#3a2f33', muted: '#8a6b75', input: '#fff' };
@@ -62,6 +64,17 @@ export default function ProfileScreen() {
       }
     } catch (e) { Alert.alert('Fehler', String(e)); }
   }
+
+  // DOB picker state
+  const [showDob, setShowDob] = useState(false);
+  const dobDate = useMemo(() => {
+    try {
+      const s = state.profile.dob; if (!s) return null;
+      const [y,m,d] = s.split('-').map((n)=>parseInt(n,10));
+      if (!y || !m || !d) return null;
+      return new Date(y, m-1, d);
+    } catch { return null; }
+  }, [state.profile.dob]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -133,16 +146,25 @@ export default function ProfileScreen() {
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Text style={{ color: colors.text, fontWeight: '700' }}>Details</Text>
           <View style={{ marginTop: 8, gap: 8 }}>
+            {/* DOB with DateTimePicker */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ color: colors.text, width: 120 }}>Geburtsdatum</Text>
-              <TextInput
-                placeholder='YYYY-MM-DD'
-                placeholderTextColor={colors.muted}
-                value={state.profile.dob || ''}
-                onChangeText={(v)=> state.setProfile({ dob: v })}
-                style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }}
-              />
+              <TouchableOpacity onPress={() => setShowDob(true)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 10, backgroundColor: colors.input }}>
+                <Ionicons name='calendar' size={16} color={colors.text} />
+                <Text style={{ color: colors.text, marginLeft: 8 }}>{dobDate ? dobDate.toLocaleDateString('de-DE') : 'Wählen'}</Text>
+              </TouchableOpacity>
             </View>
+            {showDob ? (
+              <DateTimePicker
+                value={dobDate || new Date(2000, 0, 1)}
+                mode='date'
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                maximumDate={new Date()}
+                onChange={(e, d) => { setShowDob(false); if (d) state.setProfile({ dob: toKey(d) }); }}
+              />
+            ) : null}
+
+            {/* Gender */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ color: colors.text, width: 120 }}>Geschlecht</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -154,6 +176,7 @@ export default function ProfileScreen() {
                 ))}
               </View>
             </View>
+            {/* Height */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ color: colors.text, width: 120 }}>Größe</Text>
               <TextInput

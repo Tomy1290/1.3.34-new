@@ -294,7 +294,10 @@ export default function GalleryScreen() {
 
         {/* A/B compare */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Vorher/Nachher':'Before/After'}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='swap-horizontal' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'Vorher/Nachher':'Before/After'}</Text>
+          </View>
           {photosDays.length<1 ? (
             <Text style={{ color: colors.muted, marginTop: 6 }}>Zu wenige Daten</Text>
           ) : (

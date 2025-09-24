@@ -24,7 +24,7 @@ export default function AnalysisScreen() {
 
   const weightArrAll = useMemo(() => Object.values(state.days).filter((d) => typeof d.weight === 'number').sort((a, b) => a.date.localeCompare(b.date)), [state.days]);
 
-  const [range, setRange] = useState<'7'|'14'|'30'|'custom'>('14');
+  const [range, setRange] = useState<'7'|'14'|'30'|'month'|'custom'>('14');
   const [from, setFrom] = useState<Date | null>(null);
   const [to, setTo] = useState<Date | null>(null);
   const [showFrom, setShowFrom] = useState(false);
@@ -36,6 +36,10 @@ export default function AnalysisScreen() {
   const weightArr = useMemo(() => {
     if (range === 'custom' && from && to) {
       return weightArrAll.filter(d => { const dt = new Date(d.date); return +dt >= +new Date(from.getFullYear(), from.getMonth(), from.getDate()) && +dt <= +new Date(to.getFullYear(), to.getMonth(), to.getDate()); });
+    }
+    if (range === 'month') {
+      const now = new Date(); const start = new Date(now.getFullYear(), now.getMonth(), 1); const end = new Date(now.getFullYear(), now.getMonth()+1, 0);
+      return weightArrAll.filter(d => { const dt = new Date(d.date); return +dt >= +start && +dt <= +end; });
     }
     const take = parseInt(range, 10);
     return weightArrAll.slice(-take);
@@ -51,7 +55,7 @@ export default function AnalysisScreen() {
   const screenW = Dimensions.get('window').width;
   const chartWidth = Math.max(screenW - 32, weightSeries.length * 44);
 
-  const last14 = useMemo(() => weightArrAll.slice(-14), [weightArrAll]);
+  const lastForInsights = weightArr; // use current selection
 
   // BMI (from profile)
   const heightM = useMemo(() => {
@@ -78,7 +82,7 @@ export default function AnalysisScreen() {
     return { label: 'Adipositas', color: '#F44336' } as const;
   }, [bmi]);
 
-  const t = (key: string) => { const de: Record<string, string> = { analysis: 'Analyse', weight: 'Gewichtsanalyse', app: 'Scarletts Gesundheitstracking', range7: '7 Tage', range14: '14 Tage', range30: '30 Tage', custom: 'Eigener Zeitraum', from: 'Von', to: 'Bis', weight_help: 'Wähle den Zeitraum und betrachte Trends.', insights: 'Premium Insights', insights_help: 'Letzte 14 Einträge mit Tagesdifferenz.', aiultra: 'KI Pro+++ (Zyklus & Korrelationen)', aiultra_help: 'Heatmap nach Zyklustagen und Korrelationen zwischen Metriken.' }; const en: Record<string, string> = { analysis: 'Analysis', weight: 'Weight analysis', app: "Scarlett’s Health Tracking", range7: '7 days', range14: '14 days', range30: '30 days', custom: 'Custom', from: 'From', to: 'To', weight_help: 'Select a range and see trends.', insights: 'Premium Insights', insights_help: 'Last 14 entries with daily difference.', aiultra: 'AI Pro+++ (cycle & correlations)', aiultra_help: 'Heatmap by cycle days and correlations between metrics.' }; return (state.language === 'de' ? de : en)[key] || key; };
+  const t = (key: string) => { const de: Record<string, string> = { analysis: 'Analyse', weight: 'Gewichtsanalyse', app: 'Scarletts Gesundheitstracking', range7: '7 Tage', range14: '14 Tage', range30: '30 Tage', month: 'Akt. Monat', custom: 'Eigener Zeitraum', from: 'Von', to: 'Bis', weight_help: 'Wähle den Zeitraum und betrachte Trends.', insights: 'Premium Insights', insights_help: 'Ausgewählter Zeitraum mit Tagesdifferenz.', aiultra: 'KI Pro+++ (Zyklus & Korrelationen)', aiultra_help: 'Heatmap nach Zyklustagen und Korrelationen zwischen Metriken.' }; const en: Record<string, string> = { analysis: 'Analysis', weight: 'Weight analysis', app: "Scarlett’s Health Tracking", range7: '7 days', range14: '14 days', range30: '30 days', month: 'Current month', custom: 'Custom', from: 'From', to: 'To', weight_help: 'Select a range and see trends.', insights: 'Premium Insights', insights_help: 'Selected range with daily difference.', aiultra: 'AI Pro+++ (cycle & correlations)', aiultra_help: 'Heatmap by cycle days and correlations between metrics.' }; return (state.language === 'de' ? de : en)[key] || key; };
 
   // ===== Pro+++ computations =====
   const cycleHeat = useMemo(() => {
@@ -138,6 +142,13 @@ export default function AnalysisScreen() {
 
   const appTitle = t('app');
 
+  function fmtDiff(n: number) {
+    const s = Math.abs(n).toFixed(1).replace(/\.0$/, '');
+    if (n > 0) return { text: `+${s}`, color: '#E53935' }; // plus red
+    if (n < 0) return { text: `-${s}`, color: '#2E7D32' }; // minus green
+    return { text: '±0', color: colors.muted };
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 12 }]}> 
@@ -175,6 +186,7 @@ export default function AnalysisScreen() {
             <TouchableOpacity onPress={() => setRange('7')} style={[styles.badge, { borderColor: colors.muted, backgroundColor: range==='7'?colors.primary:'transparent' }]}><Text style={{ color: range==='7'?'#fff':colors.text }}>{t('range7')}</Text></TouchableOpacity>
             <TouchableOpacity onPress={() => setRange('14')} style={[styles.badge, { borderColor: colors.muted, backgroundColor: range==='14'?colors.primary:'transparent' }]}><Text style={{ color: range==='14'?'#fff':colors.text }}>{t('range14')}</Text></TouchableOpacity>
             <TouchableOpacity onPress={() => setRange('30')} style={[styles.badge, { borderColor: colors.muted, backgroundColor: range==='30'?colors.primary:'transparent' }]}><Text style={{ color: range==='30'?'#fff':colors.text }}>{t('range30')}</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => setRange('month')} style={[styles.badge, { borderColor: colors.muted, backgroundColor: range==='month'?colors.primary:'transparent' }]}><Text style={{ color: range==='month'?'#fff':colors.text }}>{t('month')}</Text></TouchableOpacity>
             <TouchableOpacity onPress={() => setRange('custom')} style={[styles.badge, { borderColor: colors.muted, backgroundColor: range==='custom'?colors.primary:'transparent' }]}><Text style={{ color: range==='custom'?'#fff':colors.text }}>{t('custom')}</Text></TouchableOpacity>
             {range==='custom' ? (<><TouchableOpacity onPress={() => setShowFrom(true)} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{t('from')}: {from?from.toLocaleDateString():"--"}</Text></TouchableOpacity><TouchableOpacity onPress={() => setShowTo(true)} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{t('to')}: {to?to.toLocaleDateString():"--"}</Text></TouchableOpacity></>) : null}
           </View>
@@ -237,18 +249,22 @@ export default function AnalysisScreen() {
           </View>
           {help.insights ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('insights_help')}</Text>) : null}
           <View style={{ marginTop: 8 }}>
-            {last14.length < 2 ? (<Text style={{ color: colors.muted }}>Zu wenige Daten</Text>) : (
-              last14.map((d, i) => {
+            {lastForInsights.length < 1 ? (<Text style={{ color: colors.muted }}>Zu wenige Daten</Text>) : (
+              lastForInsights.map((d, i) => {
                 const dt = new Date(d.date);
                 const label = `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}`;
-                const prev = last14[i-1];
+                const prev = lastForInsights[i-1];
                 const diff = i===0 ? 0 : ((Number(d.weight)||0) - (Number(prev?.weight)||0));
-                const sign = i===0 ? '' : (diff > 0 ? `+${diff.toFixed(1)} kg` : `${diff.toFixed(1)} kg`);
+                const { text: diffText, color } = fmtDiff(diff);
                 return (
-                  <View key={d.date} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 2 }}>
-                    <Text style={{ color: colors.muted, width: 60 }}>{label}</Text>
-                    <Text style={{ color: colors.muted, width: 80, textAlign: 'right' }}>{Number(d.weight).toFixed(1)} kg</Text>
-                    <Text style={{ color: colors.muted, width: 100, textAlign: 'right' }}>{i===0 ? '' : `(${sign})`}</Text>
+                  <View key={d.date} style={{ paddingVertical: 4 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Text style={{ color: colors.muted, width: 64 }}>{label}</Text>
+                      <Text style={{ color: colors.text, width: 80, textAlign: 'right' }}>{Number(d.weight).toFixed(1)} kg</Text>
+                    </View>
+                    {i>0 ? (
+                      <Text style={{ marginLeft: 64, color, fontWeight: '700' }}>{diffText}</Text>
+                    ) : null}
                   </View>
                 );
               })
