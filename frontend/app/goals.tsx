@@ -102,7 +102,35 @@ export default function GoalsScreen() {
 
   const tips = useMemo(() => {
     const list: string[] = [];
-    const pace = metrics.pace;
+    const pace = metrics.pace; // kg/day
+    const today = new Date();
+    const targetDate = new Date(targetDateInput || '');
+    const last = lastW || 0;
+    const target = parseFloat((targetWInput||'').replace(',','.'));
+    if (!isNaN(+targetDate) && target && last) {
+      const daysRem = Math.max(1, Math.round((+targetDate - +today)/(1000*60*60*24)));
+      const predictedAtTargetDate = last + pace * daysRem;
+      const diffToTarget = predictedAtTargetDate - target;
+      const requiredDaily = (target - last) / daysRem; // kg/day required
+      if (Math.abs(diffToTarget) <= 0.5) {
+        list.push('Auf Kurs: Prognose liegt ±0,5 kg am Zieldatum.');
+      } else if ((pace <= 0 && requiredDaily <= pace) || (pace >= 0 && requiredDaily >= pace)) {
+        // pace is strong enough
+        list.push('Tempo passt: Mit aktuellem Trend ist das Ziel erreichbar.');
+      } else {
+        // propose realistic goal or new date
+        const neededDays = pace !== 0 ? Math.round((target - last) / pace) : Infinity;
+        if (isFinite(neededDays) && neededDays > daysRem) {
+          const newDate = new Date(); newDate.setDate(newDate.getDate() + neededDays);
+          list.push(`Aktueller Trend reicht nicht aus: Realistisches Zieldatum ca. ${newDate.toLocaleDateString()}.`);
+        } else {
+          const realisticTarget = Number(predictedAtTargetDate.toFixed(1));
+          list.push(`Realistisches Zielgewicht bis ${targetDate.toLocaleDateString()}: ca. ${realisticTarget} kg.`);
+        }
+        list.push(`Benötigte tägliche Änderung: ${requiredDaily.toFixed(3)} kg/Tag (aktuell: ${pace.toFixed(3)} kg/Tag).`);
+      }
+    }
+
     const plateau = metrics.plateau;
     const waterAvg = (() => {
       const days = Object.values(state.days);
@@ -118,8 +146,8 @@ export default function GoalsScreen() {
     if (waterAvg < 3) list.push('Mehr trinken: Ziel 35 ml/kg pro Tag hilft dem Stoffwechsel.');
     if (sportDays7 < 2) list.push('Mehr Bewegung: 2–3 leichte Sporteinheiten pro Woche steigern den Trend.');
     if (list.length===0) list.push('Weiter so! Stabiler Kurs – konsistent bleiben.');
-    return list.slice(0,3);
-  }, [metrics, state.days]);
+    return list.slice(0,5);
+  }, [metrics, state.days, targetDateInput, targetWInput, lastW]);
 
   function saveGoal() {
     const tw = parseFloat((targetWInput||'').replace(',','.'));
@@ -129,61 +157,83 @@ export default function GoalsScreen() {
     state.setGoal({ targetWeight: tw, targetDate: targetDateInput, startWeight: startW, active: true, startDate });
   }
 
-  // ===== Ziel-Diagramm: Soll vs. Ist =====
-  const chartData = useMemo(() => {
+  // ===== Verlauf: History (Soll vs Ist bis heute) =====
+  const chartHist = useMemo(() => {
     try {
       if (!effectiveStartDate || !effectiveStartWeight || !targetDateInput) return null;
       const targetDate = new Date(targetDateInput);
       if (isNaN(+targetDate)) return null;
       const start = new Date(effectiveStartDate.getFullYear(), effectiveStartDate.getMonth(), effectiveStartDate.getDate());
-      const end = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
-      const totalDays = daysBetween(start, end);
-      // Build map of actual weights by date + forward-fill when sampling
-      const weightMap: Record<string, number> = {};
-      for (const d of weights as any[]) { weightMap[d.date] = Number(d.weight)||0; }
-      const todayKey = toKey(new Date());
-      const screenW = Dimensions.get('window').width;
-      const chartWidth = screenW - 32; // card padding
-      const minSpacing = 22; // px per point
-      const maxPoints = Math.max(6, Math.floor(chartWidth / minSpacing));
-      let step = Math.max(2, Math.ceil(totalDays / maxPoints)); // min alle 2 Tage
-      // Build date list stepping by 'step', ensure today and end included
-      const dates: Date[] = [];
-      const addDate = (d: Date) => { const k = toKey(d); if (!dates.find(x=>toKey(x)===k)) dates.push(new Date(d.getFullYear(), d.getMonth(), d.getDate())); };
-      for (let i=0;i<=totalDays;i+=step) { const di = new Date(start); di.setDate(start.getDate()+i); addDate(di); }
-      // ensure end
-      addDate(end);
-      // ensure today
-      const today = new Date(); if (+today >= +start && +today <= +end) addDate(today);
+      const today = new Date(); const todayKey = toKey(today);
+      const totalDaysAll = daysBetween(start, targetDate);
+      const totalDaysHist = Math.max(1, Math.min(totalDaysAll, daysBetween(start, today)));
+      // Gather weight map
+      const weightMap: Record<string, number> = {}; for (const d of weights as any[]) weightMap[d.date] = Number(d.weight)||0;
+      const screenW = Dimensions.get('window').width; const chartWidth = screenW - 32; const minSpacing = 22; const maxPoints = Math.max(6, Math.floor(chartWidth / minSpacing));
+      let step = Math.max(1, Math.ceil(totalDaysHist / maxPoints));
+      const dates: Date[] = []; const addDate = (d: Date) => { const k = toKey(d); if (!dates.find(x=>toKey(x)===k)) dates.push(new Date(d.getFullYear(), d.getMonth(), d.getDate())); };
+      for (let i=0;i<=totalDaysHist;i+=step) { const di = new Date(start); di.setDate(start.getDate()+i); addDate(di); }
+      addDate(today);
       dates.sort((a,b)=> +a - +b);
-      // Labels density: ~6 labels max
       const labelEvery = Math.max(1, Math.ceil(dates.length / 6));
       const labels: string[] = [];
       const dateKeys: string[] = [];
       const targetW = Number((targetWInput||effectiveStartWeight));
-      // Interpolate planned line and sample actual line (forward-fill last known)
       const planned: {value:number}[] = [];
       const actual: {value:number}[] = [];
       let lastKnown = effectiveStartWeight;
       dates.forEach((d, idx) => {
-        const k = toKey(d);
-        dateKeys.push(k);
+        const k = toKey(d); dateKeys.push(k);
         if (typeof weightMap[k] === 'number') lastKnown = weightMap[k];
-        const dayPos = Math.min(totalDays, Math.max(0, daysBetween(start, d)));
-        const plannedVal = effectiveStartWeight + (targetW - effectiveStartWeight) * (dayPos / totalDays);
+        const dayPos = Math.min(totalDaysAll, Math.max(0, daysBetween(start, d)));
+        const plannedVal = effectiveStartWeight + (targetW - effectiveStartWeight) * (dayPos / totalDaysAll);
         const isToday = k === todayKey;
         planned.push({ value: plannedVal });
         actual.push({ value: lastKnown, ...(isToday ? { customDataPoint: () => (<View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary, borderWidth: 2, borderColor: '#fff' }} />) } : {}) });
-        // labels
         const dt = d; const lbl = `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}`;
         if (idx % labelEvery === 0 || isToday || idx===dates.length-1 || idx===0) labels.push(lbl); else labels.push('');
       });
-      // spacing to fit width
       const spacing = Math.max(12, Math.floor((chartWidth - 24) / Math.max(1, dates.length-1)));
-      const todayIndex = dateKeys.indexOf(todayKey);
-      return { planned, actual, labels, spacing, dateKeys, todayIndex };
+      return { planned, actual, labels, spacing, dateKeys };
     } catch { return null; }
   }, [effectiveStartDate, effectiveStartWeight, targetDateInput, targetWInput, weights, state.days, state.theme]);
+
+  // ===== Prognose ab heute: Expected (Trend) vs Soll in eigener Farbe =====
+  const chartFuture = useMemo(() => {
+    try {
+      if (!effectiveStartDate || !effectiveStartWeight || !targetDateInput || !lastW) return null;
+      const targetDate = new Date(targetDateInput); if (isNaN(+targetDate)) return null;
+      const today = new Date(); const todayKey = toKey(today);
+      const weightDates = (weights as any[]).map(w=>w.date);
+      const lastEntryKey = weightDates[weightDates.length-1] || todayKey;
+      const lastEntryDate = new Date(lastEntryKey);
+      // slope kg/day from metrics (already smoothed)
+      const slope = metrics.pace || 0;
+      const totalDaysFuture = Math.max(1, daysBetween(today, targetDate));
+      const screenW = Dimensions.get('window').width; const chartWidth = screenW - 32; const minSpacing = 22; const maxPoints = Math.max(6, Math.floor(chartWidth / minSpacing));
+      let step = Math.max(1, Math.ceil(totalDaysFuture / maxPoints));
+      const dates: Date[] = []; const addDate = (d: Date) => { const k = toKey(d); if (!dates.find(x=>toKey(x)===k)) dates.push(new Date(d.getFullYear(), d.getMonth(), d.getDate())); };
+      for (let i=0;i<=totalDaysFuture;i+=step) { const di = new Date(today); di.setDate(today.getDate()+i); addDate(di); }
+      addDate(targetDate);
+      dates.sort((a,b)=> +a - +b);
+      const labels: string[] = []; const labelEvery = Math.max(1, Math.ceil(dates.length/6));
+      const planned: {value:number}[] = []; const expected: {value:number}[] = [];
+      const targetW = Number((targetWInput||effectiveStartWeight));
+      const totalDaysAll = Math.max(1, daysBetween(effectiveStartDate, targetDate));
+      dates.forEach((d, idx)=>{
+        const dayPosAll = Math.min(totalDaysAll, Math.max(0, daysBetween(effectiveStartDate, d)));
+        const p = effectiveStartWeight + (targetW - effectiveStartWeight) * (dayPosAll / totalDaysAll);
+        planned.push({ value: p });
+        const dayFromLast = Math.max(0, daysBetween(lastEntryDate, d));
+        const exp = lastW + slope * dayFromLast;
+        expected.push({ value: exp });
+        const lbl = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}`;
+        labels.push(idx % labelEvery === 0 || idx===0 || idx===dates.length-1 ? lbl : '');
+      });
+      const spacing = Math.max(12, Math.floor((chartWidth - 24) / Math.max(1, dates.length-1)));
+      return { planned, expected, labels, spacing };
+    } catch { return null; }
+  }, [effectiveStartDate, effectiveStartWeight, targetDateInput, targetWInput, weights, metrics.pace, lastW, state.theme]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -206,7 +256,10 @@ export default function GoalsScreen() {
         {/* Info */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>Info</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='information-circle' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Info</Text>
+            </View>
             <TouchableOpacity onPress={()=> setInfo(v=>!v)}>
               <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
             </TouchableOpacity>
@@ -220,7 +273,10 @@ export default function GoalsScreen() {
 
         {/* Goal form */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'Ziel setzen':(state.language==='pl'?'Ustaw cel':'Set goal')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='flag' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'Ziel setzen':(state.language==='pl'?'Ustaw cel':'Set goal')}</Text>
+          </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
             <Text style={{ color: colors.text, width: 120 }}>Zielgewicht</Text>
             <TextInput value={targetWInput} onChangeText={setTargetWInput} keyboardType='decimal-pad' placeholder='z. B. 62,0' placeholderTextColor={colors.muted} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text }} />
@@ -242,9 +298,45 @@ export default function GoalsScreen() {
           </View>
         </View>
 
+        {/* BMI block (wie Profil) */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='scale' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>BMI</Text>
+            </View>
+          </View>
+          {(!state.profile.heightCm || !lastW) ? (
+            <Text style={{ color: colors.muted, marginTop: 8 }}>Bitte Größe im Profil und mindestens ein Gewicht eintragen.</Text>
+          ) : (
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ color: colors.text }}>Letztes Gewicht: {lastW?.toFixed(1)} kg · Größe: {state.profile.heightCm} cm</Text>
+              <Text style={{ color: colors.text, marginTop: 2 }}>BMI: {bmi?.toFixed(1)}</Text>
+              <View style={{ height: 10, backgroundColor: colors.bg, borderRadius: 5, overflow: 'hidden', marginTop: 8 }}>
+                <View style={{ width: '100%', height: '100%', flexDirection: 'row' }}>
+                  <View style={{ flex: 185, backgroundColor: '#2196F3' }} />
+                  <View style={{ flex: 250-185, backgroundColor: '#4CAF50' }} />
+                  <View style={{ flex: 300-250, backgroundColor: '#FFC107' }} />
+                  <View style={{ flex: 400-300, backgroundColor: '#F44336' }} />
+                </View>
+              </View>
+              {bmi ? (
+                <View style={{ position: 'relative', height: 16, marginTop: 2 }}>
+                  <View style={{ position: 'absolute', left: Math.min(100, Math.max(0, (bmi/40)*100)) + '%', top: 0 }}>
+                    <Ionicons name='caret-down' size={16} color={colors.primary} />
+                  </View>
+                </View>
+              ) : null}
+            </View>
+          )}
+        </View>
+
         {/* Plan vs. Ist (heutiger Vergleich) */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700' }}>Plan vs. Ist</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='stats-chart' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Plan vs. Ist</Text>
+          </View>
           {!planVsActual ? (
             <Text style={{ color: colors.muted, marginTop: 6 }}>Zu wenige Daten</Text>
           ) : (
@@ -258,10 +350,13 @@ export default function GoalsScreen() {
           )}
         </View>
 
-        {/* Verlauf: Soll (Trend) vs. Ist (Messwerte) */}
+        {/* Verlauf (Soll vs. Ist – Ist nur bis heute) */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>Verlauf (Soll vs. Ist)</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='trending-down' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Verlauf (Soll vs. Ist)</Text>
+            </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
@@ -273,13 +368,13 @@ export default function GoalsScreen() {
               </View>
             </View>
           </View>
-          {!chartData ? (
+          {!chartHist ? (
             <Text style={{ color: colors.muted, marginTop: 6 }}>Lege Ziel und Daten an, um den Verlauf zu sehen.</Text>
           ) : (
             <View style={{ marginTop: 8 }}>
               <LineChart
-                data={chartData.actual}
-                data2={chartData.planned}
+                data={chartHist.actual}
+                data2={chartHist.planned}
                 color={colors.primary}
                 color2={'#2bb673'}
                 thickness={2}
@@ -291,52 +386,68 @@ export default function GoalsScreen() {
                 noOfSections={4}
                 hideRules={false}
                 initialSpacing={8}
-                spacing={chartData.spacing}
-                xAxisLabelTexts={chartData.labels}
+                spacing={chartHist.spacing}
+                xAxisLabelTexts={chartHist.labels}
                 xAxisLabelTextStyle={{ color: colors.muted, fontSize: 10 }}
                 xAxisThickness={1}
-                focusEnabled
-                showDataPointOnPress
-                pointerConfig={{
-                  activatePointersOnLongPress: true,
-                  pointerStripHeight: 200,
-                  pointerStripColor: colors.muted,
-                  pointerStripWidth: 1,
-                  pointerColor: colors.muted,
-                  autoAdjustPointerLabelPosition: true,
-                  pointerLabelComponent: (items) => {
-                    try {
-                      const idx = (items && items[0] && typeof items[0].index === 'number') ? items[0].index : 0;
-                      const dateKey = chartData.dateKeys[idx] || '';
-                      const dt = dateKey ? new Date(dateKey) : null;
-                      const label = dt ? `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}.${dt.getFullYear()}` : '';
-                      const ist = items?.[0]?.value ?? undefined;
-                      const soll = items?.[1]?.value ?? undefined;
-                      return (
-                        <View style={{ backgroundColor: colors.card, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted, minWidth: 140 }}>
-                          <Text style={{ color: colors.text, fontWeight: '700' }}>{label}</Text>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                            <View style={{ width: 10, height: 3, backgroundColor: colors.primary, marginRight: 6 }} />
-                            <Text style={{ color: colors.text }}>Ist: {typeof ist==='number'? ist.toFixed(1): '—'} kg</Text>
-                          </View>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                            <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
-                            <Text style={{ color: colors.text }}>Soll: {typeof soll==='number'? soll.toFixed(1): '—'} kg</Text>
-                          </View>
-                        </View>
-                      );
-                    } catch { return <View />; }
-                  },
-                }}
               />
-              <Text style={{ color: colors.muted, marginTop: 6 }}>Heutiger Punkt ist markiert. Tippe oder halte auf die Linie, um Werte anzuzeigen.</Text>
+              <Text style={{ color: colors.muted, marginTop: 6 }}>Ist-Linie endet am heutigen Tag.</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Prognose ab heute (Erwartet vs. Soll) */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='trending-up' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Erwarteter Verlauf ab heute</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ width: 10, height: 3, backgroundColor: '#00bcd4', marginRight: 6 }} />
+                <Text style={{ color: colors.muted }}>Erwartet</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
+                <Text style={{ color: colors.muted }}>Soll</Text>
+              </View>
+            </View>
+          </View>
+          {!chartFuture ? (
+            <Text style={{ color: colors.muted, marginTop: 6 }}>Zu wenige Daten oder Ziel fehlt.</Text>
+          ) : (
+            <View style={{ marginTop: 8 }}>
+              <LineChart
+                data={chartFuture.expected}
+                data2={chartFuture.planned}
+                color={'#00bcd4'}
+                color2={'#2bb673'}
+                thickness={2}
+                thickness2={2}
+                showYAxisText
+                yAxisTextStyle={{ color: colors.muted }}
+                yAxisColor={colors.muted}
+                xAxisColor={colors.muted}
+                noOfSections={4}
+                hideRules={false}
+                initialSpacing={8}
+                spacing={chartFuture.spacing}
+                xAxisLabelTexts={chartFuture.labels}
+                xAxisLabelTextStyle={{ color: colors.muted, fontSize: 10 }}
+                xAxisThickness={1}
+              />
+              <Text style={{ color: colors.muted, marginTop: 6 }}>Erwartete Linie basiert auf deinem Trend (lineare Regression light).</Text>
             </View>
           )}
         </View>
 
         {/* Pace/ETA/Trend/BMI */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700' }}>Pace · ETA · Trend · BMI</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='pulse' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Pace · ETA · Trend · BMI</Text>
+          </View>
           <View style={{ marginTop: 6, gap: 4 }}>
             <Text style={{ color: colors.muted }}>Pace (7d): {metrics.pace.toFixed(3)} kg/Tag</Text>
             <Text style={{ color: colors.muted }}>Trend: {metrics.trend}{metrics.plateau?' · Plateau':''}</Text>
@@ -347,7 +458,10 @@ export default function GoalsScreen() {
 
         {/* Analyse + Kurztipps */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700' }}>Analyse & Kurztipps</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='bulb' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Analyse &amp; Kurztipps</Text>
+          </View>
           {tips.map((t)=> (
             <Text key={t} style={{ color: colors.muted, marginTop: 4 }}>• {t}</Text>
           ))}

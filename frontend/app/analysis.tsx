@@ -140,7 +140,7 @@ export default function AnalysisScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 12 }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 12 }]}> 
         <TouchableOpacity onPress={() => router.back()} accessibilityLabel={state.language==='de'?'Zurück':'Back'} style={{ padding: 8 }}>
           <Ionicons name='chevron-back' size={26} color={colors.text} />
         </TouchableOpacity>
@@ -160,7 +160,7 @@ export default function AnalysisScreen() {
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* Gewicht */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Ionicons name='fitness' size={18} color={colors.primary} />
@@ -188,6 +188,39 @@ export default function AnalysisScreen() {
             </ScrollView>
           ) : (
             <Text style={{ color: colors.muted, marginTop: 6 }}>Zu wenige Daten</Text>
+          )}
+        </View>
+
+        {/* BMI zwischen Gewichtsanalyse und Premium Insights */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name='scale' size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>BMI</Text>
+            </View>
+          </View>
+          {(!heightM || !lastWeight) ? (
+            <Text style={{ color: colors.muted, marginTop: 8 }}>Bitte Größe und mindestens ein Gewicht eintragen.</Text>
+          ) : (
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ color: colors.text }}>Letztes Gewicht: {lastWeight?.toFixed(1)} kg · Größe: {Math.round((heightM||0)*100)} cm</Text>
+              <Text style={{ color: colors.text, marginTop: 2 }}>BMI: {bmi?.toFixed(1)} {bmiCategory?`(${bmiCategory.label})`:''}</Text>
+              <View style={{ height: 10, backgroundColor: colors.bg, borderRadius: 5, overflow: 'hidden', marginTop: 8 }}>
+                <View style={{ width: '100%', height: '100%', flexDirection: 'row' }}>
+                  <View style={{ flex: 185, backgroundColor: '#2196F3' }} />
+                  <View style={{ flex: 250-185, backgroundColor: '#4CAF50' }} />
+                  <View style={{ flex: 300-250, backgroundColor: '#FFC107' }} />
+                  <View style={{ flex: 400-300, backgroundColor: '#F44336' }} />
+                </View>
+              </View>
+              {bmi ? (
+                <View style={{ position: 'relative', height: 16, marginTop: 2 }}>
+                  <View style={{ position: 'absolute', left: Math.min(100, Math.max(0, (bmi/40)*100)) + '%', top: 0 }}>
+                    <Ionicons name='caret-down' size={16} color={bmiCategory?.color || colors.primary} />
+                  </View>
+                </View>
+              ) : null}
+            </View>
           )}
         </View>
 
