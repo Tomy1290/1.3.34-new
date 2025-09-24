@@ -100,6 +100,37 @@ export default function GoalsScreen() {
     return lastW / (h*h);
   }, [state.profile.heightCm, lastW]);
 
+  // ===== EWMA (glättung) + Konfidenzband (1σ) =====
+  const ewma = useMemo(() => {
+    try {
+      if (weights.length < 2) return null;
+      const alpha = 0.3;
+      const smoothed: { date: string; value: number }[] = [];
+      let prev = Number((weights[0] as any).weight) || 0;
+      smoothed.push({ date: (weights[0] as any).date, value: prev });
+      for (let i=1;i<weights.length;i++) {
+        const v = Number((weights[i] as any).weight) || prev;
+        const s = alpha * v + (1 - alpha) * prev;
+        smoothed.push({ date: (weights[i] as any).date, value: s });
+        prev = s;
+      }
+      // residual std dev
+      const residuals = weights.map((w:any, i:number) => (Number(w.weight) || 0) - (smoothed[i]?.value || 0));
+      const mean = residuals.reduce((a,b)=>a+b,0) / residuals.length;
+      const varr = residuals.reduce((a,b)=>a + Math.pow(b-mean,2),0) / Math.max(1, residuals.length-1);
+      const sigma = Math.sqrt(Math.max(0, varr));
+      // slope per day from last 7 smoothed points
+      const take = smoothed.slice(-7);
+      let slope = 0;
+      if (take.length >= 2) {
+        const first = take[0]; const last = take[take.length-1];
+        const days = daysBetween(new Date(first.date), new Date(last.date));
+        slope = days>0 ? (last.value - first.value)/days : 0;
+      }
+      return { smoothed, sigma, slope };
+    } catch { return null; }
+  }, [weights]);
+
   const tips = useMemo(() => {
     const list: string[] = [];
     const pace = metrics.pace; // kg/day
@@ -167,7 +198,6 @@ export default function GoalsScreen() {
       const today = new Date(); const todayKey = toKey(today);
       const totalDaysAll = daysBetween(start, targetDate);
       const totalDaysHist = Math.max(1, Math.min(totalDaysAll, daysBetween(start, today)));
-      // Gather weight map
       const weightMap: Record<string, number> = {}; for (const d of weights as any[]) weightMap[d.date] = Number(d.weight)||0;
       const screenW = Dimensions.get('window').width; const chartWidth = screenW - 32; const minSpacing = 22; const maxPoints = Math.max(6, Math.floor(chartWidth / minSpacing));
       let step = Math.max(1, Math.ceil(totalDaysHist / maxPoints));
@@ -198,17 +228,16 @@ export default function GoalsScreen() {
     } catch { return null; }
   }, [effectiveStartDate, effectiveStartWeight, targetDateInput, targetWInput, weights, state.days, state.theme]);
 
-  // ===== Prognose ab heute: Expected (Trend) vs Soll in eigener Farbe =====
+  // ===== Prognose ab heute: Erwartet (EWMA) vs Soll =====
   const chartFuture = useMemo(() => {
     try {
       if (!effectiveStartDate || !effectiveStartWeight || !targetDateInput || !lastW) return null;
       const targetDate = new Date(targetDateInput); if (isNaN(+targetDate)) return null;
       const today = new Date(); const todayKey = toKey(today);
-      const weightDates = (weights as any[]).map(w=>w.date);
-      const lastEntryKey = weightDates[weightDates.length-1] || todayKey;
+      const lastEntryKey = (weights as any[]).map(w=>w.date).slice(-1)[0] || todayKey;
       const lastEntryDate = new Date(lastEntryKey);
-      // slope kg/day from metrics (already smoothed)
-      const slope = metrics.pace || 0;
+      const slope = ewma?.slope ?? metrics.pace ?? 0;
+      const sigma = ewma?.sigma ?? 0;
       const totalDaysFuture = Math.max(1, daysBetween(today, targetDate));
       const screenW = Dimensions.get('window').width; const chartWidth = screenW - 32; const minSpacing = 22; const maxPoints = Math.max(6, Math.floor(chartWidth / minSpacing));
       let step = Math.max(1, Math.ceil(totalDaysFuture / maxPoints));
@@ -217,23 +246,26 @@ export default function GoalsScreen() {
       addDate(targetDate);
       dates.sort((a,b)=> +a - +b);
       const labels: string[] = []; const labelEvery = Math.max(1, Math.ceil(dates.length/6));
-      const planned: {value:number}[] = []; const expected: {value:number}[] = [];
+      const planned: {value:number}[] = []; const expected: {value:number}[] = []; const upper: {value:number}[] = [];
       const targetW = Number((targetWInput||effectiveStartWeight));
       const totalDaysAll = Math.max(1, daysBetween(effectiveStartDate, targetDate));
+      const dateKeys: string[] = [];
       dates.forEach((d, idx)=>{
+        const k = toKey(d); dateKeys.push(k);
         const dayPosAll = Math.min(totalDaysAll, Math.max(0, daysBetween(effectiveStartDate, d)));
         const p = effectiveStartWeight + (targetW - effectiveStartWeight) * (dayPosAll / totalDaysAll);
         planned.push({ value: p });
         const dayFromLast = Math.max(0, daysBetween(lastEntryDate, d));
         const exp = lastW + slope * dayFromLast;
         expected.push({ value: exp });
+        upper.push({ value: exp + 1.0 * sigma });
         const lbl = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}`;
         labels.push(idx % labelEvery === 0 || idx===0 || idx===dates.length-1 ? lbl : '');
       });
       const spacing = Math.max(12, Math.floor((chartWidth - 24) / Math.max(1, dates.length-1)));
-      return { planned, expected, labels, spacing };
+      return { planned, expected, upper, labels, spacing, dateKeys, sigma };
     } catch { return null; }
-  }, [effectiveStartDate, effectiveStartWeight, targetDateInput, targetWInput, weights, metrics.pace, lastW, state.theme]);
+  }, [effectiveStartDate, effectiveStartWeight, targetDateInput, targetWInput, weights, metrics.pace, lastW, ewma, state.theme]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -266,7 +298,7 @@ export default function GoalsScreen() {
           </View>
           {info ? (
             <Text style={{ color: colors.muted, marginTop: 6 }}>
-              Plan vs. Ist basiert auf einer linearen Entwicklung zwischen Startgewicht und Zielgewicht bis zum Zieldatum. Pace 7d = kg/Tag der letzten Woche. ETA schätzt das Datum bei gleichbleibender Pace. BMI nutzt Profildaten.
+              Plan vs. Ist basiert auf einer linearen Entwicklung zwischen Startgewicht und Zielgewicht bis zum Zieldatum. Pace 7d = kg/Tag der letzten Woche. ETA schätzt das Datum bei gleichbleibender Pace. BMI nutzt Profildaten. Erwartung verwendet eine geglättete EWMA-Prognose mit einfachem Konfidenzband (±1σ).
             </Text>
           ) : null}
         </View>
@@ -390,6 +422,39 @@ export default function GoalsScreen() {
                 xAxisLabelTexts={chartHist.labels}
                 xAxisLabelTextStyle={{ color: colors.muted, fontSize: 10 }}
                 xAxisThickness={1}
+                focusEnabled
+                showDataPointOnPress
+                pointerConfig={{
+                  activatePointersOnLongPress: true,
+                  pointerStripHeight: 200,
+                  pointerStripColor: colors.muted,
+                  pointerStripWidth: 1,
+                  pointerColor: colors.muted,
+                  autoAdjustPointerLabelPosition: true,
+                  pointerLabelComponent: (items) => {
+                    try {
+                      const idx = (items && items[0] && typeof items[0].index === 'number') ? items[0].index : 0;
+                      const dateKey = chartHist.dateKeys[idx] || '';
+                      const dt = dateKey ? new Date(dateKey) : null;
+                      const label = dt ? `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}.${dt.getFullYear()}` : '';
+                      const ist = items?.[0]?.value ?? undefined;
+                      const soll = items?.[1]?.value ?? undefined;
+                      return (
+                        <View style={{ backgroundColor: colors.card, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted, minWidth: 140 }}>
+                          <Text style={{ color: colors.text, fontWeight: '700' }}>{label}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                            <View style={{ width: 10, height: 3, backgroundColor: colors.primary, marginRight: 6 }} />
+                            <Text style={{ color: colors.text }}>Ist: {typeof ist==='number'? ist.toFixed(1): '—'} kg</Text>
+                          </View>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                            <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
+                            <Text style={{ color: colors.text }}>Soll: {typeof soll==='number'? soll.toFixed(1): '—'} kg</Text>
+                          </View>
+                        </View>
+                      );
+                    } catch { return <View />; }
+                  },
+                }}
               />
               <Text style={{ color: colors.muted, marginTop: 6 }}>Ist-Linie endet am heutigen Tag.</Text>
             </View>
@@ -406,7 +471,7 @@ export default function GoalsScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ width: 10, height: 3, backgroundColor: '#00bcd4', marginRight: 6 }} />
-                <Text style={{ color: colors.muted }}>Erwartet</Text>
+                <Text style={{ color: colors.muted }}>Erwartet (EWMA)</Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
@@ -421,10 +486,13 @@ export default function GoalsScreen() {
               <LineChart
                 data={chartFuture.expected}
                 data2={chartFuture.planned}
+                data3={chartFuture.upper}
                 color={'#00bcd4'}
                 color2={'#2bb673'}
+                color3={'rgba(0,188,212,0.6)'}
                 thickness={2}
                 thickness2={2}
+                thickness3={1}
                 showYAxisText
                 yAxisTextStyle={{ color: colors.muted }}
                 yAxisColor={colors.muted}
@@ -436,8 +504,45 @@ export default function GoalsScreen() {
                 xAxisLabelTexts={chartFuture.labels}
                 xAxisLabelTextStyle={{ color: colors.muted, fontSize: 10 }}
                 xAxisThickness={1}
+                focusEnabled
+                showDataPointOnPress
+                pointerConfig={{
+                  activatePointersOnLongPress: true,
+                  pointerStripHeight: 200,
+                  pointerStripColor: colors.muted,
+                  pointerStripWidth: 1,
+                  pointerColor: colors.muted,
+                  autoAdjustPointerLabelPosition: true,
+                  pointerLabelComponent: (items) => {
+                    try {
+                      const idx = (items && items[0] && typeof items[0].index === 'number') ? items[0].index : 0;
+                      const dateKey = chartFuture.dateKeys[idx] || '';
+                      const dt = dateKey ? new Date(dateKey) : null;
+                      const label = dt ? `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}.${dt.getFullYear()}` : '';
+                      const exp = items?.[0]?.value ?? undefined; // expected
+                      const soll = items?.[1]?.value ?? undefined; // planned
+                      const sig = chartFuture.sigma || 0;
+                      const low = typeof exp==='number' ? exp - 1.0*sig : undefined;
+                      const up = typeof exp==='number' ? exp + 1.0*sig : undefined;
+                      return (
+                        <View style={{ backgroundColor: colors.card, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted, minWidth: 160 }}>
+                          <Text style={{ color: colors.text, fontWeight: '700' }}>{label}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                            <View style={{ width: 10, height: 3, backgroundColor: '#00bcd4', marginRight: 6 }} />
+                            <Text style={{ color: colors.text }}>Erwartet: {typeof exp==='number'? exp.toFixed(1): '—'} kg</Text>
+                          </View>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                            <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
+                            <Text style={{ color: colors.text }}>Soll: {typeof soll==='number'? soll.toFixed(1): '—'} kg</Text>
+                          </View>
+                          <Text style={{ color: colors.muted, marginTop: 4 }}>Band (±1σ): {typeof low==='number' &amp;&amp; typeof up==='number' ? `${low.toFixed(1)}–${up.toFixed(1)} kg` : '—'}</Text>
+                        </View>
+                      );
+                    } catch { return <View />; }
+                  },
+                }}
               />
-              <Text style={{ color: colors.muted, marginTop: 6 }}>Erwartete Linie basiert auf deinem Trend (lineare Regression light).</Text>
+              <Text style={{ color: colors.muted, marginTop: 6 }}>Erwartete Linie basiert auf deinem Trend (EWMA); Band zeigt einfache Unsicherheit (±1σ).</Text>
             </View>
           )}
         </View>
