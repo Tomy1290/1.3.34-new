@@ -175,6 +175,9 @@ frontend:
       - working: NA
         agent: "main"
         comment: "Replaced HTML entities (&gt;, &lt;, &amp;, =&gt;) with real characters across frontend/src. Primary fix in useStore.ts to resolve Metro SyntaxError. Awaiting user's Codemagic build retest."
+  - agent: "main"
+    message: "Added Metro aliases (Option B) to map react-native-linear-gradient -> src/shims/LinearGradientShim.tsx and @react-native-masked-view/masked-view -> src/shims/MaskedViewShim.tsx. No native packages installed. Please rebuild APK in Codemagic to verify."
+
 
 metadata:
   created_by: "main_agent"
