@@ -462,7 +462,10 @@ export default function SettingsScreen() {
 
         {/* App info */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700' }}>{state.language==='de'?'App':(state.language==='pl'?'Aplikacja':'App')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name='apps-outline' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{state.language==='de'?'App':(state.language==='pl'?'Aplikacja':'App')}</Text>
+          </View>
           <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Version':(state.language==='pl'?'Wersja':'Version')}: {version}</Text>
           <Text style={{ color: colors.muted, marginTop: 2 }}>created by Gugi</Text>
         </View>
