@@ -422,7 +422,10 @@ export default function SettingsScreen() {
 
         {/* Backend URL */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ color: colors.text, fontWeight: '700', marginBottom: 8 }}>Backend URL</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <Ionicons name='cloud-outline' size={18} color={colors.primary} />
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Backend URL</Text>
+          </View>
           <Text style={{ color: colors.muted, marginBottom: 8 }}>Trage hier die Backend‑Adresse ein (z.B. https://one-3-15-new.onrender.com). Diese wird zur Laufzeit verwendet.</Text>
           <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
             <TextInput
