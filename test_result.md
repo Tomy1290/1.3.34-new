@@ -164,6 +164,18 @@ frontend:
       - working: NA
         agent: "main"
         comment: "Expo frontend cannot run under current supervisor/web ingress. Kept existing web frontend for service availability. Repo's frontend is available under /app/_external_1_3_13_new/frontend for reference."
+  - task: "Fix HTML entity arrows in Expo frontend (SyntaxError in src/store/useStore.ts)"
+    implemented: true
+    working: NA
+    file: "/app/frontend/src/store/useStore.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: NA
+        agent: "main"
+        comment: "Replaced HTML entities (&gt;, &lt;, &amp;, =&gt;) with real characters across frontend/src. Primary fix in useStore.ts to resolve Metro SyntaxError. Awaiting user's Codemagic build retest."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
