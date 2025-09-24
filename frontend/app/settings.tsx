@@ -29,21 +29,6 @@ function useThemeColors(theme: string) {
   return { bg: '#fde7ef', card: '#ffd0e0', primary: '#e91e63', text: '#2a1e22', muted: '#7c5866', input: '#ffffff' };
 }
 
-function themeLabel(key: 'pink_default'|'pink_pastel'|'pink_vibrant'|'golden_pink', lang: 'de'|'en'|'pl') {
-  const mapDe: Record<string,string> = { pink_default: 'Rosa – Standard', pink_pastel: 'Rosa – Pastell', pink_vibrant: 'Rosa – Kräftig', golden_pink: 'Goldenes Rosa' };
-  const mapEn: Record<string,string> = { pink_default: 'Pink – Default', pink_pastel: 'Pink – Pastel', pink_vibrant: 'Pink – Vibrant', golden_pink: 'Golden Pink' };
-  const mapPl: Record<string,string> = { pink_default: 'Różowy – domyślny', pink_pastel: 'Różowy – pastel', pink_vibrant: 'Różowy – intensywny', golden_pink: 'Złoty róż' };
-  return (lang==='en'?mapEn:(lang==='pl'?mapPl:mapDe))[key] || key;
-}
-
-function reminderLabel(type: string, lang: 'de'|'en'|'pl', label?: string) {
-  if (label) return label;
-  const mapDe: Record<string,string> = { pills_morning: 'Tabletten morgens', pills_evening: 'Tabletten abends', weight: 'Gewicht', water: 'Wasser', sport: 'Sport', custom: 'Eigene Erinnerung' };
-  const mapEn: Record<string,string> = { pills_morning: 'Pills morning', pills_evening: 'Pills evening', weight: 'Weight', water: 'Water', sport: 'Sport', custom: 'Custom reminder' };
-  const mapPl: Record<string,string> = { pills_morning: 'Tabletki rano', pills_evening: 'Tabletki wieczorem', weight: 'Waga', water: 'Woda', sport: 'Sport', custom: 'Własne przypomnienie' };
-  return (lang==='en'?mapEn:(lang==='pl'?mapPl:mapDe))[type] || type;
-}
-
 export default function SettingsScreen() {
   const state = useAppStore();
   const router = useRouter();
@@ -92,7 +77,7 @@ export default function SettingsScreen() {
       const res = await fetch(`${v}/api/`, { method: 'GET' });
       const ok = (res as any)?.ok;
       const txt = await (res as any).text?.();
-      Alert.alert(ok ? t('common.ok') : t('common.error'), ok ? t('settings.connectionSuccessful') : `Antwort: ${txt}`);
+      Alert.alert(ok ? t('common.ok') : t('common.error'), ok ? t('settings.connectionSuccessful') : `${t('common.response')} ${txt}`);
     } catch (e: any) {
       Alert.alert(t('common.error'), String(e?.message || e));
     }
@@ -102,14 +87,14 @@ export default function SettingsScreen() {
     const currentCustom = state.reminders.filter(r => !!r.label).length;
     if (currentCustom >= 10) {
       Alert.alert(
-        state.language==='de'?'Limit erreicht':(state.language==='pl'?'Limit osiągnięty':'Limit reached'), 
-        state.language==='de'?'Maximal 10 eigene Erinnerungen.':(state.language==='pl'?'Maks. 10 własnych przypomnień.':'Maximum 10 custom reminders.')
+        t('settings.limitReachedTitle'), 
+        t('settings.limitReachedMessage')
       );
       return;
     }
 
     if (!customLabel.trim() || !customTime) {
-      Alert.alert(state.language==='de'?'Bitte alle Felder ausfüllen':(state.language==='pl'?'Proszę wypełnić wszystkie pola':'Please fill all fields'));
+      Alert.alert(t('common.error'), t('settings.fillAllFields'));
       return;
     }
 
@@ -120,12 +105,12 @@ export default function SettingsScreen() {
 
     const timeData = parseHHMM(customTime);
     if (!timeData) {
-      Alert.alert(t('common.error'), 'Ungültige Zeit');
+      Alert.alert(t('common.error'), t('settings.invalidTime'));
       return;
     }
 
     // Schedule next occurrence one-time
-    const notifId = await scheduleDailyNext(id, customLabel.trim(), 'Custom reminder', timeData.hour, timeData.minute, 'reminders');
+    const notifId = await scheduleDailyNext(id, customLabel.trim(), t('reminders.types.custom'), timeData.hour, timeData.minute, 'reminders');
 
     if (notifId) {
       const tStr = `${timeData.hour.toString().padStart(2,'0')}:${timeData.minute.toString().padStart(2,'0')}`;
@@ -140,226 +125,230 @@ export default function SettingsScreen() {
     }
   }
 
+  function reminderLabel(type: string, label?: string) {
+    return label || t(`reminders.types.${type}`);
+  }
+
   const desiredOrder = ['pills_morning','pills_evening','weight','water','sport'];
-  const sortedReminders = [...state.reminders].sort((a,b) => { const ai = desiredOrder.indexOf(a.type); const bi = desiredOrder.indexOf(b.type); const aIdx = ai < 0 ? 999 : ai; const bIdx = bi < 0 ? 999 : bi; return aIdx - bIdx; });
+  const sortedReminders = [...state.reminders].sort((a,b) => { const ai = desiredOrder.indexOf(a.type); const bi = desiredOrder.indexOf(b.type); const aIdx = ai &lt; 0 ? 999 : ai; const bIdx = bi &lt; 0 ? 999 : bi; return aIdx - bIdx; });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}> 
-        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}>
-          <Ionicons name='chevron-back' size={26} color={colors.text} />
-        </TouchableOpacity>
-        <View style={{ alignItems: 'center' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name='star' size={16} color={colors.primary} />
-            <Text style={[styles.appTitle, { color: colors.text, marginHorizontal: 6 }]}>{appTitle}</Text>
-            <Ionicons name='star' size={16} color={colors.primary} />
-          </View>
-          <Text style={[styles.title, { color: colors.muted }]}>{t('settings.title')}</Text>
-        </View>
-        <View style={{ width: 40 }} />
-      </View>
+    &lt;SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}&gt;
+      &lt;View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}&gt; 
+        &lt;TouchableOpacity onPress={() =&gt; router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}&gt;
+          &lt;Ionicons name='chevron-back' size={26} color={colors.text} /&gt;
+        &lt;/TouchableOpacity&gt;
+        &lt;View style={{ alignItems: 'center' }}&gt;
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            &lt;Ionicons name='star' size={16} color={colors.primary} /&gt;
+            &lt;Text style={[styles.appTitle, { color: colors.text, marginHorizontal: 6 }]}&gt;{appTitle}&lt;/Text&gt;
+            &lt;Ionicons name='star' size={16} color={colors.primary} /&gt;
+          &lt;/View&gt;
+          &lt;Text style={[styles.title, { color: colors.muted }]}&gt;{t('settings.title')}&lt;/Text&gt;
+        &lt;/View&gt;
+        &lt;View style={{ width: 40 }} /&gt;
+      &lt;/View&gt;
 
-       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+       &lt;ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}&gt;
         {/* Language */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-            <Ionicons name='globe' size={18} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.language')}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => state.setLanguage('de')} accessibilityLabel='Deutsch' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='de'?colors.primary:colors.muted }}>
-              <FlagDE width={40} height={26} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => state.setLanguage('en')} accessibilityLabel='English' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='en'?colors.primary:colors.muted }}>
-              <FlagUK width={40} height={26} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => state.setLanguage('pl')} accessibilityLabel='Polski' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='pl'?colors.primary:colors.muted }}>
-              <FlagPL width={40} height={26} />
-            </TouchableOpacity>
-          </View>
-        </View>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}&gt;
+            &lt;Ionicons name='globe' size={18} color={colors.primary} /&gt;
+            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.language')}&lt;/Text&gt;
+          &lt;/View&gt;
+          &lt;View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}&gt;
+            &lt;TouchableOpacity onPress={() =&gt; state.setLanguage('de')} accessibilityLabel='Deutsch' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='de'?colors.primary:colors.muted }}&gt;
+              &lt;FlagDE width={40} height={26} /&gt;
+            &lt;/TouchableOpacity&gt;
+            &lt;TouchableOpacity onPress={() =&gt; state.setLanguage('en')} accessibilityLabel='English' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='en'?colors.primary:colors.muted }}&gt;
+              &lt;FlagUK width={40} height={26} /&gt;
+            &lt;/TouchableOpacity&gt;
+            &lt;TouchableOpacity onPress={() =&gt; state.setLanguage('pl')} accessibilityLabel='Polski' style={{ padding: 4, borderRadius: 8, borderWidth: 1, borderColor: state.language==='pl'?colors.primary:colors.muted }}&gt;
+              &lt;FlagPL width={40} height={26} /&gt;
+            &lt;/TouchableOpacity&gt;
+          &lt;/View&gt;
+        &lt;/View&gt;
 
         {/* Theme */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name='color-palette' size={18} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.theme')}</Text>
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{t('settings.chooseThemeHint')}</Text>
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
-            {(['pink_default','pink_pastel','pink_vibrant','golden_pink'] as const).map((tt) => (
-              <TouchableOpacity key={tt} onPress={() => state.setTheme(tt)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: state.theme===tt?colors.primary:'transparent' }]}> 
-                <Text style={{ color: state.theme===tt?'#fff':colors.text }}>{themeLabel(tt, state.language as any)}</Text>
-              </TouchableOpacity>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            &lt;Ionicons name='color-palette' size={18} color={colors.primary} /&gt;
+            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.theme')}&lt;/Text&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('settings.chooseThemeHint')}&lt;/Text&gt;
+          &lt;View style={{ flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap' }}&gt;
+            {(['pink_default','pink_pastel','pink_vibrant','golden_pink'] as const).map((tt) =&gt; (
+              &lt;TouchableOpacity key={tt} onPress={() =&gt; state.setTheme(tt)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: state.theme===tt?colors.primary:'transparent' }]}&gt; 
+                &lt;Text style={{ color: state.theme===tt?'#fff':colors.text }}&gt;{t(`themeLabels.${tt}`)}&lt;/Text&gt;
+              &lt;/TouchableOpacity&gt;
             ))}
-          </View>
-        </View>
+          &lt;/View&gt;
+        &lt;/View&gt;
 
         {/* Quick link: Profil */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name='person-circle' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.profileQuick')}</Text>
-            </View>
-            <TouchableOpacity onPress={() => router.push('/profile')} style={[styles.badge, { borderColor: colors.muted }]}>
-              <Text style={{ color: colors.text }}>{t('common.open')}</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{t('settings.profileQuickHint')}</Text>
-        </View>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              &lt;Ionicons name='person-circle' size={18} color={colors.primary} /&gt;
+              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.profileQuick')}&lt;/Text&gt;
+            &lt;/View&gt;
+            &lt;TouchableOpacity onPress={() =&gt; router.push('/profile')} style={[styles.badge, { borderColor: colors.muted }]}&gt;
+              &lt;Text style={{ color: colors.text }}&gt;{t('common.open')}&lt;/Text&gt;
+            &lt;/TouchableOpacity&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('settings.profileQuickHint')}&lt;/Text&gt;
+        &lt;/View&gt;
 
         {/* Drinks settings */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name='cafe' size={18} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.drinksTitle')}</Text>
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{state.language==='de'?'Bechergröße für Wasser (ml). Fortschrittsbalken berechnet Tagesziel automatisch aus Gewicht (35 ml/kg) und +500 ml bei Sport.':(state.language==='pl'?'Rozmiar kubka wody (ml). Pasek postępu oblicza cel dzienny automatycznie z wagi (35 ml/kg) i +500 ml przy sporcie.':'Cup size for water (ml). Progress bar computes daily target automatically from weight (35 ml/kg) and +500 ml if sport.')}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-            <Text style={{ color: colors.text, width: 160 }}>{t('settings.cupSize')}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-              <TextInput keyboardType='number-pad' value={cupInput} onChangeText={setCupInput} onBlur={() => { const n = parseInt((cupInput||'').replace(/[^0-9]/g,'' )||'0',10); const v = Math.max(0, Math.min(1000, isNaN(n)?0:n)); state.setWaterCupMl(v); setCupInput(String(v)); }} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }} />
-              <Text style={{ color: colors.muted, marginLeft: 8 }}>ml</Text>
-            </View>
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{t('settings.rangeHint')}</Text>
-        </View>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            &lt;Ionicons name='cafe' size={18} color={colors.primary} /&gt;
+            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.drinksTitle')}&lt;/Text&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('settings.drinksInfo')}&lt;/Text&gt;
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}&gt;
+            &lt;Text style={{ color: colors.text, width: 160 }}&gt;{t('settings.cupSize')}&lt;/Text&gt;
+            &lt;View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}&gt;
+              &lt;TextInput keyboardType='number-pad' value={cupInput} onChangeText={setCupInput} onBlur={() =&gt; { const n = parseInt((cupInput||'').replace(/[^0-9]/g,'' )||'0',10); const v = Math.max(0, Math.min(1000, isNaN(n)?0:n)); state.setWaterCupMl(v); setCupInput(String(v)); }} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }} /&gt;
+              &lt;Text style={{ color: colors.muted, marginLeft: 8 }}&gt;{t('common.ml')}&lt;/Text&gt;
+            &lt;/View&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('settings.rangeHint')}&lt;/Text&gt;
+        &lt;/View&gt;
 
         {/* Reminders */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name='notifications-outline' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.reminders')}</Text>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TouchableOpacity onPress={seedDefaults} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{t('settings.seedDefaults')}</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => setCustomMode((v)=>!v)} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{t('settings.custom')}</Text></TouchableOpacity>
-            </View>
-          </View>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}&gt;
+            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              &lt;Ionicons name='notifications-outline' size={18} color={colors.primary} /&gt;
+              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.reminders')}&lt;/Text&gt;
+            &lt;/View&gt;
+            &lt;View style={{ flexDirection: 'row', gap: 8 }}&gt;
+              &lt;TouchableOpacity onPress={seedDefaults} style={[styles.badge, { borderColor: colors.muted }]}&gt;&lt;Text style={{ color: colors.text }}&gt;{t('settings.seedDefaults')}&lt;/Text&gt;&lt;/TouchableOpacity&gt;
+              &lt;TouchableOpacity onPress={() =&gt; setCustomMode((v)=&gt;!v)} style={[styles.badge, { borderColor: colors.muted }]}&gt;&lt;Text style={{ color: colors.text }}&gt;{t('settings.custom')}&lt;/Text&gt;&lt;/TouchableOpacity&gt;
+            &lt;/View&gt;
+          &lt;/View&gt;
           {customMode ? (
-            <View style={{ marginTop: 10 }}>
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <TextInput placeholder={t('settings.label')} placeholderTextColor={colors.muted} value={customLabel} onChangeText={setCustomLabel} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }} />
-                <View style={{ width: 100 }}>
-                  <TimePicker
+            &lt;View style={{ marginTop: 10 }}&gt;
+              &lt;View style={{ flexDirection: 'row', gap: 8 }}&gt;
+                &lt;TextInput placeholder={t('settings.label')} placeholderTextColor={colors.muted} value={customLabel} onChangeText={setCustomLabel} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }} /&gt;
+                &lt;View style={{ width: 100 }}&gt;
+                  &lt;TimePicker
                     time={customTime}
                     onTimeChange={setCustomTime}
                     colors={colors}
                     style={{ borderWidth: 1, borderColor: colors.muted, borderRadius: 8, backgroundColor: colors.input }}
-                  />
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-                <TouchableOpacity onPress={() => { setCustomMode(false); setCustomLabel(''); setCustomTime('08:00'); }} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{t('common.cancel')}</Text></TouchableOpacity>
-                <TouchableOpacity onPress={saveCustomReminder} style={[styles.badge, { borderColor: colors.muted, backgroundColor: colors.primary }]}><Text style={{ color: '#fff' }}>{t('common.save')}</Text></TouchableOpacity>
-              </View>
-            </View>
+                  /&gt;
+                &lt;/View&gt;
+              &lt;/View&gt;
+              &lt;View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}&gt;
+                &lt;TouchableOpacity onPress={() =&gt; { setCustomMode(false); setCustomLabel(''); setCustomTime('08:00'); }} style={[styles.badge, { borderColor: colors.muted }]}&gt;&lt;Text style={{ color: colors.text }}&gt;{t('common.cancel')}&lt;/Text&gt;&lt;/TouchableOpacity&gt;
+                &lt;TouchableOpacity onPress={saveCustomReminder} style={[styles.badge, { borderColor: colors.muted, backgroundColor: colors.primary }]}&gt;&lt;Text style={{ color: '#fff' }}&gt;{t('common.save')}&lt;/Text&gt;&lt;/TouchableOpacity&gt;
+              &lt;/View&gt;
+            &lt;/View&gt;
           ) : null}
-          {sortedReminders.length === 0 ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('reminders.none')}</Text>) : null}
-          {sortedReminders.map((r) => (
-            <View key={r.id} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center' }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>
-                  {reminderLabel(r.type, state.language as any, r.label)}
-                </Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
-                  <View style={{ flex: 1 }}>
-                    <TimePicker
+          {sortedReminders.length === 0 ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('reminders.none')}&lt;/Text&gt;) : null}
+          {sortedReminders.map((r) =&gt; (
+            &lt;View key={r.id} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center' }}&gt;
+              &lt;View style={{ flex: 1 }}&gt;
+                &lt;Text style={{ color: colors.text, fontWeight: '700' }}&gt;
+                  {reminderLabel(r.type, r.label)}
+                &lt;/Text&gt;
+                &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}&gt;
+                  &lt;View style={{ flex: 1 }}&gt;
+                    &lt;TimePicker
                       time={reminderTimes[r.id] || '08:00'}
-                      onTimeChange={(str) => updateTime(r.id, str)}
+                      onTimeChange={(str) =&gt; updateTime(r.id, str)}
                       colors={colors}
                       style={{ width: 120, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, backgroundColor: colors.input }}
-                    />
-                  </View>
-                  <View style={{ width: 8 }} />
-                  <Switch value={r.enabled} onValueChange={(v)=>toggleReminder(r.id, v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} />
-                </View>
-              </View>
-              <TouchableOpacity onPress={async ()=>{ const meta = state.notificationMeta[r.id]; if (meta?.id) await cancelNotification(meta.id); state.deleteReminder(r.id); }} style={{ padding: 8 }}>
-                <Ionicons name='trash' size={18} color={colors.muted} />
-              </TouchableOpacity>
-            </View>
+                    /&gt;
+                  &lt;/View&gt;
+                  &lt;View style={{ width: 8 }} /&gt;
+                  &lt;Switch value={r.enabled} onValueChange={(v)=&gt;toggleReminder(r.id, v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} /&gt;
+                &lt;/View&gt;
+              &lt;/View&gt;
+              &lt;TouchableOpacity onPress={async ()=&gt;{ const meta = state.notificationMeta[r.id]; if (meta?.id) await cancelNotification(meta.id); state.deleteReminder(r.id); }} style={{ padding: 8 }}&gt;
+                &lt;Ionicons name='trash' size={18} color={colors.muted} /&gt;
+              &lt;/TouchableOpacity&gt;
+            &lt;/View&gt;
           ))}
-        </View>
+        &lt;/View&gt;
 
         {/* KI Insights */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name='sparkles' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.aiInsights')}</Text>
-            </View>
-            <Switch value={state.aiInsightsEnabled} onValueChange={(v)=> state.setAiInsightsEnabled(v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} />
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{t('settings.aiInsightsHint')}</Text>
-        </View>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              &lt;Ionicons name='sparkles' size={18} color={colors.primary} /&gt;
+              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.aiInsights')}&lt;/Text&gt;
+            &lt;/View&gt;
+            &lt;Switch value={state.aiInsightsEnabled} onValueChange={(v)=&gt; state.setAiInsightsEnabled(v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} /&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('settings.aiInsightsHint')}&lt;/Text&gt;
+        &lt;/View&gt;
 
         {/* Wöchentliche Events */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name='calendar' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.weeklyEvents')}</Text>
-            </View>
-            <Switch value={state.eventsEnabled} onValueChange={(v)=> state.setEventsEnabled(v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} />
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{t('settings.weeklyEventsHint')}</Text>
-        </View>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              &lt;Ionicons name='calendar' size={18} color={colors.primary} /&gt;
+              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.weeklyEvents')}&lt;/Text&gt;
+            &lt;/View&gt;
+            &lt;Switch value={state.eventsEnabled} onValueChange={(v)=&gt; state.setEventsEnabled(v)} thumbColor={'#fff'} trackColor={{ true: colors.primary, false: colors.muted }} /&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('settings.weeklyEventsHint')}&lt;/Text&gt;
+        &lt;/View&gt;
 
         {/* Backend URL */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-            <Ionicons name='cloud-outline' size={18} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('settings.backendUrl')}</Text>
-          </View>
-          <Text style={{ color: colors.muted, marginBottom: 8 }}>{t('settings.backendUrlHint')}</Text>
-          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-            <TextInput
-              placeholder='https://<dein-backend>'
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}&gt;
+            &lt;Ionicons name='cloud-outline' size={18} color={colors.primary} /&gt;
+            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('settings.backendUrl')}&lt;/Text&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginBottom: 8 }}&gt;{t('settings.backendUrlHint')}&lt;/Text&gt;
+          &lt;View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}&gt;
+            &lt;TextInput
+              placeholder={t('settings.backendPlaceholder')}
               placeholderTextColor={colors.muted}
               value={backendUrl}
               onChangeText={setBackendUrl}
               autoCapitalize='none'
               autoCorrect={false}
               style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }}
-            />
-            <TouchableOpacity onPress={saveBackendUrl} style={[styles.badge, { borderColor: colors.muted, backgroundColor: colors.primary }]}>
-              <Text style={{ color: '#fff' }}>{t('common.save')}</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ marginTop: 8 }}>
-            <TouchableOpacity onPress={testBackendUrl} style={[styles.badge, { borderColor: colors.muted }]}>
-              <Text style={{ color: colors.text }}>{t('settings.testConnection')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            /&gt;
+            &lt;TouchableOpacity onPress={saveBackendUrl} style={[styles.badge, { borderColor: colors.muted, backgroundColor: colors.primary }]}&gt;
+              &lt;Text style={{ color: '#fff' }}&gt;{t('common.save')}&lt;/Text&gt;
+            &lt;/TouchableOpacity&gt;
+          &lt;/View&gt;
+          &lt;View style={{ marginTop: 8 }}&gt;
+            &lt;TouchableOpacity onPress={testBackendUrl} style={[styles.badge, { borderColor: colors.muted }]}&gt;
+              &lt;Text style={{ color: colors.text }}&gt;{t('settings.testConnection')}&lt;/Text&gt;
+            &lt;/TouchableOpacity&gt;
+          &lt;/View&gt;
+        &lt;/View&gt;
 
         {/* Backup */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name='cloud-upload' size={18} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('common.info')}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-            <TouchableOpacity onPress={exportData} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{t('settings.export')}</Text></TouchableOpacity>
-            <TouchableOpacity onPress={importData} style={[styles.badge, { borderColor: colors.muted }]}><Text style={{ color: colors.text }}>{t('settings.import')}</Text></TouchableOpacity>
-          </View>
-        </View>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            &lt;Ionicons name='cloud-upload' size={18} color={colors.primary} /&gt;
+            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('common.info')}&lt;/Text&gt;
+          &lt;/View&gt;
+          &lt;View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}&gt;
+            &lt;TouchableOpacity onPress={exportData} style={[styles.badge, { borderColor: colors.muted }]}&gt;&lt;Text style={{ color: colors.text }}&gt;{t('settings.export')}&lt;/Text&gt;&lt;/TouchableOpacity&gt;
+            &lt;TouchableOpacity onPress={importData} style={[styles.badge, { borderColor: colors.muted }]}&gt;&lt;Text style={{ color: colors.text }}&gt;{t('settings.import')}&lt;/Text&gt;&lt;/TouchableOpacity&gt;
+          &lt;/View&gt;
+        &lt;/View&gt;
 
         {/* App info */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name='apps-outline' size={18} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('common.profile')}</Text>
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 6 }}>{t('common.version')}: {version}</Text>
-          <Text style={{ color: colors.muted, marginTop: 2 }}>{t('common.createdBy')}</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            &lt;Ionicons name='apps-outline' size={18} color={colors.primary} /&gt;
+            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('common.profile')}&lt;/Text&gt;
+          &lt;/View&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('common.version')}: {version}&lt;/Text&gt;
+          &lt;Text style={{ color: colors.muted, marginTop: 2 }}&gt;{t('common.createdBy')}&lt;/Text&gt;
+        &lt;/View&gt;
+      &lt;/ScrollView&gt;
+    &lt;/SafeAreaView&gt;
   );
 }
 
