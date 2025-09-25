@@ -236,9 +236,17 @@ export const useAppStore = create<AppState>()(
         if (typeof patch.sex === 'boolean') merged.sex = patch.sex;
         if (typeof patch.notes === 'string') merged.notes = patch.notes;
         if (typeof patch.stress === 'number') merged.stress = clamp(patch.stress, 1, 10);
+        if (typeof patch.appetite === 'number') merged.appetite = clamp(patch.appetite, 1, 10);
+        if (typeof patch.cravings === 'number') merged.cravings = clamp(patch.cravings, 1, 10);
+        if (typeof patch.focus === 'number') merged.focus = clamp(patch.focus, 1, 10);
+        if (typeof patch.libido === 'number') merged.libido = clamp(patch.libido, 1, 10);
         if (typeof patch.period === 'boolean') merged.period = patch.period;
         if (typeof patch.flow === 'number') merged.flow = Math.max(1, Math.min(10, patch.flow));
         if (typeof patch.cramps === 'boolean') merged.cramps = patch.cramps;
+        if (typeof patch.backPain === 'boolean') merged.backPain = patch.backPain;
+        if (typeof patch.breastTenderness === 'boolean') merged.breastTenderness = patch.breastTenderness;
+        if (typeof patch.waterRetention === 'boolean') merged.waterRetention = patch.waterRetention;
+        if (typeof patch.dizziness === 'boolean') merged.dizziness = patch.dizziness;
         if (typeof patch.headache === 'boolean') merged.headache = patch.headache;
         if (typeof patch.nausea === 'boolean') merged.nausea = patch.nausea;
         // if period false, clear flow
