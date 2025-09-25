@@ -166,6 +166,28 @@ export async function scheduleOneTimeNotification(
 export async function cancelNotification(notificationId: string): Promise<void> {
   try {
     await Notifications.cancelScheduledNotificationAsync(notificationId);
+// Attempt to remove obviously broken immediate schedules (legacy seconds-based)
+async function cleanupLegacySchedules() {
+  try {
+    const list = await Notifications.getAllScheduledNotificationsAsync();
+    const now = Date.now();
+    for (const n of list) {
+      const trig: any = (n as any)?.trigger;
+      // legacy seconds trigger without repeats and scheduled in the past or near-now
+      if (trig && typeof trig.seconds === 'number' && !trig.repeats) {
+        try { await Notifications.cancelScheduledNotificationAsync((n as any).identifier); } catch {}
+      }
+      // date-based triggers in the past
+      if (trig && trig.date) {
+        const when = +new Date(trig.date);
+        if (when && when <= now) {
+          try { await Notifications.cancelScheduledNotificationAsync((n as any).identifier); } catch {}
+        }
+      }
+    }
+  } catch {}
+}
+
   } catch (e) {
     console.error('❌ cancelNotification error:', e);
   }
