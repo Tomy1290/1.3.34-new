@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useAppStore } from '../src/store/useStore';
 import { markersForMonth } from '../src/utils/cycle';
 import { LineChart } from 'react-native-gifted-charts';
+import { useI18n } from '../src/i18n';
 
 function useThemeColors(theme: string) {
   if (theme === 'pink_pastel') return { bg: '#fff0f5', card: '#ffe4ef', primary: '#d81b60', text: '#3a2f33', muted: '#8a6b75' };
@@ -25,6 +26,7 @@ function getMonthDays(year: number, month: number) {
 function dateKey(d: Date) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 export default function CycleScreen() {
+  const t = useI18n();
   const state = useAppStore();
   const router = useRouter();
   const colors = useThemeColors(state.theme);
@@ -36,14 +38,13 @@ export default function CycleScreen() {
   const year = cursor.getFullYear(); const month = cursor.getMonth();
   const monthDays = useMemo(() => getMonthDays(year, month), [year, month]);
   const { period, upcomingPeriod, fertile, ovulation, expected, avgCycleLen, avgPeriodLen, expectedNext } = useMemo(() => markersForMonth(year, month, state.cycles), [year, month, state.cycles]);
-  const lang = state.language;
 
   // entries markers from cycleLogs
   const hasLog = new Set<string>();
   for (const k of Object.keys(state.cycleLogs||{})) {
     const v = state.cycleLogs[k];
     if (!v) continue;
-    if (typeof v.mood==='number' || typeof v.energy==='number' || typeof v.pain==='number' || typeof v.sleep==='number' || typeof v.flow==='number' || typeof v.sex==='boolean' || (v.notes && v.notes.trim().length>0)) {
+    if (typeof v.mood==='number' || typeof v.energy==='number' || typeof v.pain==='number' || typeof v.sleep==='number' || typeof v.flow==='number' || v.sex || (v.notes && v.notes.trim().length>0)) {
       hasLog.add(k);
     }
   }
@@ -66,53 +67,26 @@ export default function CycleScreen() {
 
   const todayKey = dateKey(new Date());
 
-  // Highlights across all attributes (last 6 months)
-  const highlightItems = useMemo(() => {
-    const now = new Date(); const six = new Date(); six.setMonth(six.getMonth()-6);
-    const entries = Object.entries(state.cycleLogs||{})
-      .map(([k,v]) => ({ key:k, date:new Date(k), v }))
-      .filter(x => +x.date >= +six && +x.date <= +now);
-
-    function score(v: any) {
-      let s = 0;
-      const flow = typeof v.flow==='number'? v.flow : 0; s += flow * 2;
-      const pain = typeof v.pain==='number'? v.pain : 0; s += Math.max(0, pain - 5) * 2;
-      const mood = typeof v.mood==='number'? v.mood : 0; s += mood <= 3 ? (4 - mood) * 2 : 0;
-      const energy = typeof v.energy==='number'? v.energy : 0; s += energy <= 3 ? (4 - energy) * 1.5 : 0;
-      const sleep = typeof v.sleep==='number'? v.sleep : 0; s += sleep <= 3 ? (4 - sleep) * 1.5 : 0;
-      if (v.cramps) s += 2; if (v.headache) s += 2; if (v.nausea) s += 2;
-      if (v.notes && v.notes.trim().length>=30) s += 2; else if (v.notes && v.notes.trim().length>0) s += 1;
-      return s;
-    }
-
-    const arr = entries.map(e => ({ ...e, s: score(e.v) }))
-      .filter(e => e.s > 0)
-      .sort((a,b) => (b.s - a.s) || (+b.date - +a.date))
-      .slice(0,5);
-
-    return arr;
-  }, [state.cycleLogs]);
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}> 
-        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }} accessibilityLabel='Zurück'>
+      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }} accessibilityLabel={t('common.back')}>
           <Ionicons name='chevron-back' size={26} color={colors.text} />
         </TouchableOpacity>
         <View style={{ alignItems: 'center' }}>
-          <Text style={[styles.appTitle, { color: colors.text }]}>{lang==='en' ? "Scarlett’s Health Tracking" : (lang==='pl'? 'Zdrowie Scarlett' : 'Scarletts Gesundheitstracking')}</Text>
-          <Text style={[styles.title, { color: colors.muted }]}>{lang==='de'?'Zyklus':(lang==='pl'?'Cykl':'Cycle')}</Text>
+          <Text style={[styles.appTitle, { color: colors.text }]}>{t('common.appTitle')}</Text>
+          <Text style={[styles.title, { color: colors.muted }]}>{t('cycle.title')}</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* Analysis – collapsible */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Ionicons name='stats-chart' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{lang==='de'?'Analyse':'Analysis'}</Text>
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.analysisTitle')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity onPress={() => toggleHelp('analysis')} style={{ paddingHorizontal: 8 }}>
@@ -124,46 +98,46 @@ export default function CycleScreen() {
             </View>
           </View>
           {help.analysis ? (
-            <Text style={{ color: colors.muted, marginTop: 6 }}>Ø {lang==='de'?'Zykluslänge':'cycle length'} = {avgCycleLen}, Ø {lang==='de'?'Periodenlänge':'period length'} = {avgPeriodLen}. {lang==='de'?'Prognose basiert auf letzten Starts.':'Forecast based on recent cycle starts.'}</Text>
+            <Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.analysisHelp', { avgCycleLen, avgPeriodLen })}</Text>
           ) : null}
           {expanded.analysis ? (
             <>
               {/* Last period */}
               <View style={{ marginTop: 8 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>{lang==='de'?'Letzte Periode':'Last period'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.lastPeriodTitle')}</Text>
                 {last ? (
                   <Text style={{ color: colors.muted, marginTop: 4 }}>
-                    {new Date(last.start).toLocaleDateString()} – {new Date(last.end as string).toLocaleDateString()} {lastPeriodLen?`(${lastPeriodLen} ${lang==='de'?'Tage':'days'})`:''}
+                    {new Date(last.start).toLocaleDateString()} – {new Date(last.end as string).toLocaleDateString()} {lastPeriodLen?`(${t('cycle.days', { count: lastPeriodLen })})`:''}
                   </Text>
                 ) : (
-                  <Text style={{ color: colors.muted, marginTop: 4 }}>{lang==='de'?'Keine abgeschlossene Periode':'No completed period'}</Text>
+                  <Text style={{ color: colors.muted, marginTop: 4 }}>{t('cycle.noCompletedPeriod')}</Text>
                 )}
               </View>
               {/* All periods avg + sparkline */}
               <View style={{ marginTop: 10 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>{lang==='de'?'Alle Perioden':'All periods'}</Text>
-                <Text style={{ color: colors.muted, marginTop: 4 }}>Ø {lang==='de'?'Zykluslänge':'cycle length'}: {avgCycleLen} {lang==='de'?'Tage':'days'}</Text>
-                <Text style={{ color: colors.muted, marginTop: 2 }}>Ø {lang==='de'?'Periodenlänge':'period length'}: {avgPeriodLen} {lang==='de'?'Tage':'days'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.allPeriodsTitle')}</Text>
+                <Text style={{ color: colors.muted, marginTop: 4 }}>{t('cycle.avgCycleLen')}: {avgCycleLen} {t('cycle.days', { count: 0 }).split(' ')[1]}</Text>
+                <Text style={{ color: colors.muted, marginTop: 2 }}>{t('cycle.avgPeriodLen')}: {avgPeriodLen} {t('cycle.days', { count: 0 }).split(' ')[1]}</Text>
                 {sparkData.length > 1 ? (
                   <View style={{ marginTop: 6 }}>
                     <LineChart data={sparkData} height={50} initialSpacing={0} thickness={2} xAxisColor={'transparent'} yAxisColor={'transparent'} hideRules hideYAxisText hideDataPoints curved color={colors.primary} disableScroll areaChart hideAxes />
-                    <Text style={{ color: colors.muted, marginTop: 4 }}>{lang==='de'?'Trend (letzte Zyklen)':'Trend (recent cycles)'}</Text>
+                    <Text style={{ color: colors.muted, marginTop: 4 }}>{t('cycle.trendRecent')}</Text>
                   </View>
                 ) : null}
-                {expectedNext ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Nächster Zyklus erwartet am':'Next cycle expected on'} {expectedNext.toLocaleDateString()}</Text>) : null}
+                {expectedNext ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.expectedNextPrefix')} {expectedNext.toLocaleDateString()}</Text>) : null}
               </View>
             </>
           ) : null}
         </View>
 
         {/* Calendar */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <TouchableOpacity onPress={() => setCursor(new Date(year, month-1, 1))} accessibilityLabel='Vorheriger Monat'>
+            <TouchableOpacity onPress={() => setCursor(new Date(year, month-1, 1))} accessibilityLabel={t('cycle.prevMonth')}>
               <Ionicons name='chevron-back' size={20} color={colors.text} />
             </TouchableOpacity>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{new Date(year, month, 1).toLocaleDateString(lang==='de'?'de-DE':(lang==='pl'?'pl-PL':'en-US'), { month: 'long', year: 'numeric' })}</Text>
-            <TouchableOpacity onPress={() => setCursor(new Date(year, month+1, 1))} accessibilityLabel='Nächster Monat'>
+            <Text style={{ color: colors.text, fontWeight: '700' }}>{new Date(year, month, 1).toLocaleDateString(state.language==='de'?'de-DE':(state.language==='pl'?'pl-PL':'en-US'), { month: 'long', year: 'numeric' })}</Text>
+            <TouchableOpacity onPress={() => setCursor(new Date(year, month+1, 1))} accessibilityLabel={t('cycle.nextMonth')}>
               <Ionicons name='chevron-forward' size={20} color={colors.text} />
             </TouchableOpacity>
           </View>
@@ -172,10 +146,10 @@ export default function CycleScreen() {
               <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
-          {help.calendar ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Farben zeigen Periode/Fruchtbarkeit. Tippe auf einen Tag zum Eintrag.':'Colors indicate period/fertile days. Tap a day to log.'}</Text>) : null}
+          {help.calendar ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.calendarHelp')}</Text>) : null}
           {/* Weekday header (Mon start) */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-            {[lang==='de'?['Mo','Di','Mi','Do','Fr','Sa','So']:(lang==='pl'?['Pn','Wt','Śr','Cz','Pt','So','Nd']:['Mo','Tu','We','Th','Fr','Sa','Su'])].flat().map((d, i) => (
+            {[state.language==='de'?['Mo','Di','Mi','Do','Fr','Sa','So']:(state.language==='pl'?['Pn','Wt','Śr','Cz','Pt','So','Nd']:['Mo','Tu','We','Th','Fr','Sa','Su'])].flat().map((d, i) => (
               <Text key={i} style={{ color: colors.muted, width: `${100/7}%`, textAlign: 'center' }}>{d}</Text>
             ))}
           </View>
@@ -198,7 +172,7 @@ export default function CycleScreen() {
                     const has = hasLog.has(key);
                     const isFuture = key > todayKey;
                     return (
-                      <TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture && router.push(`/cycle/${key}`)} accessibilityLabel={`Tag ${key}`} testID={`cycle-day-${key}`}>
+                      <TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture && router.push(`/cycle/${key}`)} accessibilityLabel={t('cycle.dayA11y', { key })} testID={`cycle-day-${key}`}>
                         <View style={{ width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center',
                           backgroundColor: isPeriod ? colors.primary : (isUpcoming ? `${colors.primary}33` : (isFertile ? `${colors.primary}22` : 'transparent')),
                           borderWidth: isExpected ? 2 : (isFertile ? 1 : 0), borderColor: isExpected ? colors.primary : (isFertile ? colors.primary : 'transparent') }}>
@@ -217,37 +191,37 @@ export default function CycleScreen() {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: colors.primary }} />
-              <Text style={{ color: colors.text, marginLeft: 6 }}>{lang==='de'?'Periode':'Period'}</Text>
+              <Text style={{ color: colors.text, marginLeft: 6 }}>{t('cycle.legend.period')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: `${colors.primary}33` }} />
-              <Text style={{ color: colors.text, marginLeft: 6 }}>{lang==='de'?'Periode (bevorstehend)':'Period (upcoming)'}</Text>
+              <Text style={{ color: colors.text, marginLeft: 6 }}>{t('cycle.legend.upcoming')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: `${colors.primary}22`, borderWidth: 1, borderColor: colors.primary }} />
-              <Text style={{ color: colors.text, marginLeft: 6 }}>{lang==='de'?'Fruchtbar':'Fertile'}</Text>
+              <Text style={{ color: colors.text, marginLeft: 6 }}>{t('cycle.legend.fertile')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: 'transparent', borderWidth: 2, borderColor: colors.primary }} />
-              <Text style={{ color: colors.text, marginLeft: 6 }}>{lang==='de'?'Erwarteter Start':'Expected start'}</Text>
+              <Text style={{ color: colors.text, marginLeft: 6 }}>{t('cycle.legend.expectedStart')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.primary, marginRight: 6 }} />
-              <Text style={{ color: colors.text }}>{lang==='de'?'Eisprung (kleiner Punkt)':'Ovulation (small dot)'}</Text>
+              <Text style={{ color: colors.text }}>{t('cycle.legend.ovulation')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: 18, height: 2, backgroundColor: colors.primary, marginRight: 6 }} />
-              <Text style={{ color: colors.text }}>{lang==='de'?'Eintrag vorhanden':'Has entry'}</Text>
+              <Text style={{ color: colors.text }}>{t('cycle.legend.hasEntry')}</Text>
             </View>
           </View>
         </View>
 
         {/* History – last 12 cycles (collapsible) */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Ionicons name='time' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{lang==='de'?'Historie (12 Perioden)':'History (12 cycles)'}</Text>
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.history12')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity onPress={() => toggleHelp('history')} style={{ paddingHorizontal: 8 }}>
@@ -258,17 +232,17 @@ export default function CycleScreen() {
               </TouchableOpacity>
             </View>
           </View>
-          {help.history ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Letzte 12 Zyklen mit Länge; laufende Zyklen sind markiert.':'Last 12 cycles with length; ongoing cycles marked.'}</Text>) : null}
+          {help.history ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.historyHelp') || t('cycle.history12')}</Text>) : null}
           {expanded.history ? (
             state.cycles.length === 0 ? (
-              <Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Keine Einträge.':'No entries.'}</Text>
+              <Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.noEntries')}</Text>
             ) : (
               [...state.cycles].slice(-12).map((c, idx) => {
                 const s = new Date(c.start); const e = c.end ? new Date(c.end) : undefined;
                 const len = e ? Math.max(1, Math.round((+e - +s)/(24*60*60*1000))+1) : undefined;
                 return (
                   <Text key={c.start+String(idx)} style={{ color: colors.muted, marginTop: idx===0?6:2 }}>
-                    {s.toLocaleDateString()} {e ? `– ${e.toLocaleDateString()} (${len} ${lang==='de'?'Tage':'days'})` : `– ${lang==='de'?'laufend':'ongoing'}`}
+                    {s.toLocaleDateString()} {e ? `– ${e.toLocaleDateString()} (${len} ${t('cycle.days', { count: len || 0 }).split(' ')[1]})` : `– ${t('cycle.ongoing')}`}
                   </Text>
                 );
               })
@@ -277,53 +251,71 @@ export default function CycleScreen() {
         </View>
 
         {/* Highlights – top 5 intense days (last 6 months) with all attributes */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Ionicons name='flame' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{lang==='de'?'Highlights':'Highlights'}</Text>
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.highlightsTitle')}</Text>
             </View>
             <TouchableOpacity onPress={() => toggleExpanded('highlights')}>
               <Ionicons name={expanded.highlights?'chevron-up':'chevron-down'} size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
           {expanded.highlights ? (
-            highlightItems.length === 0 ? (
-              <Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Keine Highlights':'No highlights'}</Text>
-            ) : (
-              <View style={{ marginTop: 6 }}>
-                {highlightItems.map((it) => {
-                  const v: any = it.v || {};
-                  const dateLabel = new Date(it.key).toLocaleDateString(lang==='de'?'de-DE':(lang==='pl'?'pl-PL':'en-GB'));
-                  const line = (label: string, value: string | number | undefined) => (value===undefined || value===null || value=== '') ? null : (
-                    <Text style={{ color: colors.muted, marginTop: 2 }}>{label}: {value}</Text>
-                  );
-                  const bool = (label: string, on?: boolean) => on ? <Text style={{ color: colors.muted, marginTop: 2 }}>• {label}</Text> : null;
-                  return (
-                    <View key={it.key} style={{ borderTopWidth: 1, borderTopColor: `${colors.muted}33`, paddingTop: 8, marginTop: 8 }}>
-                      <Text style={{ color: colors.text, fontWeight: '700' }}>{dateLabel}</Text>
-                      {/* Numbers */}
-                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
-                        {line(lang==='de'?'Periode':'Flow', typeof v.flow==='number'? v.flow : undefined)}
-                        {line(lang==='de'?'Schmerz':'Pain', typeof v.pain==='number'? v.pain : undefined)}
-                        {line(lang==='de'?'Stimmung':'Mood', typeof v.mood==='number'? v.mood : undefined)}
-                        {line(lang==='de'?'Energie':'Energy', typeof v.energy==='number'? v.energy : undefined)}
-                        {line(lang==='de'?'Schlaf':'Sleep', typeof v.sleep==='number'? v.sleep : undefined)}
+            (() => {
+              const now = new Date(); const six = new Date(); six.setMonth(six.getMonth()-6);
+              const entries = Object.entries(state.cycleLogs||{})
+                .map(([k,v]) => ({ key:k, date:new Date(k), v }))
+                .filter(x => +x.date >= +six && +x.date <= +now);
+
+              function line(label: string, value: string | number | undefined) { return (value===undefined || value===null || value==='') ? null : (<Text style={{ color: colors.muted, marginTop: 2 }}>{label}: {value}</Text>); }
+              function bool(label: string, on?: boolean) { return on ? <Text style={{ color: colors.muted, marginTop: 2 }}>• {label}</Text> : null; }
+
+              const arr = entries.map(e => ({ ...e, s: (() => {
+                const v: any = e.v || {}; let s = 0;
+                const flow = typeof v.flow==='number'? v.flow : 0; s += flow * 2;
+                const pain = typeof v.pain==='number'? v.pain : 0; s += Math.max(0, pain - 5) * 2;
+                const mood = typeof v.mood==='number'? v.mood : 0; s += mood <= 3 ? (4 - mood) * 2 : 0;
+                const energy = typeof v.energy==='number'? v.energy : 0; s += energy <= 3 ? (4 - energy) * 1.5 : 0;
+                const sleep = typeof v.sleep==='number'? v.sleep : 0; s += sleep <= 3 ? (4 - sleep) * 1.5 : 0;
+                if (v.cramps) s += 2; if (v.headache) s += 2; if (v.nausea) s += 2;
+                if (v.notes && v.notes.trim().length>=30) s += 2; else if (v.notes && v.notes.trim().length>0) s += 1;
+                return s;
+              })() }))
+                .filter(e => e.s > 0)
+                .sort((a,b) => (b.s - a.s) || (+b.date - +a.date))
+                .slice(0,5);
+
+              if (arr.length === 0) return <Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.noHighlights')}</Text>;
+
+              return (
+                <View style={{ marginTop: 6 }}>
+                  {arr.map((it) => {
+                    const v: any = it.v || {};
+                    const dateLabel = new Date(it.key).toLocaleDateString(state.language==='de'?'de-DE':(state.language==='pl'?'pl-PL':'en-GB'));
+                    return (
+                      <View key={it.key} style={{ borderTopWidth: 1, borderTopColor: `${colors.muted}33`, paddingTop: 8, marginTop: 8 }}>
+                        <Text style={{ color: colors.text, fontWeight: '700' }}>{dateLabel}</Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
+                          {line(t('cycle.fields.flow'), typeof v.flow==='number'? v.flow : undefined)}
+                          {line(t('cycle.fields.pain'), typeof v.pain==='number'? v.pain : undefined)}
+                          {line(t('cycle.fields.mood'), typeof v.mood==='number'? v.mood : undefined)}
+                          {line(t('cycle.fields.energy'), typeof v.energy==='number'? v.energy : undefined)}
+                          {line(t('cycle.fields.sleep'), typeof v.sleep==='number'? v.sleep : undefined)}
+                        </View>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+                          {bool(t('cycle.fields.cramps'), v.cramps)}
+                          {bool(t('cycle.fields.headache'), v.headache)}
+                          {bool(t('cycle.fields.nausea'), v.nausea)}
+                          {bool(t('cycle.fields.sex'), v.sex)}
+                        </View>
+                        {v.notes ? <Text style={{ color: colors.muted, marginTop: 4 }} numberOfLines={3}>{v.notes}</Text> : null}
                       </View>
-                      {/* Toggles */}
-                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-                        {bool(lang==='de'?'Krämpfe':'Cramps', v.cramps)}
-                        {bool(lang==='de'?'Kopfschmerzen':'Headache', v.headache)}
-                        {bool(lang==='de'?'Übelkeit':'Nausea', v.nausea)}
-                        {bool('Sex', v.sex)}
-                      </View>
-                      {/* Notes */}
-                      {v.notes ? <Text style={{ color: colors.muted, marginTop: 4 }} numberOfLines={3}>{v.notes}</Text> : null}
-                    </View>
-                  );
-                })}
-              </View>
-            )
+                    );
+                  })}
+                </View>
+              );
+            })()
           ) : null}
         </View>
       </ScrollView>

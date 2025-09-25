@@ -5,6 +5,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAppStore } from '../../src/store/useStore';
 import * as Haptics from 'expo-haptics';
+import { useI18n } from '../../src/i18n';
 
 function useThemeColors(theme: string) {
   if (theme === 'pink_pastel') return { bg: '#fff0f5', card: '#ffe4ef', primary: '#d81b60', text: '#3a2f33', muted: '#8a6b75', input: '#ffffff' };
@@ -19,9 +20,9 @@ export default function CycleDayScreen() {
   const { date } = useLocalSearchParams<{ date: string }>();
   const state = useAppStore();
   const router = useRouter();
+  const t = useI18n();
   const colors = useThemeColors(state.theme);
   const serverLog = state.cycleLogs[date || ''] || {};
-  const lang = state.language;
   const [help, setHelp] = useState<{[k:string]: boolean}>({});
   const [savedVisible, setSavedVisible] = useState(false);
   const toggleHelp = (k: string) => setHelp(h => ({ ...h, [k]: !h[k] }));
@@ -100,7 +101,7 @@ export default function CycleDayScreen() {
     state.setCycleLog(String(date), draft as any);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (Platform.OS === 'android') {
-      ToastAndroid.show(lang==='de'?'Gespeichert':(lang==='pl'?'Zapisano':'Saved'), ToastAndroid.SHORT);
+      ToastAndroid.show(t('common.saved') || 'Saved', ToastAndroid.SHORT);
     } else {
       setSavedVisible(true);
       setTimeout(() => setSavedVisible(false), 1500);
@@ -127,13 +128,13 @@ export default function CycleDayScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}> 
-        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }} accessibilityLabel='Zurück'>
+      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }} accessibilityLabel={t('common.back')}>
           <Ionicons name='chevron-back' size={26} color={colors.text} />
         </TouchableOpacity>
         <View style={{ alignItems: 'center' }}>
-          <Text style={[styles.appTitle, { color: colors.text }]}>{lang==='en' ? "Scarlett’s Health Tracking" : (lang==='pl'?'Zdrowie Scarlett':'Scarletts Gesundheitstracking')}</Text>
-          <Text style={[styles.title, { color: colors.muted }]}>{lang==='de'?'Zyklus-Tag':'Cycle day'}</Text>
+          <Text style={[styles.appTitle, { color: colors.text }]}>{t('common.appTitle')}</Text>
+          <Text style={[styles.title, { color: colors.muted }]}>{t('cycle.dayTitle')}</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
@@ -143,17 +144,17 @@ export default function CycleDayScreen() {
           <Text style={{ color: colors.text, textAlign: 'center', fontWeight: '700' }}>{formattedDate}</Text>
 
           {/* Mood */}
-          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name={'happy'} size={18} color={colors.primary} />
-                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{lang==='de'?'Stimmung':'Mood'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.moodTitle')}</Text>
               </View>
               <TouchableOpacity onPress={() => toggleHelp('mood')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
             </View>
-            {help.mood ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Wähle 1–10; links traurig, Mitte neutral, rechts glücklich.':'Choose 1–10; left sad, middle neutral, right happy.'}</Text>) : null}
+            {help.mood ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.moodHelp')}</Text>) : null}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <TouchableOpacity testID={`cycle-mood-minus`} onPress={() => setVal('mood', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
                 <Ionicons name='remove' size={16} color={colors.primary} />
@@ -166,17 +167,17 @@ export default function CycleDayScreen() {
           </View>
 
           {/* Energy */}
-          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name={'flash'} size={18} color={colors.primary} />
-                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{lang==='de'?'Energie':'Energy'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.energyTitle')}</Text>
               </View>
               <TouchableOpacity onPress={() => toggleHelp('energy')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
             </View>
-            {help.energy ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Wähle 1–10: höhere Zahl = mehr Energie.':'Choose 1–10: higher number = more energy.'}</Text>) : null}
+            {help.energy ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.energyHelp')}</Text>) : null}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <TouchableOpacity testID={`cycle-energy-minus`} onPress={() => setVal('energy', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
                 <Ionicons name='remove' size={16} color={colors.primary} />
@@ -189,17 +190,17 @@ export default function CycleDayScreen() {
           </View>
 
           {/* Pain */}
-          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name={'medkit'} size={18} color={colors.primary} />
-                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{lang==='de'?'Schmerz':'Pain'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.painTitle')}</Text>
               </View>
               <TouchableOpacity onPress={() => toggleHelp('pain')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
             </View>
-            {help.pain ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Wähle 1–10: höher = stärker.':'Choose 1–10: higher = stronger.'}</Text>) : null}
+            {help.pain ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.painHelp')}</Text>) : null}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <TouchableOpacity testID={`cycle-pain-minus`} onPress={() => setVal('pain', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
                 <Ionicons name='remove' size={16} color={colors.primary} />
@@ -212,17 +213,17 @@ export default function CycleDayScreen() {
           </View>
 
           {/* Sleep */}
-          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name={'moon'} size={18} color={colors.primary} />
-                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{lang==='de'?'Schlaf':'Sleep'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.sleepTitle')}</Text>
               </View>
               <TouchableOpacity onPress={() => toggleHelp('sleep')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
             </View>
-            {help.sleep ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Wähle 1–10: höhere Zahl = besserer Schlaf.':'Choose 1–10: higher number = better sleep.'}</Text>) : null}
+            {help.sleep ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.sleepHelp')}</Text>) : null}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <TouchableOpacity testID={`cycle-sleep-minus`} onPress={() => setVal('sleep', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
                 <Ionicons name='remove' size={16} color={colors.primary} />
@@ -235,17 +236,17 @@ export default function CycleDayScreen() {
           </View>
 
           {/* Bleeding intensity (0..10 taps + stepper) */}
-          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name='water' size={16} color={colors.primary} />
-                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 6 }}>{lang==='de'?'Periode (Stärke)':'Bleeding (intensity)'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 6 }}>{t('cycle.bleedingTitle')}</Text>
               </View>
               <TouchableOpacity onPress={() => toggleHelp('bleeding')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
             </View>
-            {help.bleeding ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Wähle 0–10 Tropfen; mehr Tropfen = stärkere Blutung.':'Choose 0–10 drops; more drops = stronger bleeding.'}</Text>) : null}
+            {help.bleeding ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.bleedingHelp')}</Text>) : null}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <TouchableOpacity onPress={() => setFlow(draft.flow - 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
                 <Ionicons name='remove' size={16} color={colors.primary} />
@@ -258,58 +259,58 @@ export default function CycleDayScreen() {
           </View>
 
           {/* Additional: toggles */}
-          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Text style={{ color: colors.text, fontWeight: '700' }}>{lang==='de'?'Weitere Angaben':'Additional'}</Text>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.additionalTitle')}</Text>
               <TouchableOpacity onPress={() => toggleHelp('additional')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
             </View>
-            {help.additional ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Nützliche Marker: Krämpfe, Kopfschmerzen, Übelkeit.':'Useful markers: cramps, headache, nausea.'}</Text>) : null}
+            {help.additional ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.additionalHelp')}</Text>) : null}
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
               <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, sex: !d.sex }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.sex ? colors.primary : 'transparent' }]}> 
                 <Ionicons name='heart' size={14} color={draft.sex ? '#fff' : colors.primary} />
-                <Text style={{ color: draft.sex ? '#fff' : colors.text, marginLeft: 6 }}>{lang==='de'?'Sex':'Sex'}</Text>
+                <Text style={{ color: draft.sex ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.sex')}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, cramps: !d.cramps }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.cramps ? colors.primary : 'transparent' }]}> 
                 <Ionicons name='body' size={14} color={draft.cramps ? '#fff' : colors.primary} />
-                <Text style={{ color: draft.cramps ? '#fff' : colors.text, marginLeft: 6 }}>{lang==='de'?'Krämpfe':'Cramps'}</Text>
+                <Text style={{ color: draft.cramps ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.cramps')}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, headache: !d.headache }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.headache ? colors.primary : 'transparent' }]}> 
                 <Ionicons name='medkit' size={14} color={draft.headache ? '#fff' : colors.primary} />
-                <Text style={{ color: draft.headache ? '#fff' : colors.text, marginLeft: 6 }}>{lang==='de'?'Kopfschmerzen':'Headache'}</Text>
+                <Text style={{ color: draft.headache ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.headache')}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, nausea: !d.nausea }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.nausea ? colors.primary : 'transparent' }]}> 
                 <Ionicons name='restaurant' size={14} color={draft.nausea ? '#fff' : colors.primary} />
-                <Text style={{ color: draft.nausea ? '#fff' : colors.text, marginLeft: 6 }}>{lang==='de'?'Übelkeit':'Nausea'}</Text>
+                <Text style={{ color: draft.nausea ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.nausea')}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Notes + Save/Delete */}
-          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Text style={{ color: colors.text, fontWeight: '700' }}>{lang==='de'?'Notizen':'Notes'}</Text>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.notesTitle')}</Text>
               <TouchableOpacity onPress={() => toggleHelp('notes')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
             </View>
-            {help.notes ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Freitext für besondere Beobachtungen.':'Free text for notable observations.'}</Text>) : null}
-            <TextInput testID='cycle-notes' style={{ marginTop: 8, minHeight: 100, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, padding: 10, color: colors.text, backgroundColor: colors.input }} placeholder={lang==='de'?'Notizen hier eingeben...':'Enter notes...'} placeholderTextColor={colors.muted} value={draft.notes} onChangeText={(v) => setDraft((d)=>({ ...d, notes: v }))} multiline />
+            {help.notes ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.notesHelp')}</Text>) : null}
+            <TextInput testID='cycle-notes' style={{ marginTop: 8, minHeight: 100, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, padding: 10, color: colors.text, backgroundColor: colors.input }} placeholder={t('cycle.notesPlaceholder')} placeholderTextColor={colors.muted} value={draft.notes} onChangeText={(v) => setDraft((d)=>({ ...d, notes: v }))} multiline />
             {!canModify ? (
-              <Text style={{ color: colors.muted, marginTop: 6 }}>{lang==='de'?'Bearbeiten für Einträge älter als 7 Tage oder in der Zukunft deaktiviert.':'Editing disabled for entries older than 7 days or in the future.'}</Text>
+              <Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.editDisabled7d')}</Text>
             ) : null}
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 10 }}>
-              <TouchableOpacity disabled={!canModify} onPress={deleteDraft} style={[styles.chip, { borderColor: colors.primary, opacity: canModify?1:0.4 }]}>
+              <TouchableOpacity disabled={!canModify} onPress={deleteDraft} style={[styles.chip, { borderColor: colors.primary, opacity: canModify?1:0.4 }]}> 
                 <Ionicons name='trash' size={16} color={colors.primary} />
-                <Text style={{ color: colors.text, marginLeft: 6 }}>{lang==='de'?'Löschen':'Delete'}</Text>
+                <Text style={{ color: colors.text, marginLeft: 6 }}>{t('common.delete')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity disabled={!canModify} onPress={saveDraft} style={[styles.chip, { backgroundColor: colors.primary, borderColor: colors.primary, opacity: canModify?1:0.4 }]}>
+              <TouchableOpacity disabled={!canModify} onPress={saveDraft} style={[styles.chip, { backgroundColor: colors.primary, borderColor: colors.primary, opacity: canModify?1:0.4 }]}> 
                 <Ionicons name='save' size={16} color={'#fff'} />
-                <Text style={{ color: '#fff', marginLeft: 6 }}>{lang==='de'?'Speichern':'Save'}</Text>
+                <Text style={{ color: '#fff', marginLeft: 6 }}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
-            {savedVisible ? (<Text style={{ color: colors.muted, marginTop: 6, textAlign: 'right' }}>{lang==='de'?'Gespeichert':'Saved'}</Text>) : null}
+            {savedVisible ? (<Text style={{ color: colors.muted, marginTop: 6, textAlign: 'right' }}>{t('common.saved') || 'Saved'}</Text>) : null}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
