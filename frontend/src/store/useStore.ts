@@ -260,41 +260,7 @@ export const useAppStore = create<AppState>()(
 
       scheduleCycleNotifications: async () => {
         try {
-          await ensureNotificationPermissions();
-          await ensureAndroidChannel();
-          const keys = ['cycle_period_minus2','cycle_period_day0','cycle_fertile_minus2','cycle_fertile_day0'];
-          for (const k of keys) { const meta = get().notificationMeta[k]; if (meta?.id) await cancelNotification(meta.id); }
-          const cycles = get().cycles;
-          const next = predictNextStart(cycles);
-          const fertile = getFertileWindow(cycles);
-          if (next) {
-            const day0 = new Date(next.getFullYear(), next.getMonth(), next.getDate(), 9, 0, 0);
-            const minus2 = new Date(day0); minus2.setDate(day0.getDate() - 2);
-            const title0 = get().language==='en' ? 'Period expected today' : (get().language==='pl'?'Okres spodziewany dziś':'Periode heute erwartet');
-            const title2 = get().language==='en' ? 'Period in 2 days' : (get().language==='pl'?'Okres za 2 dni':'Periode in 2 Tagen erwartet');
-            if (+minus2 > +new Date()) {
-              const id2 = await scheduleOneTimeNotification(title2, '', minus2, 'cycle');
-              if (id2) get().setNotificationMeta('cycle_period_minus2', { id: id2 });
-            }
-            if (+day0 > +new Date()) {
-              const id0 = await scheduleOneTimeNotification(title0, '', day0, 'cycle');
-              if (id0) get().setNotificationMeta('cycle_period_day0', { id: id0 });
-            }
-          }
-          if (fertile) {
-            const start = new Date(fertile.start.getFullYear(), fertile.start.getMonth(), fertile.start.getDate(), 9, 0, 0);
-            const minus2f = new Date(start); minus2f.setDate(start.getDate() - 2);
-            const title0f = get().language==='en' ? 'Fertile phase starts today' : (get().language==='pl'?'Płodna faza zaczyna się dziś':'Fruchtbare Phase ab heute');
-            const title2f = get().language==='en' ? 'Fertile phase in 2 days' : (get().language==='pl'?'Płodna faza za 2 dni':'Fruchtbare Phase in 2 Tagen');
-            if (+minus2f > +new Date()) {
-              const id2f = await scheduleOneTimeNotification(title2f, '', minus2f, 'cycle');
-              if (id2f) get().setNotificationMeta('cycle_fertile_minus2', { id: id2f });
-            }
-            if (+start > +new Date()) {
-              const id0f = await scheduleOneTimeNotification(title0f, '', start, 'cycle');
-              if (id0f) get().setNotificationMeta('cycle_fertile_day0', { id: id0f });
-            }
-          }
+          await scheduleCycleNotificationsUtil(useAppStore.getState());
         } catch {}
       },
 
