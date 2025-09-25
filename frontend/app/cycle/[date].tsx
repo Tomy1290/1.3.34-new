@@ -436,6 +436,22 @@ export default function CycleDayScreen() {
                 <Ionicons name='body' size={14} color={draft.cramps ? '#fff' : colors.primary} />
                 <Text style={{ color: draft.cramps ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.cramps')}</Text>
               </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, backPain: !d.backPain }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.backPain ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='fitness' size={14} color={draft.backPain ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.backPain ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.backPain') || 'Rückenschmerzen'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, breastTenderness: !d.breastTenderness }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.breastTenderness ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='female' size={14} color={draft.breastTenderness ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.breastTenderness ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.breastTenderness') || 'Brustspannen'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, waterRetention: !d.waterRetention }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.waterRetention ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='water' size={14} color={draft.waterRetention ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.waterRetention ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.waterRetention') || 'Wassereinlagerungen'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, dizziness: !d.dizziness }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.dizziness ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='swap-vertical' size={14} color={draft.dizziness ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.dizziness ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.dizziness') || 'Schwindel'}</Text>
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, headache: !d.headache }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.headache ? colors.primary : 'transparent' }]}> 
                 <Ionicons name='medkit' size={14} color={draft.headache ? '#fff' : colors.primary} />
                 <Text style={{ color: draft.headache ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.headache')}</Text>
