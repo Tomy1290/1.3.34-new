@@ -283,6 +283,11 @@ const de = {
     highlightsTitle: "Highlights",
     noHighlights: "Keine Highlights",
     fields: {
+      backPain: "Rückenschmerzen",
+      breastTenderness: "Brustspannen",
+      waterRetention: "Wassereinlagerungen",
+      dizziness: "Schwindel",
+
       flow: "Periode",
       pain: "Schmerz",
       mood: "Stimmung",
