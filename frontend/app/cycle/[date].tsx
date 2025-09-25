@@ -154,7 +154,7 @@ export default function CycleDayScreen() {
       const today = new Date();
       const dayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const dtOnly = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-      if (+dtOnly &gt; +dayOnly) return false; // future
+      if (+dtOnly > +dayOnly) return false; // future
       const diffDays = Math.floor((+dayOnly - +dtOnly)/(24*60*60*1000));
       return diffDays <= 7;
     } catch { return true; }
