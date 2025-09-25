@@ -74,6 +74,8 @@ export async function initializeNotifications(): Promise<boolean> {
     const hasPermissions = await requestNotificationPermissions();
     if (!hasPermissions) return false;
     await setupAndroidChannels();
+    // Best-effort Cleanup alter (Legacy) Schedules
+    try { await cleanupLegacySchedules(); } catch {}
     return true;
   } catch (error) {
     console.error('❌ Error initializing notifications:', error);
