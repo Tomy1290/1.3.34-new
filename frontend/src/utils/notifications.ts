@@ -98,7 +98,8 @@ function isHyperOSLike() {
   return brand.includes('xiaomi') || brand.includes('redmi') || brand.includes('poco') || manufacturer.includes('xiaomi');
 }
 
-export async function scheduleDailyNext(
+// Schedule a DAILY repeating reminder at given hour:minute
+export async function scheduleDailyReminder(
   id: string,
   title: string,
   body: string,
@@ -107,32 +108,34 @@ export async function scheduleDailyNext(
   channel: 'reminders' | 'cycle' = 'reminders'
 ): Promise<string | null> {
   try {
-    const when = computeNextOccurrence(hour, minute);
-    const now = new Date();
-
-    if (isHyperOSLike()) {
-      let diffSec = Math.ceil((+when - +now) / 1000);
-      if (diffSec < 60) diffSec = 60; // mindestens 60 Sekunden in die Zukunft
-      const nid = await Notifications.scheduleNotificationAsync({
-        content: { title, body, sound: true, channelId: channel },
-        trigger: { seconds: diffSec },
-      });
-      console.log(`⏲️ [DailyNext-HyperOS] in ${diffSec}s (${when.toLocaleString()})`);
-      logNotificationPlanned('DailyNext-HyperOS', title, when);
-      return nid;
-    } else {
-      const nid = await Notifications.scheduleNotificationAsync({
-        content: { title, body, sound: true, channelId: channel },
-        trigger: { date: when },
-      });
-      console.log(`⏲️ [DailyNext-Standard] at ${when.toLocaleString()}`);
-      logNotificationPlanned('DailyNext-Standard', title, when);
-      return nid;
+    // Safety: if the time is within next 20s, push to +2 minutes to avoid "fires on app start" perception
+    const next = computeNextOccurrence(hour, minute);
+    const diffMs = +next - +new Date();
+    if (diffMs > 0 && diffMs < 20_000) {
+      next.setMinutes(next.getMinutes() + 2);
     }
+    const nid = await Notifications.scheduleNotificationAsync({
+      content: { title, body, sound: true, channelId: channel },
+      trigger: { hour: next.getHours(), minute: next.getMinutes(), repeats: true } as any,
+    });
+    logNotificationPlanned('DailyRepeating', title, next);
+    return nid;
   } catch (e) {
-    console.error('❌ scheduleDailyNext error:', e);
+    console.error('❌ scheduleDailyReminder error:', e);
     return null;
   }
+}
+
+// Backward-compatible wrapper used throughout the app
+export async function scheduleDailyNext(
+  id: string,
+  title: string,
+  body: string,
+  hour: number,
+  minute: number,
+  channel: 'reminders' | 'cycle' = 'reminders'
+): Promise<string | null> {
+  return scheduleDailyReminder(id, title, body, hour, minute, channel);
 }
 
 export async function scheduleOneTimeNotification(
