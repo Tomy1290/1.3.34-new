@@ -459,6 +459,43 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
         </View>
+        {/* Debug: geplante Benachrichtigungen anzeigen */
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="bug-outline" size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>Debug</Text>
+            </View>
+            <TouchableOpacity
+              onPress={async () => {
+                try {
+                  const list = await getScheduledNotifications();
+                  const lines = (list || []).map((n) => {
+                    const t = (n as any)?.content?.title || '(ohne Titel)';
+                    const trig = (n as any)?.trigger;
+                    let when = '';
+                    if (trig?.date) {
+                      try { when = new Date(trig.date).toLocaleString(); } catch {}
+                    } else if (typeof trig?.hour === 'number' && typeof trig?.minute === 'number') {
+                      when = `${String(trig.hour).padStart(2,'0')}:${String(trig.minute).padStart(2,'0')} (täglich)`;
+                    } else if (typeof trig?.seconds === 'number') {
+                      when = `in ${trig.seconds}s`;
+                    }
+                    return `• ${t} → ${when}`;
+                  }).join('\n');
+                  const msg = lines || 'Keine geplanten Benachrichtigungen gefunden.';
+                  Alert.alert('Geplante Benachrichtigungen', msg);
+                } catch (e: any) {
+                  Alert.alert('Fehler', String(e?.message || e));
+                }
+              }}
+              style={[styles.badge, { borderColor: colors.muted, backgroundColor: colors.primary }]}>
+              <Text style={{ color: '#fff' }}>Anzeigen</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>Zeigt eine Liste aller durch das System geplanten Benachrichtigungen.</Text>
+        </View>
+
 
         {/* App info */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
