@@ -61,7 +61,7 @@ export default function CycleDayScreen() {
     });
   }, [date]);
 
-  const setVal = (field: 'mood'|'energy'|'pain'|'sleep', delta: number) => {
+  const setVal = (field: 'mood'|'energy'|'pain'|'sleep'|'stress'|'appetite'|'cravings'|'focus'|'libido', delta: number) => {
     setDraft((d) => ({ ...d, [field]: clamp((d as any)[field] + delta, 1, 10) }));
   };
   const setFlow = (val: number) => setDraft((d) => ({ ...d, flow: Math.max(1, Math.min(10, val)), period: true }));
