@@ -41,6 +41,8 @@ const de = {
     showMore: "Mehr anzeigen",
     showLess: "Weniger anzeigen",
     delete: "Löschen",
+    all: "Alle",
+    lang: { de: "Deutsch", en: "English", pl: "Polski" },
   },
   settings: {
     title: "Einstellungen",
@@ -336,6 +338,100 @@ const de = {
     you: "Du",
     week: "Woche",
     offlineHint: "Offline‑Modus: Nur eigene Werte. Online‑Sync kann später ergänzt werden."
+  },
+  profile: {
+    title: "Profil",
+    subtitle: "Avatar, persönliche Daten und BMI",
+    infoHelp: "Deine Profildaten werden nur lokal auf dem Gerät gespeichert. Ein Avatar hilft dir, dein Profil zu personalisieren. Größe und Geburtsdatum werden für Analysen (z. B. BMI) verwendet.",
+    genderLabel: "Geschlecht",
+    bmiCat: { underweight: "Untergewicht", normal: "Normalgewicht", overweight: "Übergewicht", obesity: "Adipositas" },
+  },
+  saved: {
+    title: "Gespeicherte Nachrichten",
+    searchPlaceholder: "Suchen (Titel, Text, Tags)…",
+    all: "Alle",
+    new: "Neu anlegen",
+    titlePlaceholder: "Titel (optional)",
+    customCategoryPlaceholder: "Eigene Kategorie…",
+    tagsPlaceholder: "Tags (kommagetrennt)",
+    textPlaceholder: "Text…",
+    editTitle: "Nachricht bearbeiten",
+    defaultNoteTitle: "Notiz",
+    presets: {
+      motivation: "Motivation",
+      nutrition: "Ernährung",
+      water: "Trinken",
+      sport: "Sport",
+      general: "Allgemein"
+    }
+  },
+  faq: {
+    title: "FAQ",
+    categories: {
+      nav: "Einstieg & Navigation",
+      drinks: "Getränke & Sport",
+      cycle: "Zyklus-Tracking",
+      weight: "Gewicht & Analyse",
+      reminders: "Erinnerungen & Daten",
+      game: "Gamification & Erfolge",
+      ai: "Chat & KI"
+    },
+    items: {
+      nav1: { q: "Wie wechsle ich den Tag?", a: "Nutze die Pfeile oben oder tippe auf das Datum, um zu \"Heute\" zurückzuspringen." },
+      nav2: { q: "Wo finde ich den Kalender?", a: "Dashboard → Karte \"Zyklus\" → Button \"Kalender\"." },
+      nav3: { q: "Was ist \"Schnellzugriff\"?", a: "Kacheln zu häufig genutzten Bereichen wie Chat, Einstellungen, Gespeichert und FAQ." },
+      nav4: { q: "Wie ändere ich die Sprache?", a: "Einstellungen → Sprache → Deutsch/English/Polski." },
+      dr1: { q: "Wie trage ich Wasser ein?", a: "Im Bereich \"Getränke & Sport\": \"Wasser\" → – / Anzahl / +. Bechergröße in Einstellungen festlegen." },
+      dr2: { q: "Wie berechnet sich das Tagesziel?", a: "35 ml pro kg Körpergewicht + 500 ml bei Sport. \"Wasserkur\" addiert +1,0 L zur Aufnahme (nicht zum Ziel)." },
+      dr3: { q: "Was macht \"Wasserkur\"?", a: "Schaltet einen +1,0 L Bonus für die Aufnahme an/aus." },
+      dr4: { q: "Zählt Kaffee negativ für XP?", a: "Ab der 7. Tasse werden pro weiterer Tasse 10 XP abgezogen; darunter unverändert." },
+      cy1: { q: "Wie starte/beende ich meinen Zyklus?", a: "Dashboard → Karte \"Zyklus\" → \"Zyklus Beginn/Ende\"." },
+      cy2: { q: "Was bedeuten die Farben im Kalender?", a: "Vollfarbe: Periode. Hell: bevorstehende Periode. Umrandet: fruchtbar. Kleiner Punkt: Eisprung." },
+      cy3: { q: "Kann ich zukünftige Tage öffnen?", a: "Zukunftstage sind gesperrt. Tippe auf vergangene/heutige Tage zum Eintrag." },
+      cy4: { q: "Was ist die 7‑Tage-Regel?", a: "Einträge älter als 7 Tage (und Zukunft) können nicht gespeichert/gelöscht werden." },
+      cy5: { q: "Wie erfasse ich die Periodenstärke?", a: "Auf dem Zyklus-Tag: \"Periode (Stärke)\" 0–10 per Tap oder mit –/+ einstellen." },
+      w1: { q: "Wie trage ich mein Gewicht ein?", a: "Dashboard → Karte \"Gewicht\" → \"Eintragen\"." },
+      w2: { q: "Was zeigt die Analyse?", a: "Verläufe, Filter und Hinweise (erweiterte Stats ab Level 10; Premium Insights optional)." },
+      w3: { q: "Wie wird das Wasserziel im Dashboard berechnet?", a: "Automatisch aus Gewicht (35 ml/kg) + 500 ml bei Sport; Bechergröße in Einstellungen." },
+      r1: { q: "Wie richte ich Erinnerungen ein?", a: "Einstellungen → Erinnerungen. \"Standard anlegen\" oder eigene (Label + Zeit)." },
+      r2: { q: "Wie exportiere/importiere ich Daten?", a: "Einstellungen → Daten & Backup. Android: SAF-Ordner wählen; sonst teilen als JSON." },
+      r3: { q: "Welche Werte hat die Bechergröße?", a: "0–1000 ml; Eingabe wird automatisch auf den Bereich gekürzt." },
+      g1: { q: "Wie erhalte ich XP/Level?", a: "Durch tägliche Aktionen, Wasser, Events und Erfolge. Level steigt pro 100 XP." },
+      g2: { q: "Was sind \"Ketten\"?", a: "Meilensteine aus mehreren Erfolgen. Sortierung nach Fortschritt. Zeigt den nächsten Schritt." },
+      g3: { q: "Gibt es Belohnungen?", a: "Ja: z. B. L10 Erweiterte Stats, L25 Premium Insights, L50 VIP-Chat, L75 Golden Pink." },
+      ai1: { q: "Was ist VIP-Chat?", a: "Ab Level 50 längerer Verlauf (bis 30 Nachrichten)." },
+      ai2: { q: "Wie speichere ich Tipps aus dem Chat?", a: "Im Chat: Tipp speichern (Bookmark). Später unter \"Gespeichert\"." },
+      ai3: { q: "Was sind \"Premium Insights\"?", a: "Optionale KI-Hinweise in Analyse/Chat (Einstellungen → Premium Insights)." }
+    }
+  },
+  chat: {
+    a11y: { knowledge: "Wissen", filter: "Rezepte filtern", saved: "Gespeichert", saveTip: "Tipp speichern" },
+    placeholder: "Schreibe eine Nachricht…",
+    send: "Senden",
+    noMessages: "Keine Nachrichten",
+    recipesListTitle: "Rezepte:",
+    shareToChat: "In Chat teilen",
+    filter: {
+      title: "Rezepte filtern",
+      help: "Wähle Küche, Kategorie, Mahlzeit oder nutze Suche.",
+      cuisine: "Küche",
+      category: "Kategorie",
+      category_fleisch: "Fleisch",
+      category_abnehmen: "Abnehmen",
+      category_vegetarisch: "Vegetarisch",
+      category_kuchen: "Kuchen",
+      category_suesses: "Süßes",
+      meal: "Mahlzeit",
+      meal_breakfast: "Frühstück",
+      meal_lunch: "Mittag",
+      meal_dinner: "Abend",
+      search: "Suche",
+      keywordPlaceholder: "Stichwort...",
+      searchBtn: "Suchen",
+      resultsCount: "{count} Ergebnisse"
+    },
+    knowledge: { title: "Wissen", help: "Wähle ein Thema und poste es in den Chat." },
+    recipe: { ingredients: "Zutaten", instructions: "Zubereitung" }
   }
 };
 

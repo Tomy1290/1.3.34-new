@@ -40,6 +40,8 @@ const pl = {
     response: "Odpowiedź:",
     showMore: "Pokaż więcej",
     showLess: "Pokaż mniej",
+    all: "Wszystkie",
+    lang: { de: "Deutsch", en: "English", pl: "Polski" },
   },
   settings: {
     title: "Ustawienia",
@@ -335,6 +337,100 @@ const pl = {
     you: "Ty",
     week: "Tydzień",
     offlineHint: "Tryb offline: tylko Twoje statystyki. Synchronizację online można dodać później."
+  },
+  profile: {
+    title: "Profil",
+    subtitle: "Avatar, dane osobowe i BMI",
+    infoHelp: "Dane profilu są przechowywane lokalnie na urządzeniu. Avatar pomaga spersonalizować profil. Wzrost i data urodzenia używane w analizach (np. BMI).",
+    genderLabel: "Płeć",
+    bmiCat: { underweight: "Niedowaga", normal: "Norma", overweight: "Nadwaga", obesity: "Otyłość" },
+  },
+  saved: {
+    title: "Zapisane wiadomości",
+    searchPlaceholder: "Szukaj (tytuł, tekst, tagi)…",
+    all: "Wszystkie",
+    new: "Utwórz nową",
+    titlePlaceholder: "Tytuł (opcjonalnie)",
+    customCategoryPlaceholder: "Własna kategoria…",
+    tagsPlaceholder: "Tagi (oddzielone przecinkami)",
+    textPlaceholder: "Tekst…",
+    editTitle: "Edytuj wiadomość",
+    defaultNoteTitle: "Notatka",
+    presets: {
+      motivation: "Motywacja",
+      nutrition: "Żywienie",
+      water: "Woda",
+      sport: "Sport",
+      general: "Ogólne"
+    }
+  },
+  faq: {
+    title: "FAQ",
+    categories: {
+      nav: "Pierwsze kroki i nawigacja",
+      drinks: "Napoje i sport",
+      cycle: "Śledzenie cyklu",
+      weight: "Waga i analiza",
+      reminders: "Przypomnienia i dane",
+      game: "Gamifikacja i osiągnięcia",
+      ai: "Czat i AI"
+    },
+    items: {
+      nav1: { q: "Jak zmienić dzień?", a: "Użyj strzałek u góry lub stuknij datę, aby wrócić do \"Dziś\"." },
+      nav2: { q: "Gdzie jest kalendarz?", a: "Ekran główny → karta \"Cykl\" → przycisk \"Kalendarz\"." },
+      nav3: { q: "Czym jest \"Szybki dostęp\"?", a: "Kafelki do często używanych sekcji: Czat, Ustawienia, Zapisane i FAQ." },
+      nav4: { q: "Jak zmienić język?", a: "Ustawienia → Język → Deutsch/English/Polski." },
+      dr1: { q: "Jak dodać wodę?", a: "W \"Napoje i sport\": \"Woda\" → – / liczba / +. Ustaw pojemność kubka w Ustawieniach." },
+      dr2: { q: "Jak liczony jest cel dzienny?", a: "35 ml na kg masy ciała + 500 ml przy sporcie. \"Kuracja wodna\" dodaje +1,0 L do spożycia (nie do celu)." },
+      dr3: { q: "Co robi \"Kuracja wodna\"?", a: "Włącza/wyłącza bonus +1,0 L do spożycia." },
+      dr4: { q: "Czy kawa zmniejsza XP?", a: "Od 7. filiżanki -10 XP za każdą kolejną; poniżej bez zmian." },
+      cy1: { q: "Jak rozpocząć/zakończyć cykl?", a: "Ekran główny → karta \"Cykl\" → \"Start/End cycle\"." },
+      cy2: { q: "Co oznaczają kolory w kalendarzu?", a: "Pełny kolor: okres. Jasny: nadchodzący okres. Obramowanie: płodność. Kropka: owulacja." },
+      cy3: { q: "Czy mogę otwierać przyszłe dni?", a: "Przyszłe dni są zablokowane. Stuknij dni przeszłe/dzisiejsze, aby dodać wpis." },
+      cy4: { q: "Na czym polega reguła 7 dni?", a: "Wpisów starszych niż 7 dni (i przyszłych) nie można zapisywać/usuwać." },
+      cy5: { q: "Jak zapisać intensywność okresu?", a: "Na dniu cyklu: \"Okres (siła)\" 0–10 stuknięciem lub –/+." },
+      w1: { q: "Jak zapisać wagę?", a: "Ekran główny → karta \"Waga\" → \"Zapisz\"." },
+      w2: { q: "Co pokazuje analiza?", a: "Trendy, filtry i wskazówki (rozszerzone statystyki od poziomu 10; premium insights opcjonalnie)." },
+      w3: { q: "Jak liczony jest cel wody na ekranie głównym?", a: "Automatycznie z wagi (35 ml/kg) + 500 ml przy sporcie; rozmiar kubka w Ustawieniach." },
+      r1: { q: "Jak ustawić przypomnienia?", a: "Ustawienia → Przypomnienia. \"Utwórz domyślne\" lub własne (etykieta + czas)." },
+      r2: { q: "Jak eksportować/importować dane?", a: "Ustawienia → Dane i kopia. Android: wybierz katalog SAF; w innym razie udostępnij JSON." },
+      r3: { q: "Jaki jest zakres rozmiaru kubka?", a: "0–1000 ml; wartość jest automatycznie zawężana do zakresu." },
+      g1: { q: "Jak zdobywać XP/poziomy?", a: "Poprzez codzienne akcje, wodę, wydarzenia i osiągnięcia. Poziom rośnie co 100 XP." },
+      g2: { q: "Czym są \"łańcuchy\"?", a: "Kamienie milowe z wielu osiągnięć. Sortowane wg postępu, pokazują kolejny krok." },
+      g3: { q: "Czy są nagrody?", a: "Tak: np. L10 Rozszerzone statystyki, L25 Premium Insights, L50 VIP czat, L75 Golden Pink." },
+      ai1: { q: "Czym jest VIP czat?", a: "Od poziomu 50 dłuższa historia (do 30 wiadomości)." },
+      ai2: { q: "Jak zapisać wskazówki z czatu?", a: "Na czacie: zapisz zakładką. Później w \"Zapisane\"." },
+      ai3: { q: "Czym są \"Premium insights\"?", a: "Opcjonalne wskazówki AI w analizie/czacie (Ustawienia → Premium insights)." }
+    }
+  },
+  chat: {
+    a11y: { knowledge: "Wiedza", filter: "Filtruj przepisy", saved: "Zapisane", saveTip: "Zapisz wskazówkę" },
+    placeholder: "Napisz wiadomość…",
+    send: "Wyślij",
+    noMessages: "Brak wiadomości",
+    recipesListTitle: "Przepisy:",
+    shareToChat: "Udostępnij na czacie",
+    filter: {
+      title: "Filtruj przepisy",
+      help: "Wybierz kuchnię, kategorię, posiłek lub użyj wyszukiwania.",
+      cuisine: "Kuchnia",
+      category: "Kategoria",
+      category_fleisch: "Mięso",
+      category_abnehmen: "Odchudzanie",
+      category_vegetarisch: "Wegetariańskie",
+      category_kuchen: "Ciasto",
+      category_suesses: "Słodkie",
+      meal: "Posiłek",
+      meal_breakfast: "Śniadanie",
+      meal_lunch: "Obiad",
+      meal_dinner: "Kolacja",
+      search: "Szukaj",
+      keywordPlaceholder: "Słowo kluczowe...",
+      searchBtn: "Szukaj",
+      resultsCount: "{count} Wyniki"
+    },
+    knowledge: { title: "Wiedza", help: "Wybierz temat i udostępnij na czacie." },
+    recipe: { ingredients: "Składniki", instructions: "Przygotowanie" }
   }
 };
 

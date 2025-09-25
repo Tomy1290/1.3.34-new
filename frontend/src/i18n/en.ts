@@ -40,6 +40,8 @@ const en = {
     response: "Response:",
     showMore: "Show more",
     showLess: "Show less",
+    all: "Any",
+    lang: { de: "Deutsch", en: "English", pl: "Polski" },
   },
   settings: {
     title: "Settings",
@@ -335,6 +337,100 @@ const en = {
     you: "You",
     week: "Week",
     offlineHint: "Offline mode: Only your own stats. Online sync can be added later."
+  },
+  profile: {
+    title: "Profile",
+    subtitle: "Avatar, personal data and BMI",
+    infoHelp: "Your profile data is stored locally on the device only. An avatar helps you personalize your profile. Height and date of birth are used for analyses (e.g. BMI).",
+    genderLabel: "Gender",
+    bmiCat: { underweight: "Underweight", normal: "Normal", overweight: "Overweight", obesity: "Obesity" },
+  },
+  saved: {
+    title: "Saved messages",
+    searchPlaceholder: "Search (title, text, tags)…",
+    all: "All",
+    new: "Create new",
+    titlePlaceholder: "Title (optional)",
+    customCategoryPlaceholder: "Custom category…",
+    tagsPlaceholder: "Tags (comma separated)",
+    textPlaceholder: "Text…",
+    editTitle: "Edit message",
+    defaultNoteTitle: "Note",
+    presets: {
+      motivation: "Motivation",
+      nutrition: "Nutrition",
+      water: "Water",
+      sport: "Sport",
+      general: "General"
+    }
+  },
+  faq: {
+    title: "FAQ",
+    categories: {
+      nav: "Getting started & navigation",
+      drinks: "Drinks & sport",
+      cycle: "Cycle tracking",
+      weight: "Weight & analysis",
+      reminders: "Reminders & data",
+      game: "Gamification & achievements",
+      ai: "Chat & AI"
+    },
+    items: {
+      nav1: { q: "How do I change the day?", a: "Use the arrows on top or tap the date to jump back to \"Today\"." },
+      nav2: { q: "Where is the calendar?", a: "Dashboard → \"Cycle\" card → \"Calendar\" button." },
+      nav3: { q: "What is \"Quick access\"?", a: "Tiles to frequently used areas like Chat, Settings, Saved and FAQ." },
+      nav4: { q: "How do I change language?", a: "Settings → Language → Deutsch/English/Polski." },
+      dr1: { q: "How to log water?", a: "In \"Drinks & Sport\": \"Water\" → – / count / +. Set cup size in Settings." },
+      dr2: { q: "How is the daily goal calculated?", a: "35 ml per kg body weight + 500 ml if sport. \"Water cure\" adds +1.0 L to intake (not to goal)." },
+      dr3: { q: "What does \"Water cure\" do?", a: "Toggles a +1.0 L intake bonus on/off." },
+      dr4: { q: "Does coffee reduce XP?", a: "From the 7th cup, -10 XP per additional cup; below that unchanged." },
+      cy1: { q: "How do I start/end my cycle?", a: "Dashboard → \"Cycle\" card → \"Start/End cycle\"." },
+      cy2: { q: "What do calendar colors mean?", a: "Solid: period. Light: upcoming period. Outlined: fertile. Small dot: ovulation." },
+      cy3: { q: "Can I open future days?", a: "Future days are locked. Tap past/today to log." },
+      cy4: { q: "What is the 7‑day rule?", a: "Entries older than 7 days (and future) cannot be saved/deleted." },
+      cy5: { q: "How to log period intensity?", a: "On cycle day: \"Bleeding (intensity)\" 0–10 via tap or –/+." },
+      w1: { q: "How do I log my weight?", a: "Dashboard → \"Weight\" card → \"Log\"." },
+      w2: { q: "What does analysis show?", a: "Trends, filters and hints (extended stats at Level 10; premium insights optional)." },
+      w3: { q: "How is the water goal on the dashboard calculated?", a: "Automatically from weight (35 ml/kg) + 500 ml if sport; cup size in Settings." },
+      r1: { q: "How to set reminders?", a: "Settings → Reminders. \"Seed defaults\" or create custom (label + time)." },
+      r2: { q: "How to export/import data?", a: "Settings → Data & Backup. Android: choose SAF folder; otherwise share JSON." },
+      r3: { q: "What is the cup size range?", a: "0–1000 ml; input is clamped automatically." },
+      g1: { q: "How do I gain XP/level?", a: "Via daily actions, water, events and achievements. Level increases per 100 XP." },
+      g2: { q: "What are \"chains\"?", a: "Milestones composed of multiple achievements. Sorted by progress, shows next step." },
+      g3: { q: "Are there rewards?", a: "Yes: e.g. L10 Extended Stats, L25 Premium Insights, L50 VIP chat, L75 Golden Pink." },
+      ai1: { q: "What is VIP chat?", a: "From level 50 longer history (up to 30 messages)." },
+      ai2: { q: "How do I save tips from chat?", a: "In chat: save via bookmark. Later under \"Saved\"." },
+      ai3: { q: "What are \"Premium insights\"?", a: "Optional AI hints in analysis/chat (Settings → Premium insights)." }
+    }
+  },
+  chat: {
+    a11y: { knowledge: "Knowledge", filter: "Filter recipes", saved: "Saved", saveTip: "Save tip" },
+    placeholder: "Type a message…",
+    send: "Send",
+    noMessages: "No messages yet",
+    recipesListTitle: "Recipes:",
+    shareToChat: "Share to chat",
+    filter: {
+      title: "Filter recipes",
+      help: "Choose cuisine, category, meal or use search.",
+      cuisine: "Cuisine",
+      category: "Category",
+      category_fleisch: "Meat",
+      category_abnehmen: "Weight Loss",
+      category_vegetarisch: "Vegetarian",
+      category_kuchen: "Cake",
+      category_suesses: "Sweet",
+      meal: "Meal",
+      meal_breakfast: "Breakfast",
+      meal_lunch: "Lunch",
+      meal_dinner: "Dinner",
+      search: "Search",
+      keywordPlaceholder: "Keyword...",
+      searchBtn: "Search",
+      resultsCount: "{count} Results"
+    },
+    knowledge: { title: "Knowledge", help: "Pick a topic and post it to the chat." },
+    recipe: { ingredients: "Ingredients", instructions: "Instructions" }
   }
 };
 
