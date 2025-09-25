@@ -1,5 +1,6 @@
 import { AppState } from '../store/useStore';
 import { scheduleOneTimeNotification, cancelNotification } from './notifications';
+// NOTE: cycle notifications stay one-time by design. Reminders are daily repeats.
 import { predictNextStart, getFertileWindow, getOvulationDate } from './cycle';
 import { storage } from './storage';
 
