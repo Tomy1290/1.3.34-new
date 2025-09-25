@@ -142,7 +142,7 @@ export default function CycleDayScreen() {
   };
   const deleteDraft = () => {
     state.clearCycleLog(String(date));
-    setDraft({ mood: 5, energy: 5, pain: 5, sleep: 5, sex: false, notes: '', flow: 0, cramps: false, headache: false, nausea: false });
+    setDraft({ mood: 5, energy: 5, pain: 5, sleep: 5, stress:5, appetite:5, cravings:5, focus:5, libido:5, sex: false, notes: '', period: false, flow: undefined as any, cramps: false, backPain:false, breastTenderness:false, waterRetention:false, dizziness:false, headache: false, nausea: false });
   };
 
   // 7-day rule and future lock for save/delete
