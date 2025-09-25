@@ -202,6 +202,12 @@ export default function Home() {
             >
               <SunIcon size={18} color={day.pills.morning ? "#fff" : colors.primary} />
               <Text style={{ color: day.pills.morning ? "#fff" : colors.text, marginLeft: 6 }}>{t("index.morning")}</Text>
+              <View style={{ flex: 1 }} />
+              <Ionicons
+                name={day.pills.morning ? "checkmark-circle" : "close-circle"}
+                size={18}
+                color={day.pills.morning ? "#fff" : colors.primary}
+              />
             </TouchableOpacity>
 
             {/* Evening Button */}
