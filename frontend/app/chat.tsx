@@ -12,6 +12,7 @@ import { searchRecipes, getRecipeDetail } from '../src/ai/recipes';
 import type { Cuisine, Meal, Category } from '../src/data/recipes';
 import { answerTopic } from '../src/ai/knowledge';
 import { safeTimeHM } from '../src/utils/locale';
+import { useI18n } from '../src/i18n';
 
 function useThemeColors(theme: string) {
   if (theme === 'pink_pastel') return { bg: '#fff0f5', card: '#ffe4ef', primary: '#d81b60', text: '#3a2f33', muted: '#8a6b75', input: '#ffffff' };
@@ -45,6 +46,7 @@ export default function ChatScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const [text, setText] = useState('');
   const [saved, setSaved] = useState<Record<string, boolean>>({});
+  const t = useI18n();
 
   const [typing, setTyping] = useState(false);
   const [typingText, setTypingText] = useState('');
@@ -110,8 +112,8 @@ export default function ChatScreen() {
   }, [state.aiInsightsEnabled, state.language, state.days, state.cycles]));
 
   async function send() {
-    const t = text.trim(); if (!t) return;
-    const msg = { id: String(Date.now()), sender: 'user' as const, text: t, createdAt: Date.now() };
+    const tx = text.trim(); if (!tx) return;
+    const msg = { id: String(Date.now()), sender: 'user' as const, text: tx, createdAt: Date.now() };
     state.addChat(msg); setText(''); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     
     // Update AI status before making request
@@ -120,10 +122,10 @@ export default function ChatScreen() {
     
     let replyText = '';
     try {
-      replyText = await hybridReply(state, t);
+      replyText = await hybridReply(state, tx);
     } catch (e) {
       // hard fallback
-      replyText = await localReply(state, t);
+      replyText = await localReply(state, tx);
     }
     typingAbort.current.abort = false; const typed = await typeOut(replyText || '');
     if (typed) { 
@@ -139,8 +141,7 @@ export default function ChatScreen() {
     state.addSaved({ id: String(Date.now()), title: `Gugi: ${title}`, category: 'Chat', tags: ['Gugi','Tipp'], text, createdAt: Date.now() }); setSaved((s) => ({ ...s, [id]: true })); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
 
-  const canSend = text.trim().length > 0; const appTitle = state.language==='en' ? "Scarlett’s Health Tracking" : (state.language==='pl'?'Zdrowie Scarlett':'Scarletts Gesundheitstracking');
-  const lbl = (de: string, en: string, pl?: string) => (state.language==='en'?en:(state.language==='pl'?(pl||en):de));
+  const canSend = text.trim().length > 0; const appTitle = t('common.appTitle');
 
   function runSearch() {
     const res = searchRecipes({ lang: state.language as any, cuisine: selCuisine, meal: selMeal, category: selCat, keywords: kw, limit: 20 }); setResults(res as any);
@@ -149,8 +150,8 @@ export default function ChatScreen() {
   function shareResultsToChat() {
     if (!results.length) return; const lang = state.language as 'de'|'en'|'pl';
     const list = results.slice(0,5).map((r:any)=>`• ${r.title[lang]} – ${r.desc[lang]}`).join('\n');
-    const text = lbl('Rezepte:', 'Recipes:', 'Przepisy:') + '\n' + list;
-    const bot = { id: String(Date.now()), sender: 'bot' as const, text, createdAt: Date.now() }; state.addChat(bot);
+    const txt = t('chat.recipesListTitle') + '\n' + list;
+    const bot = { id: String(Date.now()), sender: 'bot' as const, text: txt, createdAt: Date.now() }; state.addChat(bot);
     setShowFilter(false); setResults([]);
   }
 
@@ -164,7 +165,7 @@ export default function ChatScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={[styles.header, { backgroundColor: colors.card }]}> 
-        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={state.language==='de'?'Zurück':'Back'}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}>
           <Ionicons name='chevron-back' size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={{ alignItems: 'center' }}>
@@ -178,18 +179,16 @@ export default function ChatScreen() {
               backgroundColor: aiStatus === 'cloud' ? '#4CAF50' : aiStatus === 'local' ? '#FF9800' : '#9E9E9E'
             }} />
           </View>
-          <Text style={[styles.title, { color: colors.muted }]}>
-            Gugi {aiStatus === 'cloud' ? '☁️' : aiStatus === 'local' ? '📱' : '⏳'}
-          </Text>
+          <Text style={[styles.title, { color: colors.muted }]}>Gugi {aiStatus === 'cloud' ? '☁️' : aiStatus === 'local' ? '📱' : '⏳'}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => setShowKnowledge(true)} style={styles.iconBtn} accessibilityLabel='Wissen'>
+          <TouchableOpacity onPress={() => setShowKnowledge(true)} style={styles.iconBtn} accessibilityLabel={t('chat.a11y.knowledge')}>
             <Ionicons name='book-outline' size={20} color={colors.text} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowFilter(true)} style={styles.iconBtn} accessibilityLabel='Rezepte filtern'>
+          <TouchableOpacity onPress={() => setShowFilter(true)} style={styles.iconBtn} accessibilityLabel={t('chat.a11y.filter')}>
             <Ionicons name='filter' size={20} color={colors.text} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push('/saved')} style={styles.iconBtn} accessibilityLabel='Gespeichert'>
+          <TouchableOpacity onPress={() => router.push('/saved')} style={styles.iconBtn} accessibilityLabel={t('chat.a11y.saved')}>
             <Ionicons name='bookmark' size={20} color={colors.text} />
           </TouchableOpacity>
         </View>
@@ -206,7 +205,7 @@ export default function ChatScreen() {
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: m.sender==='user' ? 'flex-end' : 'flex-start', marginTop: 4 }}>
                     {m.sender==='bot' ? (
-                      <TouchableOpacity onPress={() => saveTip(m.id, m.text)} accessibilityLabel='Tipp speichern' style={{ paddingHorizontal: 4, paddingVertical: 2, marginRight: 6 }}>
+                      <TouchableOpacity onPress={() => saveTip(m.id, m.text)} accessibilityLabel={t('chat.a11y.saveTip')} style={{ paddingHorizontal: 4, paddingVertical: 2, marginRight: 6 }}>
                         <Ionicons name={saved[m.id] ? 'bookmark' : 'bookmark-outline'} size={14} color={saved[m.id] ? colors.primary : colors.muted} />
                       </TouchableOpacity>
                     ) : null}
@@ -227,14 +226,14 @@ export default function ChatScreen() {
             ) : null}
 
             {visibleChat.length === 0 && !typing ? (
-              <Text style={{ color: colors.muted, textAlign: 'center', marginTop: 24 }}>{lbl('Keine Nachrichten','No messages yet','Brak wiadomości')}</Text>
+              <Text style={{ color: colors.muted, textAlign: 'center', marginTop: 24 }}>{t('chat.noMessages')}</Text>
             ) : null}
           </ScrollView>
         </View>
 
         <View style={[styles.inputBar, { backgroundColor: colors.card, borderTopColor: colors.muted }]}> 
-          <TextInput ref={inputRef} value={text} onChangeText={setText} placeholder={lbl('Schreibe eine Nachricht…','Type a message…','Napisz wiadomość…')} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text, backgroundColor: colors.input, borderColor: colors.muted }]} multiline />
-          <TouchableOpacity disabled={!canSend || typing} onPress={send} style={[styles.sendBtn, { backgroundColor: canSend && !typing ? colors.primary : colors.muted }]} accessibilityLabel={lbl('Senden','Send','Wyślij')}>
+          <TextInput ref={inputRef} value={text} onChangeText={setText} placeholder={t('chat.placeholder')} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text, backgroundColor: colors.input, borderColor: colors.muted }]} multiline />
+          <TouchableOpacity disabled={!canSend || typing} onPress={send} style={[styles.sendBtn, { backgroundColor: canSend && !typing ? colors.primary : colors.muted }]} accessibilityLabel={t('chat.send')}>
             <Ionicons name='send' size={18} color={'#fff'} />
           </TouchableOpacity>
         </View>
@@ -246,22 +245,22 @@ export default function ChatScreen() {
           <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
             <View style={[styles.sheet, { backgroundColor: colors.bg, borderColor: colors.muted }]}> 
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 16 }}>{lbl('Wissen','Knowledge','Wiedza')}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 16 }}>{t('chat.knowledge.title')}</Text>
                 <TouchableOpacity onPress={() => setShowKnowledge(false)}>
                   <Ionicons name='close' size={20} color={colors.muted} />
                 </TouchableOpacity>
               </View>
-              <Text style={{ color: colors.muted, marginTop: 6 }}>{lbl('Wähle ein Thema und poste es in den Chat.','Pick a topic and post it to the chat.','Wybierz temat i udostępnij na czacie.')}</Text>
+              <Text style={{ color: colors.muted, marginTop: 6 }}>{t('chat.knowledge.help')}</Text>
               <ScrollView horizontal contentContainerStyle={{ gap: 8, paddingVertical: 8 }} showsHorizontalScrollIndicator={false}>
-                {TOPICS.map(t => (
-                  <TouchableOpacity key={t.key} onPress={() => setSelTopic(t.key)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: selTopic===t.key?colors.primary:'transparent' }]}> 
-                    <Text style={{ color: selTopic===t.key?'#fff':colors.text }}>{t.label[state.language as 'de'|'en'|'pl']}</Text>
+                {TOPICS.map(tk => (
+                  <TouchableOpacity key={tk.key} onPress={() => setSelTopic(tk.key)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: selTopic===tk.key?colors.primary:'transparent' }]}> 
+                    <Text style={{ color: selTopic===tk.key?'#fff':colors.text }}>{tk.label[state.language as 'de'|'en'|'pl']}</Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
                 <TouchableOpacity onPress={shareKnowledgeToChat} style={[styles.badge, { backgroundColor: colors.primary }]}> 
-                  <Text style={{ color: '#fff' }}>{lbl('In Chat teilen','Share to chat','Udostępnij na czacie')}</Text>
+                  <Text style={{ color: '#fff' }}>{t('chat.shareToChat')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -275,69 +274,69 @@ export default function ChatScreen() {
           <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
             <View style={[styles.sheet, { backgroundColor: colors.bg, borderColor: colors.muted }]}> 
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 16 }}>{lbl('Rezepte filtern','Filter recipes','Filtruj przepisy')}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 16 }}>{t('chat.filter.title')}</Text>
                 <TouchableOpacity onPress={() => setShowFilter(false)}>
                   <Ionicons name='close' size={20} color={colors.muted} />
                 </TouchableOpacity>
               </View>
-              <Text style={{ color: colors.muted, marginTop: 6 }}>{lbl('Wähle Küche, Kategorie, Mahlzeit oder nutze Suche.','Choose cuisine, category, meal or use search.','Wybierz kuchnię, kategorię, posiłek lub użyj wyszukiwania.')}</Text>
+              <Text style={{ color: colors.muted, marginTop: 6 }}>{t('chat.filter.help')}</Text>
 
               <ScrollView contentContainerStyle={{ paddingVertical: 8 }}>
                 {/* Cuisine */}
-                <Text style={{ color: colors.text, fontWeight: '600', marginBottom: 6 }}>{lbl('Küche','Cuisine','Kuchnia')}</Text>
+                <Text style={{ color: colors.text, fontWeight: '600', marginBottom: 6 }}>{t('chat.filter.cuisine')}</Text>
                 <ScrollView horizontal contentContainerStyle={{ gap: 8, paddingVertical: 4 }} showsHorizontalScrollIndicator={false}>
                   {CUISINES.map(c => (
                     <TouchableOpacity key={c} onPress={() => setSelCuisine(c)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: selCuisine===c?colors.primary:'transparent' }]}> 
-                      <Text style={{ color: selCuisine===c?'#fff':colors.text }}>{c==='any'?lbl('Alle','Any','Wszystkie'):c.toUpperCase()}</Text>
+                      <Text style={{ color: selCuisine===c?'#fff':colors.text }}>{c==='any'?t('common.all'):c.toUpperCase()}</Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
 
                 {/* Category */}
-                <Text style={{ color: colors.text, fontWeight: '600', marginTop: 12, marginBottom: 6 }}>{lbl('Kategorie','Category','Kategoria')}</Text>
+                <Text style={{ color: colors.text, fontWeight: '600', marginTop: 12, marginBottom: 6 }}>{t('chat.filter.category')}</Text>
                 <ScrollView horizontal contentContainerStyle={{ gap: 8, paddingVertical: 4 }} showsHorizontalScrollIndicator={false}>
                   {CATS.map(c => (
                     <TouchableOpacity key={c} onPress={() => setSelCat(c)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: selCat===c?colors.primary:'transparent' }]}> 
                       <Text style={{ color: selCat===c?'#fff':colors.text }}>
-                        {c==='any'?lbl('Alle','Any','Wszystkie'):
-                         c==='fleisch'?lbl('Fleisch','Meat','Mięso'):
+                        {c==='any'?t('common.all'):
+                         c==='fleisch'?t('chat.filter.category_fleisch'):
                          c==='lowcarb'?'Low Carb':
-                         c==='abnehmen'?lbl('Abnehmen','Weight Loss','Odchudzanie'):
-                         c==='vegetarisch'?lbl('Vegetarisch','Vegetarian','Wegetariańskie'):
-                         c==='kuchen'?lbl('Kuchen','Cake','Ciasto'):
-                         c==='suesses'?lbl('Süßes','Sweet','Słodkie'):c}
+                         c==='abnehmen'?t('chat.filter.category_abnehmen'):
+                         c==='vegetarisch'?t('chat.filter.category_vegetarisch'):
+                         c==='kuchen'?t('chat.filter.category_kuchen'):
+                         c==='suesses'?t('chat.filter.category_suesses'):c}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
 
                 {/* Meal */}
-                <Text style={{ color: colors.text, fontWeight: '600', marginTop: 12, marginBottom: 6 }}>{lbl('Mahlzeit','Meal','Posiłek')}</Text>
+                <Text style={{ color: colors.text, fontWeight: '600', marginTop: 12, marginBottom: 6 }}>{t('chat.filter.meal')}</Text>
                 <ScrollView horizontal contentContainerStyle={{ gap: 8, paddingVertical: 4 }} showsHorizontalScrollIndicator={false}>
                   {MEALS.map(m => (
                     <TouchableOpacity key={m} onPress={() => setSelMeal(m)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: selMeal===m?colors.primary:'transparent' }]}> 
                       <Text style={{ color: selMeal===m?'#fff':colors.text }}>
-                        {m==='any'?lbl('Alle','Any','Wszystkie'):
-                         m==='breakfast'?lbl('Frühstück','Breakfast','Śniadanie'):
-                         m==='lunch'?lbl('Mittag','Lunch','Obiad'):
-                         m==='dinner'?lbl('Abend','Dinner','Kolacja'):m}
+                        {m==='any'?t('common.all'):
+                         m==='breakfast'?t('chat.filter.meal_breakfast'):
+                         m==='lunch'?t('chat.filter.meal_lunch'):
+                         m==='dinner'?t('chat.filter.meal_dinner'):m}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
 
                 {/* Search */}
-                <Text style={{ color: colors.text, fontWeight: '600', marginTop: 12, marginBottom: 6 }}>{lbl('Suche','Search','Szukaj')}</Text>
+                <Text style={{ color: colors.text, fontWeight: '600', marginTop: 12, marginBottom: 6 }}>{t('chat.filter.search')}</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   <TextInput
                     value={kw}
                     onChangeText={setKw}
-                    placeholder={lbl('Stichwort...','Keyword...','Słowo kluczowe...')}
+                    placeholder={t('chat.filter.keywordPlaceholder')}
                     placeholderTextColor={colors.muted}
                     style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, color: colors.text, backgroundColor: colors.input }}
                   />
-                  <TouchableOpacity onPress={runSearch} style={[styles.badge, { backgroundColor: colors.primary }]}>
-                    <Text style={{ color: '#fff' }}>{lbl('Suchen','Search','Szukaj')}</Text>
+                  <TouchableOpacity onPress={runSearch} style={[styles.badge, { backgroundColor: colors.primary }]}> 
+                    <Text style={{ color: '#fff' }}>{t('chat.filter.searchBtn')}</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -345,13 +344,13 @@ export default function ChatScreen() {
                 {results.length > 0 && (
                   <>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
-                      <Text style={{ color: colors.text, fontWeight: '600' }}>{results.length} {lbl('Ergebnisse','Results','Wyniki')}</Text>
-                      <TouchableOpacity onPress={shareResultsToChat} style={[styles.badge, { backgroundColor: colors.primary }]}>
-                        <Text style={{ color: '#fff' }}>{lbl('In Chat teilen','Share to chat','Udostępnij na czacie')}</Text>
+                      <Text style={{ color: colors.text, fontWeight: '600' }}>{t('chat.filter.resultsCount', { count: results.length })}</Text>
+                      <TouchableOpacity onPress={shareResultsToChat} style={[styles.badge, { backgroundColor: colors.primary }]}> 
+                        <Text style={{ color: '#fff' }}>{t('chat.shareToChat')}</Text>
                       </TouchableOpacity>
                     </View>
                     {results.slice(0, 8).map((r: any) => (
-                      <TouchableOpacity key={r.id} onPress={() => setDetailId(r.id)} style={[styles.card, { backgroundColor: colors.card, marginTop: 8 }]}>
+                      <TouchableOpacity key={r.id} onPress={() => setDetailId(r.id)} style={[styles.card, { backgroundColor: colors.card, marginTop: 8 }]}> 
                         <Text style={{ color: colors.text, fontWeight: '600' }}>{r.title[state.language]}</Text>
                         <Text style={{ color: colors.muted, marginTop: 4 }}>{r.desc[state.language]}</Text>
                       </TouchableOpacity>
@@ -379,12 +378,12 @@ export default function ChatScreen() {
                 <Text style={{ color: colors.muted, marginTop: 4 }}>{detail.desc[state.language as 'de'|'en'|'pl']}</Text>
                 
                 <ScrollView contentContainerStyle={{ paddingVertical: 8 }}>
-                  <Text style={{ color: colors.text, fontWeight: '600', marginTop: 8 }}>{lbl('Zutaten','Ingredients','Składniki')}</Text>
+                  <Text style={{ color: colors.text, fontWeight: '600', marginTop: 8 }}>{t('chat.recipe.ingredients')}</Text>
                   {detail.ingredients[state.language as 'de'|'en'|'pl'].map((ing, idx) => (
                     <Text key={idx} style={{ color: colors.text, marginTop: 4 }}>• {ing}</Text>
                   ))}
                   
-                  <Text style={{ color: colors.text, fontWeight: '600', marginTop: 16 }}>{lbl('Zubereitung','Instructions','Przygotowanie')}</Text>
+                  <Text style={{ color: colors.text, fontWeight: '600', marginTop: 16 }}>{t('chat.recipe.instructions')}</Text>
                   {detail.steps[state.language as 'de'|'en'|'pl'].map((step, idx) => (
                     <Text key={idx} style={{ color: colors.text, marginTop: 6 }}>{idx + 1}. {step}</Text>
                   ))}
@@ -393,14 +392,14 @@ export default function ChatScreen() {
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
                   <TouchableOpacity 
                     onPress={() => {
-                      const recipeText = `${detail.title[state.language as 'de'|'en'|'pl']}\n\n${lbl('Zutaten:','Ingredients:','Składniki:')}\n${detail.ingredients[state.language as 'de'|'en'|'pl'].map(i => `• ${i}`).join('\n')}\n\n${lbl('Zubereitung:','Instructions:','Przygotowanie:')}\n${detail.steps[state.language as 'de'|'en'|'pl'].map((s, i) => `${i+1}. ${s}`).join('\n')}`;
+                      const recipeText = `${detail.title[state.language as 'de'|'en'|'pl']}\n\n${t('chat.recipe.ingredients')}:\n${detail.ingredients[state.language as 'de'|'en'|'pl'].map(i => `• ${i}`).join('\n')}\n\n${t('chat.recipe.instructions')}:\n${detail.steps[state.language as 'de'|'en'|'pl'].map((s, i) => `${i+1}. ${s}`).join('\n')}`;
                       const bot = { id: String(Date.now()), sender: 'bot' as const, text: recipeText, createdAt: Date.now() };
                       state.addChat(bot);
                       setDetailId(null);
                     }}
                     style={[styles.badge, { backgroundColor: colors.primary }]}
                   >
-                    <Text style={{ color: '#fff' }}>{lbl('In Chat teilen','Share to chat','Udostępnij na czacie')}</Text>
+                    <Text style={{ color: '#fff' }}>{t('chat.shareToChat')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>

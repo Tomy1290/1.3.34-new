@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAppStore } from '../src/store/useStore';
 import { toKey } from '../src/utils/date';
+import { useI18n } from '../src/i18n';
 
 function useThemeColors(theme: string) {
   if (theme === 'pink_pastel') return { bg: '#fff0f5', card: '#ffe4ef', primary: '#d81b60', text: '#3a2f33', muted: '#8a6b75', input: '#fff' };
@@ -19,6 +20,7 @@ export default function ProfileScreen() {
   const state = useAppStore();
   const router = useRouter();
   const colors = useThemeColors(state.theme);
+  const t = useI18n();
   const [help, setHelp] = useState<{[k:string]: boolean}>({});
 
   const heightM = useMemo(() => {
@@ -39,30 +41,30 @@ export default function ProfileScreen() {
   const bmiCategory = useMemo(() => {
     const v = bmi || 0;
     if (!bmi) return undefined;
-    if (v < 18.5) return { label: 'Untergewicht', color: '#2196F3' };
-    if (v < 25) return { label: 'Normalgewicht', color: '#4CAF50' };
-    if (v < 30) return { label: 'Übergewicht', color: '#FFC107' };
-    return { label: 'Adipositas', color: '#F44336' };
-  }, [bmi]);
+    if (v < 18.5) return { label: t('profile.bmiCat.underweight'), color: '#2196F3' };
+    if (v < 25) return { label: t('profile.bmiCat.normal'), color: '#4CAF50' };
+    if (v < 30) return { label: t('profile.bmiCat.overweight'), color: '#FFC107' };
+    return { label: t('profile.bmiCat.obesity'), color: '#F44336' };
+  }, [bmi, state.language]);
 
   async function pickImage(from: 'camera'|'gallery') {
     try {
       if (from === 'camera') {
         const perm = await ImagePicker.requestCameraPermissionsAsync();
-        if (perm.status !== 'granted') { Alert.alert('Berechtigung', 'Kamerazugriff verweigert'); return; }
+        if (perm.status !== 'granted') { Alert.alert(t('common.info'), t('settings.cameraNotAllowed') || t('gallery.cameraNotAllowed')); return; }
         const res = await ImagePicker.launchCameraAsync({ quality: 0.7, base64: true });
         if (!res.canceled && res.assets?.[0]?.base64) {
           state.setProfile({ avatarBase64: `data:${res.assets[0].mimeType||'image/jpeg'};base64,${res.assets[0].base64}` });
         }
       } else {
         const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (perm.status !== 'granted') { Alert.alert('Berechtigung', 'Galeriezugriff verweigert'); return; }
+        if (perm.status !== 'granted') { Alert.alert(t('common.info'), t('gallery.galleryNotAllowed')); return; }
         const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.7, base64: true });
         if (!res.canceled && res.assets?.[0]?.base64) {
           state.setProfile({ avatarBase64: `data:${res.assets[0].mimeType||'image/jpeg'};base64,${res.assets[0].base64}` });
         }
       }
-    } catch (e) { Alert.alert('Fehler', String(e)); }
+    } catch (e) { Alert.alert(t('common.error'), String(e)); }
   }
 
   // DOB picker state
@@ -76,19 +78,21 @@ export default function ProfileScreen() {
     } catch { return null; }
   }, [state.profile.dob]);
 
+  const locale = state.language==='de'?'de-DE':(state.language==='pl'?'pl-PL':'en-GB');
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={{ backgroundColor: colors.card, paddingVertical: 12, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }} accessibilityLabel={t('common.back')}>
           <Ionicons name='chevron-back' size={26} color={colors.text} />
         </TouchableOpacity>
         <View style={{ alignItems: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Ionicons name='star' size={16} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: '800', marginHorizontal: 6 }}>Profil</Text>
+            <Text style={{ color: colors.text, fontWeight: '800', marginHorizontal: 6 }}>{t('profile.title')}</Text>
             <Ionicons name='star' size={16} color={colors.primary} />
           </View>
-          <Text style={{ color: colors.muted, marginTop: 2 }}>Avatar, persönliche Daten und BMI</Text>
+          <Text style={{ color: colors.muted, marginTop: 2 }}>{t('profile.subtitle')}</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
@@ -97,21 +101,21 @@ export default function ProfileScreen() {
         {/* Info field */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>Info</Text>
+            <Text style={{ color: colors.text, fontWeight: '700' }}>{t('common.info')}</Text>
             <TouchableOpacity onPress={() => setHelp(h => ({ ...h, info: !h.info }))}>
               <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
           {help.info ? (
             <Text style={{ color: colors.muted, marginTop: 6 }}>
-              Deine Profildaten werden nur lokal auf dem Gerät gespeichert. Ein Avatar hilft dir, dein Profil zu personalisieren. Größe und Geburtsdatum werden für Analysen (z. B. BMI) verwendet.
+              {t('profile.infoHelp')}
             </Text>
           ) : null}
         </View>
 
         {/* Avatar + Name */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={{ color: colors.text, fontWeight: '700' }}>Profil</Text>
+          <Text style={{ color: colors.text, fontWeight: '700' }}>{t('common.profile')}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
             <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {state.profile.avatarBase64 ? (
@@ -122,20 +126,20 @@ export default function ProfileScreen() {
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
               <TextInput
-                placeholder='Name'
+                placeholder={t('common.name')}
                 placeholderTextColor={colors.muted}
                 value={state.profile.name || ''}
                 onChangeText={(v)=> state.setProfile({ name: v })}
                 style={{ borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }}
               />
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                <TouchableOpacity onPress={() => pickImage('camera')} style={[styles.badge, { borderColor: colors.muted }]}>
+                <TouchableOpacity onPress={() => pickImage('camera')} style={[styles.badge, { borderColor: colors.muted }]}> 
                   <Ionicons name='camera' size={16} color={colors.text} />
-                  <Text style={{ color: colors.text, marginLeft: 6 }}>Kamera</Text>
+                  <Text style={{ color: colors.text, marginLeft: 6 }}>{t('common.camera')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => pickImage('gallery')} style={[styles.badge, { borderColor: colors.muted }]}>
+                <TouchableOpacity onPress={() => pickImage('gallery')} style={[styles.badge, { borderColor: colors.muted }]}> 
                   <Ionicons name='images' size={16} color={colors.text} />
-                  <Text style={{ color: colors.text, marginLeft: 6 }}>Galerie</Text>
+                  <Text style={{ color: colors.text, marginLeft: 6 }}>{t('common.gallery')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -144,14 +148,14 @@ export default function ProfileScreen() {
 
         {/* Personal data */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={{ color: colors.text, fontWeight: '700' }}>Details</Text>
+          <Text style={{ color: colors.text, fontWeight: '700' }}>{t('common.details')}</Text>
           <View style={{ marginTop: 8, gap: 8 }}>
             {/* DOB with DateTimePicker */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ color: colors.text, width: 120 }}>Geburtsdatum</Text>
+              <Text style={{ color: colors.text, width: 120 }}>{t('common.dateOfBirth')}</Text>
               <TouchableOpacity onPress={() => setShowDob(true)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 10, backgroundColor: colors.input }}>
                 <Ionicons name='calendar' size={16} color={colors.text} />
-                <Text style={{ color: colors.text, marginLeft: 8 }}>{dobDate ? dobDate.toLocaleDateString('de-DE') : 'Wählen'}</Text>
+                <Text style={{ color: colors.text, marginLeft: 8 }}>{dobDate ? dobDate.toLocaleDateString(locale) : t('common.choose')}</Text>
               </TouchableOpacity>
             </View>
             {showDob ? (
@@ -166,19 +170,19 @@ export default function ProfileScreen() {
 
             {/* Gender */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ color: colors.text, width: 120 }}>Geschlecht</Text>
+              <Text style={{ color: colors.text, width: 120 }}>{t('profile.genderLabel')}</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 {(['female','male'] as const).map((g) => (
-                  <TouchableOpacity key={g} onPress={() => state.setProfile({ gender: g })} style={[styles.badge, { borderColor: colors.muted, backgroundColor: state.profile.gender===g?colors.primary:'transparent' }]}>
+                  <TouchableOpacity key={g} onPress={() => state.setProfile({ gender: g })} style={[styles.badge, { borderColor: colors.muted, backgroundColor: state.profile.gender===g?colors.primary:'transparent' }]}> 
                     <Ionicons name={g==='female'?'female':'male'} size={16} color={state.profile.gender===g?'#fff':colors.text} />
-                    <Text style={{ color: state.profile.gender===g?'#fff':colors.text, marginLeft: 6 }}>{g==='female'?'Frau':'Mann'}</Text>
+                    <Text style={{ color: state.profile.gender===g?'#fff':colors.text, marginLeft: 6 }}>{g==='female'?t('common.genderFemale'):t('common.genderMale')}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
             {/* Height */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ color: colors.text, width: 120 }}>Größe</Text>
+              <Text style={{ color: colors.text, width: 120 }}>{t('common.height')}</Text>
               <TextInput
                 placeholder='170'
                 placeholderTextColor={colors.muted}
@@ -187,7 +191,7 @@ export default function ProfileScreen() {
                 onChangeText={(v)=> { const n = parseInt(v.replace(/[^0-9]/g,''),10); state.setProfile({ heightCm: isNaN(n)?undefined:n }); }}
                 style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }}
               />
-              <Text style={{ color: colors.muted, marginLeft: 8 }}>cm</Text>
+              <Text style={{ color: colors.muted, marginLeft: 8 }}>{t('common.cm')}</Text>
             </View>
           </View>
         </View>
@@ -197,22 +201,22 @@ export default function ProfileScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Ionicons name='scale' size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>BMI</Text>
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('common.bmi')}</Text>
             </View>
             <TouchableOpacity onPress={() => setHelp(h => ({ ...h, bmi: !h.bmi }))}>
               <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
           {help.bmi ? (
-            <Text style={{ color: colors.muted, marginTop: 6 }}>BMI = Gewicht (kg) / (Größe in m)^2. Kategorien: &lt;18.5 Untergewicht, 18.5–24.9 Normalgewicht, 25–29.9 Übergewicht, ≥30 Adipositas. Für Erwachsene.</Text>
+            <Text style={{ color: colors.muted, marginTop: 6 }}>{t('common.bmi_hint')}</Text>
           ) : null}
 
           {(!heightM || !lastWeight) ? (
-            <Text style={{ color: colors.muted, marginTop: 8 }}>Bitte Größe und mindestens ein Gewicht eintragen.</Text>
+            <Text style={{ color: colors.muted, marginTop: 8 }}>{t('common.pleaseEnterSizeAndWeight')}</Text>
           ) : (
             <View style={{ marginTop: 8 }}>
-              <Text style={{ color: colors.text }}>Letztes Gewicht: {lastWeight?.toFixed(1)} kg · Größe: {Math.round((heightM||0)*100)} cm</Text>
-              <Text style={{ color: colors.text, marginTop: 2 }}>BMI: {bmi?.toFixed(1)} {bmiCategory?`(${bmiCategory.label})`:''}</Text>
+              <Text style={{ color: colors.text }}>{t('analysis.lastWeightAndHeight', { weight: Number(lastWeight).toFixed(1), heightCm: Math.round((heightM||0)*100) })}</Text>
+              <Text style={{ color: colors.text, marginTop: 2 }}>{t('common.bmi')}: {bmi?.toFixed(1)} {bmiCategory?`(${bmiCategory.label})`:''}</Text>
               {/* Colored bar */}
               <View style={{ height: 10, backgroundColor: colors.bg, borderRadius: 5, overflow: 'hidden', marginTop: 8 }}>
                 <View style={{ width: '100%', height: '100%', flexDirection: 'row' }}>

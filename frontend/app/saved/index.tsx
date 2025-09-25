@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAppStore } from '../../src/store/useStore';
 import * as Haptics from 'expo-haptics';
+import { useI18n } from '../../src/i18n';
 
 function useThemeColors(theme: string) {
   if (theme === 'pink_pastel') return { bg: '#fff0f5', card: '#ffe4ef', primary: '#d81b60', text: '#3a2f33', muted: '#8a6b75' };
@@ -12,12 +13,19 @@ function useThemeColors(theme: string) {
   return { bg: '#fde7ef', card: '#ffd0e0', primary: '#e91e63', text: '#2a1e22', muted: '#7c5866' };
 }
 
-const PRESET_CATEGORIES = ['Motivation', 'Ernährung', 'Trinken', 'Sport', 'Allgemein'];
-
 export default function SavedManager() {
   const router = useRouter();
   const state = useAppStore();
   const colors = useThemeColors(state.theme);
+  const t = useI18n();
+
+  const PRESET_CATEGORIES = useMemo(() => [
+    t('saved.presets.motivation'),
+    t('saved.presets.nutrition'),
+    t('saved.presets.water'),
+    t('saved.presets.sport'),
+    t('saved.presets.general'),
+  ], [state.language]);
 
   const [query, setQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('');
@@ -35,13 +43,13 @@ export default function SavedManager() {
   const categories = useMemo(() => {
     const fromSaved = Array.from(new Set((state.saved || []).map(s => s.category).filter(Boolean) as string[]));
     return Array.from(new Set([...PRESET_CATEGORIES, ...fromSaved]));
-  }, [state.saved]);
+  }, [state.saved, PRESET_CATEGORIES.join('|')]);
 
   const filtered = useMemo(() => {
     let arr = state.saved || [];
     if (query.trim()) {
       const q = query.toLowerCase();
-      arr = arr.filter(s => (s.title?.toLowerCase().includes(q) || s.text.toLowerCase().includes(q) || (s.tags||[]).some(t => t.toLowerCase().includes(q))));
+      arr = arr.filter(s => (s.title?.toLowerCase().includes(q) || s.text.toLowerCase().includes(q) || (s.tags||[]).some(tg => tg.toLowerCase().includes(q))));
     }
     if (categoryFilter) {
       arr = arr.filter(s => (s.category || '') === categoryFilter);
@@ -51,7 +59,7 @@ export default function SavedManager() {
 
   function addItem() {
     if (!newText.trim()) return;
-    state.addSaved({ id: String(Date.now()), title: newTitle || 'Notiz', category: newCategory || undefined, tags: newTags ? newTags.split(',').map(t => t.trim()).filter(Boolean) : undefined, text: newText.trim(), createdAt: Date.now() });
+    state.addSaved({ id: String(Date.now()), title: newTitle || t('saved.defaultNoteTitle'), category: newCategory || undefined, tags: newTags ? newTags.split(',').map(tg => tg.trim()).filter(Boolean) : undefined, text: newText.trim(), createdAt: Date.now() });
     setNewTitle(''); setNewCategory(''); setNewTags(''); setNewText(''); setShowNew(false);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }
@@ -66,8 +74,8 @@ export default function SavedManager() {
 
   function saveEdit() {
     if (!editingId) return;
-    const tags = editTags ? editTags.split(',').map(t => t.trim()).filter(Boolean) : undefined;
-    useAppStore.getState().updateSaved(editingId, { title: editTitle || 'Notiz', category: editCategory || undefined, tags });
+    const tags = editTags ? editTags.split(',').map(tg => tg.trim()).filter(Boolean) : undefined;
+    useAppStore.getState().updateSaved(editingId, { title: editTitle || t('saved.defaultNoteTitle'), category: editCategory || undefined, tags });
     setEditingId(null);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
@@ -75,24 +83,24 @@ export default function SavedManager() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
       <View style={[styles.header, { backgroundColor: colors.card }]}> 
-        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={state.language==='de'?'Zurück':'Back'}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}>
           <Ionicons name='chevron-back' size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={{ alignItems: 'center' }}>
-          <Text style={[styles.appTitle, { color: colors.text }]}>{state.language==='en' ? "Scarlett’s Health Tracking" : 'Scarletts Gesundheitstracking'}</Text>
-          <Text style={[styles.title, { color: colors.muted }]}>{state.language==='de'?'Gespeicherte Nachrichten':'Saved messages'}</Text>
+          <Text style={[styles.appTitle, { color: colors.text }]}>{t('common.appTitle')}</Text>
+          <Text style={[styles.title, { color: colors.muted }]}>{t('saved.title')}</Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
 
       <View style={{ padding: 16, gap: 8 }}>
-        <TextInput value={query} onChangeText={setQuery} placeholder='Suchen (Titel, Text, Tags)…' placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text }]} />
+        <TextInput value={query} onChangeText={setQuery} placeholder={t('saved.searchPlaceholder')} placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text }]} />
         <ScrollView horizontal contentContainerStyle={{ gap: 8 }} showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity onPress={() => setCategoryFilter('')} style={[styles.badge, { borderColor: colors.muted, backgroundColor: categoryFilter===''?colors.primary:'transparent' }]}>
-            <Text style={{ color: categoryFilter===''?'#fff':colors.text }}>Alle</Text>
+          <TouchableOpacity onPress={() => setCategoryFilter('')} style={[styles.badge, { borderColor: colors.muted, backgroundColor: categoryFilter===''?colors.primary:'transparent' }]}> 
+            <Text style={{ color: categoryFilter===''?'#fff':colors.text }}>{t('saved.all')}</Text>
           </TouchableOpacity>
           {categories.map((c) => (
-            <TouchableOpacity key={c} onPress={() => setCategoryFilter(c)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: categoryFilter===c?colors.primary:'transparent' }]}>
+            <TouchableOpacity key={c} onPress={() => setCategoryFilter(c)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: categoryFilter===c?colors.primary:'transparent' }]}> 
               <Text style={{ color: categoryFilter===c?'#fff':colors.text }}>{c}</Text>
             </TouchableOpacity>
           ))}
@@ -101,11 +109,11 @@ export default function SavedManager() {
         {/* Collapsible new item */}
         <TouchableOpacity onPress={() => setShowNew((v)=>!v)} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
           <Ionicons name={showNew ? 'chevron-down' : 'chevron-forward'} size={18} color={colors.text} />
-          <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 6 }}>{state.language==='de'?'Neu anlegen':'Create new'}</Text>
+          <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 6 }}>{t('saved.new')}</Text>
         </TouchableOpacity>
         {showNew ? (
           <View style={[styles.card, { backgroundColor: colors.card, marginTop: 8 }]}> 
-            <TextInput value={newTitle} onChangeText={setNewTitle} placeholder='Titel (optional)' placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginBottom: 8 }]} />
+            <TextInput value={newTitle} onChangeText={setNewTitle} placeholder={t('saved.titlePlaceholder')} placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginBottom: 8 }]} />
             <ScrollView horizontal contentContainerStyle={{ gap: 8 }} showsHorizontalScrollIndicator={false}>
               {PRESET_CATEGORIES.map((c) => (
                 <TouchableOpacity key={c} onPress={() => setNewCategory(c)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: newCategory===c?colors.primary:'transparent' }]}> 
@@ -113,14 +121,14 @@ export default function SavedManager() {
                 </TouchableOpacity>
               ))}
               <View style={{ width: 8 }} />
-              <TextInput value={newCategory} onChangeText={setNewCategory} placeholder='Eigene Kategorie…' placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, width: 180 }]} />
+              <TextInput value={newCategory} onChangeText={setNewCategory} placeholder={t('saved.customCategoryPlaceholder')} placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, width: 180 }]} />
             </ScrollView>
-            <TextInput value={newTags} onChangeText={setNewTags} placeholder='Tags (kommagetrennt)' placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 8 }]} />
-            <TextInput value={newText} onChangeText={setNewText} placeholder='Text…' placeholderTextColor={colors.muted} multiline style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 8, minHeight: 80 }]} />
+            <TextInput value={newTags} onChangeText={setNewTags} placeholder={t('saved.tagsPlaceholder')} placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 8 }]} />
+            <TextInput value={newText} onChangeText={setNewText} placeholder={t('saved.textPlaceholder')} placeholderTextColor={colors.muted} multiline style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 8, minHeight: 80 }]} />
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
               <TouchableOpacity onPress={addItem} style={[styles.primaryBtn, { backgroundColor: colors.primary }]}> 
                 <Ionicons name='save' size={16} color='#fff' />
-                <Text style={{ color: '#fff', marginLeft: 8 }}>{state.language==='de'?'Speichern':'Save'}</Text>
+                <Text style={{ color: '#fff', marginLeft: 8 }}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -132,7 +140,7 @@ export default function SavedManager() {
           <View key={s.id} style={[styles.card, { backgroundColor: colors.card }]}> 
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flex: 1, paddingRight: 8 }}>
-                <Text style={{ color: colors.text, fontWeight: '700' }}>{s.title || 'Notiz'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700' }}>{s.title || t('saved.defaultNoteTitle')}</Text>
                 {s.category ? <Text style={{ color: colors.muted, marginTop: 2 }}>{s.category}</Text> : null}
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -147,9 +155,9 @@ export default function SavedManager() {
             <Text style={{ color: colors.text, marginTop: 8 }}>{s.text}</Text>
             {s.tags?.length ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-                {s.tags.map((t, i) => (
+                {s.tags.map((tg, i) => (
                   <View key={i} style={[styles.tag, { borderColor: colors.muted }]}> 
-                    <Text style={{ color: colors.muted }}>#{t}</Text>
+                    <Text style={{ color: colors.muted }}>#{tg}</Text>
                   </View>
                 ))}
               </View>
@@ -164,12 +172,12 @@ export default function SavedManager() {
           <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
             <View style={[styles.modalSheet, { backgroundColor: colors.bg, borderColor: colors.muted }]}> 
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 16 }}>{state.language==='de'?'Nachricht bearbeiten':'Edit message'}</Text>
+                <Text style={{ color: colors.text, fontWeight: '700', fontSize: 16 }}>{t('saved.editTitle')}</Text>
                 <TouchableOpacity onPress={() => setEditingId(null)}>
                   <Ionicons name='close' size={20} color={colors.muted} />
                 </TouchableOpacity>
               </View>
-              <TextInput value={editTitle} onChangeText={setEditTitle} placeholder='Titel' placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 12 }]} />
+              <TextInput value={editTitle} onChangeText={setEditTitle} placeholder={t('saved.titlePlaceholder')} placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 12 }]} />
               <ScrollView horizontal contentContainerStyle={{ gap: 8 }} showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
                 {categories.map((c) => (
                   <TouchableOpacity key={c} onPress={() => setEditCategory(c)} style={[styles.badge, { borderColor: colors.muted, backgroundColor: editCategory===c?colors.primary:'transparent' }]}> 
@@ -177,13 +185,13 @@ export default function SavedManager() {
                   </TouchableOpacity>
                 ))}
                 <View style={{ width: 8 }} />
-                <TextInput value={editCategory} onChangeText={setEditCategory} placeholder='Eigene Kategorie…' placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, width: 180 }]} />
+                <TextInput value={editCategory} onChangeText={setEditCategory} placeholder={t('saved.customCategoryPlaceholder')} placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, width: 180 }]} />
               </ScrollView>
-              <TextInput value={editTags} onChangeText={setEditTags} placeholder='Tags (kommagetrennt)' placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 12 }]} />
+              <TextInput value={editTags} onChangeText={setEditTags} placeholder={t('saved.tagsPlaceholder')} placeholderTextColor={colors.muted} style={[styles.input, { borderColor: colors.muted, color: colors.text, marginTop: 12 }]} />
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12 }}>
                 <TouchableOpacity onPress={saveEdit} style={[styles.primaryBtn, { backgroundColor: colors.primary }]}> 
                   <Ionicons name='save' size={16} color={'#fff'} />
-                  <Text style={{ color: '#fff', marginLeft: 8 }}>{state.language==='de'?'Speichern':'Save'}</Text>
+                  <Text style={{ color: '#fff', marginLeft: 8 }}>{t('common.save')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
