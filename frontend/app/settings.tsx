@@ -150,6 +150,25 @@ export default function SettingsScreen() {
     } catch {}
   }
 
+  async function saveCustomReminder() {
+    const label = (customLabel || '').trim();
+    const timeStr = toHHMM(customTime) || customTime || '08:00';
+    if (!label) { Alert.alert(t('common.error'), t('settings.label')); return; }
+    const parsed = parseHHMM(timeStr) || { hour: 8, minute: 0 };
+    try {
+      const id = `custom_${Date.now()}`;
+      // Add reminder to store
+      state.addReminder({ id, type: 'custom', time: timeStr, enabled: true, label });
+      // Schedule daily repeating
+      const nid = await scheduleDailyNext(id, label, t('reminders.actionTime'), parsed.hour, parsed.minute, 'reminders');
+      if (nid) state.setNotificationMeta(id, { id: nid, time: timeStr });
+      setCustomMode(false); setCustomLabel(''); setCustomTime('08:00');
+      Alert.alert(t('common.done'));
+    } catch (e: any) {
+      Alert.alert(t('common.error'), String(e?.message || e));
+    }
+  }
+
   async function exportData() {
     try {
       const full = useAppStore.getState();
