@@ -64,7 +64,7 @@ export default function CycleDayScreen() {
   const setVal = (field: 'mood'|'energy'|'pain'|'sleep', delta: number) => {
     setDraft((d) => ({ ...d, [field]: clamp((d as any)[field] + delta, 1, 10) }));
   };
-  const setFlow = (val: number) => setDraft((d) => ({ ...d, flow: Math.max(0, Math.min(10, val)) }));
+  const setFlow = (val: number) => setDraft((d) => ({ ...d, flow: Math.max(1, Math.min(10, val)), period: true }));
 
   const formattedDate = (() => { try { const [y,m,d] = String(date).split('-').map(Number); return `${String(d).padStart(2,'0')}.${String(m).padStart(2,'0')}.${y}`; } catch { return String(date); }})();
 
