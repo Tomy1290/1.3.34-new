@@ -45,7 +45,20 @@ export default function CycleDayScreen() {
   useEffect(() => {
     // If date changes, refresh draft from store
     const s = state.cycleLogs[date || ''] || {};
-    setDraft({ mood: s.mood ?? 5, energy: s.energy ?? 5, pain: s.pain ?? 5, sleep: s.sleep ?? 5, sex: !!s.sex, notes: s.notes || '', flow: typeof s.flow === 'number' ? s.flow : 0, cramps: !!s.cramps, headache: !!s.headache, nausea: !!s.nausea });
+    setDraft({
+      mood: s.mood ?? 5,
+      energy: s.energy ?? 5,
+      pain: s.pain ?? 5,
+      sleep: s.sleep ?? 5,
+      stress: s.stress ?? 5,
+      sex: !!s.sex,
+      notes: s.notes || '',
+      period: typeof s.period === 'boolean' ? !!s.period : (typeof s.flow === 'number' && s.flow > 0),
+      flow: typeof s.flow === 'number' && s.flow > 0 ? Math.max(1, Math.min(10, s.flow)) : undefined,
+      cramps: !!s.cramps,
+      headache: !!s.headache,
+      nausea: !!s.nausea,
+    });
   }, [date]);
 
   const setVal = (field: 'mood'|'energy'|'pain'|'sleep', delta: number) => {
