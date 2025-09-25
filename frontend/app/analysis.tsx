@@ -142,9 +142,9 @@ export default function AnalysisScreen() {
 
   function fmtDiff(n: number) {
     const s = Math.abs(n).toFixed(1).replace(/\.0$/, '');
-    if (n > 0) return { text: `+${s}`, color: '#E53935' };
-    if (n < 0) return { text: `-${s}`, color: '#2E7D32' };
-    return { text: '±0', color: colors.muted };
+    if (n > 0) return { text: `↑ +${s}`, color: '#E53935' };
+    if (n < 0) return { text: `↓ -${s}`, color: '#2E7D32' };
+    return { text: '→ ±0', color: colors.muted };
   }
 
   return (
