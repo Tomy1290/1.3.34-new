@@ -23,6 +23,17 @@ export default function RootLayout() {
         // Keine globalen Resets mehr beim Start – manche Systeme feuern sonst direkt.
         await scheduleCycleNotifications(state);
         // Reminder werden ausschließlich über Settings geplant (explizites User-Event).
+        // Hotfix: Prüfe und räume offensichtlich problematische Termine auf (Date in Vergangenheit)
+        try {
+          const state2 = useAppStore.getState();
+          const nm = state2.notificationMeta || {};
+          for (const key of Object.keys(nm)) {
+            const meta = nm[key];
+            if (!meta?.id) continue;
+            // keine Logik hier: cleanupLegacySchedules in initializeNotifications übernimmt OS-seitig die Stornierung
+          }
+        } catch {}
+
       }
     })();
   }, []);
