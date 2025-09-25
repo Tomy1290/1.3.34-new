@@ -40,6 +40,7 @@ const de = {
     response: "Antwort:",
     showMore: "Mehr anzeigen",
     showLess: "Weniger anzeigen",
+    delete: "Löschen",
   },
   settings: {
     title: "Einstellungen",
