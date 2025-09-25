@@ -28,7 +28,7 @@ export default function CycleDayScreen() {
   const toggleHelp = (k: string) => setHelp(h => ({ ...h, [k]: !h[k] }));
 
   // Local draft, only save to store when pressing save
-  const [draft, setDraft] = useState({
+  const [draft, setDraft] = useState<{ mood:number; energy:number; pain:number; sleep:number; stress:number; appetite:number; cravings:number; focus:number; libido:number; sex:boolean; notes:string; period?:boolean; flow?:number; cramps:boolean; backPain:boolean; breastTenderness:boolean; waterRetention:boolean; dizziness:boolean; headache:boolean; nausea:boolean; }>(() => ({
     mood: serverLog.mood ?? 5,
     energy: serverLog.energy ?? 5,
     pain: serverLog.pain ?? 5,
