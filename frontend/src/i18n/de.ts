@@ -28,7 +28,7 @@ const de = {
     kg: "kg",
     ml: "ml",
     bmi: "BMI",
-    bmi_hint: "BMI = Gewicht (kg) / (Größe in m)^2. Kategorien: &lt;18,5 Untergewicht, 18,5–24,9 Normal, 25–29,9 Übergewicht, ≥30 Adipositas. Nur Erwachsene.",
+    bmi_hint: "BMI = Gewicht (kg) / (Größe in m)^2. Kategorien: <18,5 Untergewicht, 18,5–24,9 Normal, 25–29,9 Übergewicht, ≥30 Adipositas. Nur Erwachsene.",
     pleaseEnterSizeAndWeight: "Bitte Größe und mindestens ein Gewicht eingeben.",
     tooFewData: "Zu wenige Daten",
     ok: "OK",
