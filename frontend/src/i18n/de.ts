@@ -295,6 +295,9 @@ const de = {
       notes: "Notizen"
     },
     moodTitle: "Stimmung",
+    stressTitle: "Stress",
+    stressHelp: "Skala 1–10; 1 = sehr entspannt, 10 = extrem gestresst.",
+
     moodHelp: "Wähle 1–10; links traurig, Mitte neutral, rechts glücklich.",
     energyTitle: "Energie",
     energyHelp: "Wähle 1–10: höhere Zahl = mehr Energie.",
