@@ -192,7 +192,15 @@ const pl = {
     prevMonth: "Poprzedni miesiąc",
     nextMonth: "Następny miesiąc",
     pickFirstDay: "Najpierw wybierz dzień (Przed).",
-    pickSecondDay: "Wybierz drugi dzień (Po)."
+    pickSecondDay: "Wybierz drugi dzień (Po).",
+    noPhotosForDay: "Brak zdjęć w tym dniu.",
+    statisticsTitle: "Statystyki",
+    firstPhotoLabel: "Pierwsze zdjęcie:",
+    lastPhotoLabel: "Ostatnie zdjęcie:",
+    compareTitle: "Przed/Po",
+    deletePhotoConfirmTitle: "Usunąć zdjęcie?",
+    deletePhotoConfirmMessage: "Czy na pewno usunąć to zdjęcie?",
+    dayA11y: "Dzień {key}"
   },
   goals: {
     title: "Cele wagowe",
