@@ -138,7 +138,7 @@ export default function SettingsScreen() {
     state.updateReminder(id, { enabled });
     try {
       const meta = state.notificationMeta[id];
-      if (!enabled and meta?.id) {
+      if (!enabled && meta?.id) {
         await cancelNotification(meta.id);
         state.setNotificationMeta(id, undefined);
       } else if (enabled) {
