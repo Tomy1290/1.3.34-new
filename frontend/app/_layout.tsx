@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Image, View, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { initializeNotifications, cancelAllNotifications } from '../src/utils/notifications';
+import { initializeNotifications } from '../src/utils/notifications';
 import { scheduleCycleNotifications } from '../src/utils/cycleNotifications';
 import { useAppStore } from "../src/store/useStore";
 
