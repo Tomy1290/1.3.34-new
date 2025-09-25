@@ -274,7 +274,7 @@ export default function CycleDayScreen() {
             </View>
           </View>
 
-          {/* Bleeding intensity (0..10 taps + stepper) */}
+          {/* Period toggle and bleeding intensity (1..10) */}
           <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -286,15 +286,25 @@ export default function CycleDayScreen() {
               </TouchableOpacity>
             </View>
             {help.bleeding ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.bleedingHelp')}</Text>) : null}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              <TouchableOpacity onPress={() => setFlow(draft.flow - 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                <Ionicons name='remove' size={16} color={colors.primary} />
-              </TouchableOpacity>
-              <View style={{ flex: 1, alignItems: 'center' }}>{renderBleedingScale(draft.flow)}</View>
-              <TouchableOpacity onPress={() => setFlow(draft.flow + 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                <Ionicons name='add' size={16} color={colors.primary} />
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
+              <Text style={{ color: colors.text }}>{t('cycle.fields.flow')}</Text>
+              <TouchableOpacity onPress={() => setDraft(d=>({ ...d, period: !d.period, flow: d.period ? undefined : (d.flow||5) }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.period ? colors.primary : 'transparent' }]}> 
+                <Text style={{ color: draft.period ? '#fff' : colors.text }}>{draft.period ? (t('common.ok')||'OK') : (t('common.cancel')||'Aus')}</Text>
               </TouchableOpacity>
             </View>
+
+            {draft.period ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+                <TouchableOpacity onPress={() => setFlow((draft.flow||5) - 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                  <Ionicons name='remove' size={16} color={colors.primary} />
+                </TouchableOpacity>
+                <View style={{ flex: 1, alignItems: 'center' }}>{renderBleedingScale(draft.flow||5)}</View>
+                <TouchableOpacity onPress={() => setFlow((draft.flow||5) + 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                  <Ionicons name='add' size={16} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </View>
 
           {/* Additional: toggles */}
