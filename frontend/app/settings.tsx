@@ -44,7 +44,7 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     const times: Record<string, string> = {};
-    if (state.reminders and Array.isArray(state.reminders)) {
+    if (state.reminders && Array.isArray(state.reminders)) {
       for (const r of state.reminders) {
         if (!r or !r.id) continue;
         const tStr = toHHMM((r as any).time);
