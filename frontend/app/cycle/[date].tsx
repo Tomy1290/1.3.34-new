@@ -209,6 +209,99 @@ export default function CycleDayScreen() {
               <TouchableOpacity onPress={() => toggleHelp('energy')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
+
+          {/* Appetite */}
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'fast-food'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.appetiteTitle') || 'Appetit'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('appetite')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.appetite ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.appetiteHelp') || '1–10; höher = mehr Appetit.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('appetite', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.appetite, 'fast-food', 'energy')}</View>
+              <TouchableOpacity onPress={() => setVal('appetite', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Cravings */}
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'ice-cream'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.cravingsTitle') || 'Heißhunger'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('cravings')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.cravings ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.cravingsHelp') || '1–10; höher = stärkerer Heißhunger.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('cravings', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.cravings, 'ice-cream', 'energy')}</View>
+              <TouchableOpacity onPress={() => setVal('cravings', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Focus/Concentration */}
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'book'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.focusTitle') || 'Fokus/Konzentration'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('focus')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.focus ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.focusHelp') || '1–10; höher = bessere Konzentration.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('focus', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.focus, 'book', 'energy')}</View>
+              <TouchableOpacity onPress={() => setVal('focus', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Libido */}
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'flame'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.libidoTitle') || 'Libido'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('libido')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.libido ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.libidoHelp') || '1–10; höher = stärkere Libido.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('libido', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.libido, 'flame', 'energy')}</View>
+              <TouchableOpacity onPress={() => setVal('libido', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
             </View>
             {help.energy ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.energyHelp')}</Text>) : null}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
