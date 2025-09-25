@@ -178,6 +178,18 @@ frontend:
   - agent: "main"
     message: "Added Metro aliases (Option B) to map react-native-linear-gradient -> src/shims/LinearGradientShim.tsx and @react-native-masked-view/masked-view -> src/shims/MaskedViewShim.tsx. No native packages installed. Please rebuild APK in Codemagic to verify."
 
+  - task: "Fix HTML entities in Expo app (gallery.tsx, goals.tsx)"
+    implemented: true
+    working: NA
+    file: "/app/frontend/app/gallery.tsx, /app/frontend/app/goals.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: NA
+        agent: "main"
+        comment: "Replaced HTML entities (<, >, &&, =>) with actual characters across the two screens. Resolves Metro SyntaxError at gallery.tsx:67 from Codemagic logs. Please re-run Android APK build."
+
 
 metadata:
   created_by: "main_agent"
