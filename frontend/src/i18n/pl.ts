@@ -28,7 +28,7 @@ const pl = {
     kg: "kg",
     ml: "ml",
     bmi: "BMI",
-    bmi_hint: "BMI = masa (kg) / (wzrost w m)^2. Kategorie: &lt;18.5 niedowaga, 18.5–24.9 norma, 25–29.9 nadwaga, ≥30 otyłość. Dla dorosłych.",
+    bmi_hint: "BMI = masa (kg) / (wzrost w m)^2. Kategorie: <18.5 niedowaga, 18.5–24.9 norma, 25–29.9 nadwaga, ≥30 otyłość. Dla dorosłych.",
     pleaseEnterSizeAndWeight: "Podaj wzrost i co najmniej jedną wagę.",
     tooFewData: "Za mało danych",
     ok: "OK",
