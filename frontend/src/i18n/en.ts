@@ -192,7 +192,15 @@ const en = {
     prevMonth: "Previous month",
     nextMonth: "Next month",
     pickFirstDay: "Pick the first day (Before) on the calendar.",
-    pickSecondDay: "Pick the second day (After)."
+    pickSecondDay: "Pick the second day (After).",
+    noPhotosForDay: "No photos for this day yet.",
+    statisticsTitle: "Statistics",
+    firstPhotoLabel: "First photo on:",
+    lastPhotoLabel: "Last photo on:",
+    compareTitle: "Before/After",
+    deletePhotoConfirmTitle: "Delete photo?",
+    deletePhotoConfirmMessage: "Do you really want to delete this photo?",
+    dayA11y: "Day {key}"
   },
   goals: {
     title: "Target weights",
