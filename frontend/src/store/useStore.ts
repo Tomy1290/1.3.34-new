@@ -39,11 +39,19 @@ export type CycleLog = {
   pain?: number; // 1-10
   sleep?: number; // 1-10
   stress?: number; // 1-10
+  appetite?: number; // 1-10
+  cravings?: number; // 1-10 (heißhunger)
+  focus?: number; // 1-10 (Konzentration)
+  libido?: number; // 1-10
   sex?: boolean;
   notes?: string;
   period?: boolean; // whether period is active today
   flow?: number; // 1..10 intensity (only if period is true)
   cramps?: boolean;
+  backPain?: boolean;
+  breastTenderness?: boolean;
+  waterRetention?: boolean;
+  dizziness?: boolean;
   headache?: boolean;
   nausea?: boolean;
   updatedAt?: number;
