@@ -551,7 +551,7 @@ export default function GoalsScreen() {
                             <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} />
                             <Text style={{ color: colors.text }}>{t('goals.plannedLabel')}: {typeof soll==='number'? soll.toFixed(1): '—'} {t('common.kg')}</Text>
                           </View>
-                          <Text style={{ color: colors.muted, marginTop: 4 }}>{t('goals.expectedBand')}: {typeof low==='number' &amp;&amp; typeof up==='number' ? `${low.toFixed(1)}–${up.toFixed(1)} ${t('common.kg')}` : '—'}</Text>
+                          <Text style={{ color: colors.muted, marginTop: 4 }}>{t('goals.expectedBand')}: {typeof low==='number' && typeof up==='number' ? `${low.toFixed(1)}–${up.toFixed(1)} ${t('common.kg')}` : '—'}</Text>
                         </View>
                       );
                     } catch { return <View />; }
