@@ -298,6 +298,15 @@ const de = {
       nausea: "Übelkeit",
       sex: "Sex",
       notes: "Notizen"
+    appetiteTitle: "Appetit",
+    appetiteHelp: "Skala 1–10; 1 = kein Appetit, 10 = sehr starker Appetit.",
+    cravingsTitle: "Heißhunger",
+    cravingsHelp: "Skala 1–10; 10 = sehr starker Heißhunger.",
+    focusTitle: "Fokus/Konzentration",
+    focusHelp: "Skala 1–10; 10 = sehr gute Konzentration.",
+    libidoTitle: "Libido",
+    libidoHelp: "Skala 1–10; 10 = sehr hohe Libido.",
+
     },
     moodTitle: "Stimmung",
     stressTitle: "Stress",
