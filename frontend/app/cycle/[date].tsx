@@ -113,7 +113,9 @@ export default function CycleDayScreen() {
   };
 
   const saveDraft = () => {
-    state.setCycleLog(String(date), draft as any);
+    const payload: any = { ...draft };
+    if (!payload.period) { delete payload.flow; }
+    state.setCycleLog(String(date), payload);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (Platform.OS === 'android') {
       ToastAndroid.show(t('common.saved') || 'Saved', ToastAndroid.SHORT);
