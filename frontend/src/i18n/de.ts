@@ -64,7 +64,7 @@ const de = {
     connectionSuccessful: "Verbindung erfolgreich.",
     enterUrlFirst: "Bitte zuerst eine Backend-URL eingeben.",
     invalidUrl: "Bitte vollständige URL mit http(s):// angeben",
-    backendPlaceholder: "https://&lt;dein-backend>",
+    backendPlaceholder: "https://<dein-backend>",
     aiInsights: "KI-Einblicke",
     aiInsightsHint: "Aktiviert kurze, lokale Tipps in Chat und Analysen.",
     weeklyEvents: "Wöchentliche Events",
