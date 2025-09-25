@@ -212,6 +212,10 @@ const pl = {
     targetDate: "Data docelowa",
     pickDate: "Wybierz datę",
     remove: "Usuń",
+    save: "Zapisz",
+    infoTitle: "Info",
+    bmiTitle: "BMI",
+    goalFormTitle: "Ustaw cel",
     planVsActual: "Plan vs. Rzeczywistość",
     plannedToday: "Plan na dziś",
     actual: "Rzecz.",
@@ -236,7 +240,15 @@ const pl = {
       moreExercise: "Więcej ruchu: 2–3 lekkie treningi/tydz. poprawiają trend.",
       keepGoing: "Tak trzymaj! Bądź konsekwentny."
     },
-    enterHeightAndWeight: "Podaj wzrost w profilu i co najmniej jedną wagę."
+    enterHeightAndWeight: "Podaj wzrost w profilu i co najmniej jedną wagę.",
+    notEnoughData: "Za mało danych",
+    expectedBand: "Pasmo (±1σ)",
+    expectedLabel: "Oczekiwany",
+    plannedLabel: "Plan",
+    todayLabel: "Dziś",
+    paceLabel: "Tempo (7d)",
+    trendLabel: "Trend",
+    etaLabel: "ETA"
   },
   themeLabels: {
     pink_default: "Różowy – domyślny",
