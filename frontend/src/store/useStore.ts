@@ -227,10 +227,14 @@ export const useAppStore = create<AppState>()(
         if (typeof patch.sleep === 'number') merged.sleep = clamp(patch.sleep, 1, 10);
         if (typeof patch.sex === 'boolean') merged.sex = patch.sex;
         if (typeof patch.notes === 'string') merged.notes = patch.notes;
-        if (typeof patch.flow === 'number') merged.flow = Math.max(0, Math.min(10, patch.flow));
+        if (typeof patch.stress === 'number') merged.stress = clamp(patch.stress, 1, 10);
+        if (typeof patch.period === 'boolean') merged.period = patch.period;
+        if (typeof patch.flow === 'number') merged.flow = Math.max(1, Math.min(10, patch.flow));
         if (typeof patch.cramps === 'boolean') merged.cramps = patch.cramps;
         if (typeof patch.headache === 'boolean') merged.headache = patch.headache;
         if (typeof patch.nausea === 'boolean') merged.nausea = patch.nausea;
+        // if period false, clear flow
+        if (merged.period === false) delete merged.flow;
         merged.updatedAt = Date.now();
         all[dateKey] = merged; set({ cycleLogs: all }); },
       clearCycleLog: (dateKey) => { const all = { ...(get().cycleLogs || {}) }; delete all[dateKey]; set({ cycleLogs: all }); },
