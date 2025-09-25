@@ -64,7 +64,7 @@ const pl = {
     connectionSuccessful: "Połączenie udane.",
     enterUrlFirst: "Najpierw podaj adres URL backendu.",
     invalidUrl: "Podaj pełny URL z http(s)://",
-    backendPlaceholder: "https://&lt;twoj-backend>",
+    backendPlaceholder: "https://<twoj-backend>",
     aiInsights: "Wskazówki KI",
     aiInsightsHint: "Aktywuje krótkie, lokalne wskazówki na czacie i w analizach.",
     weeklyEvents: "Wydarzenia tygodniowe",
