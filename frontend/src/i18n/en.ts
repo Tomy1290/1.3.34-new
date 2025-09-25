@@ -212,6 +212,10 @@ const en = {
     targetDate: "Target date",
     pickDate: "Pick date",
     remove: "Remove",
+    save: "Save",
+    infoTitle: "Info",
+    bmiTitle: "BMI",
+    goalFormTitle: "Set goal",
     planVsActual: "Plan vs. actual",
     plannedToday: "Planned today",
     actual: "Actual",
@@ -236,7 +240,15 @@ const en = {
       moreExercise: "More movement: 2–3 light sessions/week improve trend.",
       keepGoing: "Keep going! Stay consistent."
     },
-    enterHeightAndWeight: "Please enter height in profile and at least one weight."
+    enterHeightAndWeight: "Please enter height in profile and at least one weight.",
+    notEnoughData: "Too few data",
+    expectedBand: "Band (±1σ)",
+    expectedLabel: "Expected",
+    plannedLabel: "Planned",
+    todayLabel: "Today",
+    paceLabel: "Pace (7d)",
+    trendLabel: "Trend",
+    etaLabel: "ETA"
   },
   themeLabels: {
     pink_default: "Pink – Default",
