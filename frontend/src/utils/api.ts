@@ -7,10 +7,16 @@ export function getBackendBaseUrl() {
   if (stored && typeof stored === 'string' && stored.trim().length > 0) {
     return stored.replace(/\/$/, '');
   }
-  // 2) Build-time config via Expo extra
+  // 2) Build-time config via Expo extra or environment variables
   const extra = (Constants.expoConfig as any)?.extra || (Constants.manifest as any)?.extra || {};
-  const envUrl = extra.EXPO_PUBLIC_BACKEND_URL || (typeof process !== 'undefined' ? (process.env as any)?.EXPO_PUBLIC_BACKEND_URL : '');
-  return String(envUrl || '').replace(/\/$/, '');
+  const envCandidates = [
+    extra.EXPO_PUBLIC_BACKEND_URL,
+    extra.REACT_APP_BACKEND_URL, // allow CRA-style var passed via extra
+    typeof process !== 'undefined' ? (process.env as any)?.REACT_APP_BACKEND_URL : '',
+    typeof process !== 'undefined' ? (process.env as any)?.EXPO_PUBLIC_BACKEND_URL : '',
+  ].filter(Boolean);
+  const picked = String(envCandidates[0] || '').trim();
+  return picked.replace(/\/$/, '');
 }
 
 export async function apiFetch(path: string, init?: RequestInit) {
