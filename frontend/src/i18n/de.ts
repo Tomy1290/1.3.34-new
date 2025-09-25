@@ -212,6 +212,10 @@ const de = {
     targetDate: "Zieldatum",
     pickDate: "Datum wählen",
     remove: "Entfernen",
+    save: "Speichern",
+    infoTitle: "Info",
+    bmiTitle: "BMI",
+    goalFormTitle: "Ziel setzen",
     planVsActual: "Plan vs. Ist",
     plannedToday: "Geplant heute",
     actual: "Ist",
@@ -236,7 +240,15 @@ const de = {
       moreExercise: "Mehr Bewegung: 2–3 leichte Sporteinheiten pro Woche steigern den Trend.",
       keepGoing: "Weiter so! Stabiler Kurs – konsistent bleiben."
     },
-    enterHeightAndWeight: "Bitte Größe im Profil und mindestens ein Gewicht eintragen."
+    enterHeightAndWeight: "Bitte Größe im Profil und mindestens ein Gewicht eintragen.",
+    notEnoughData: "Zu wenige Daten",
+    expectedBand: "Band (±1σ)",
+    expectedLabel: "Erwartet",
+    plannedLabel: "Soll",
+    todayLabel: "Heute",
+    paceLabel: "Pace (7d)",
+    trendLabel: "Trend",
+    etaLabel: "ETA"
   },
   themeLabels: {
     pink_default: "Rosa – Standard",
