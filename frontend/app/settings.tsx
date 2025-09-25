@@ -459,7 +459,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        {/* Debug: geplante Benachrichtigungen anzeigen */
+        {/* Debug: geplante Benachrichtigungen anzeigen */}
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
