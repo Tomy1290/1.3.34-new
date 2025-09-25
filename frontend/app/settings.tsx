@@ -318,6 +318,25 @@ export default function SettingsScreen() {
                   setCupInput(String(v));
                 }}
                 style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text, backgroundColor: colors.input }}
+  async function saveCustomReminder() {
+    const label = (customLabel || '').trim();
+    const timeStr = toHHMM(customTime) || customTime || '08:00';
+    if (!label) { Alert.alert(t('common.error'), t('settings.label')); return; }
+    const parsed = parseHHMM(timeStr) || { hour: 8, minute: 0 };
+    try {
+      const id = `custom_${Date.now()}`;
+      // Add reminder to store
+      state.addReminder({ id, type: 'custom', time: timeStr, enabled: true, label });
+      // Schedule daily repeating
+      const nid = await scheduleDailyNext(id, label, t('reminders.actionTime'), parsed.hour, parsed.minute, 'reminders');
+      if (nid) state.setNotificationMeta(id, { id: nid, time: timeStr });
+      setCustomMode(false); setCustomLabel(''); setCustomTime('08:00');
+      Alert.alert(t('common.done'));
+    } catch (e: any) {
+      Alert.alert(t('common.error'), String(e?.message || e));
+    }
+  }
+
               />
               <Text style={{ color: colors.muted, marginLeft: 8 }}>{t("common.ml")}</Text>
             </View>
