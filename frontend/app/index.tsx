@@ -228,6 +228,12 @@ export default function Home() {
             >
               <MoonIcon size={18} color={day.pills.evening ? "#fff" : colors.primary} />
               <Text style={{ color: day.pills.evening ? "#fff" : colors.text, marginLeft: 6 }}>{t("index.evening")}</Text>
+              <View style={{ flex: 1 }} />
+              <Ionicons
+                name={day.pills.evening ? "checkmark-circle" : "close-circle"}
+                size={18}
+                color={day.pills.evening ? "#fff" : colors.primary}
+              />
             </TouchableOpacity>
           </View>
         </View>
