@@ -92,7 +92,7 @@ export default function SettingsScreen() {
     ];
     for (const d of defs) {
       try {
-        const exists = state.reminders.find((r) => r.id === d.id || (r.type === d.type and !r.label));
+        const exists = state.reminders.find((r) => r.id === d.id || (r.type === d.type && !r.label));
         let nid: string | null = null;
         if (d.enabled) {
           const parsed = parseHHMM(d.time) || { hour: 8, minute: 0 };
