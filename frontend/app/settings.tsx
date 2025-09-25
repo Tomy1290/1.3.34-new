@@ -65,7 +65,7 @@ export default function SettingsScreen() {
   }
 
   async function testBackendUrl() {
-    const v = (backendUrl or "").trim().replace(/\/$/, "");
+    const v = (backendUrl || "").trim().replace(/\/$/, "");
     if (!v) {
       Alert.alert(t("common.info"), t("settings.enterUrlFirst"));
       return;
