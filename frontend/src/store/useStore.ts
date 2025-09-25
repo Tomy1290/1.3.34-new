@@ -5,7 +5,8 @@ import { mmkvAdapter, storage } from "../utils/storage";
 import { toKey } from "../utils/date";
 import { computeAchievements } from "../achievements";
 import { predictNextStart, getFertileWindow } from "../utils/cycle";
-import { ensureAndroidChannel, ensureNotificationPermissions, cancelNotification, scheduleOneTimeNotification } from "../utils/notifications";
+import { cancelNotification } from "../utils/notifications";
+import { scheduleCycleNotifications as scheduleCycleNotificationsUtil } from "../utils/cycleNotifications";
 import { toHHMM } from "../utils/time";
 
 export type Language = "de" | "en" | "pl";
