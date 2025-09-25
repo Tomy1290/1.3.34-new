@@ -9,7 +9,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as Sharing from "expo-sharing";
 import { useRouter } from "expo-router";
 import { useAppStore } from "../src/store/useStore";
-import { initializeNotifications, cancelNotification, scheduleDailyNext } from "../src/utils/notifications";
+import { initializeNotifications, cancelNotification, scheduleDailyNext, getScheduledNotifications } from "../src/utils/notifications";
 import { TimePicker } from "../src/components/TimePicker";
 import { parseHHMM, toHHMM } from "../src/utils/time";
 import FlagDE from "../src/components/flags/FlagDE";
