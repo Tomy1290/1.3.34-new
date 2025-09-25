@@ -28,7 +28,7 @@ const en = {
     kg: "kg",
     ml: "ml",
     bmi: "BMI",
-    bmi_hint: "BMI = weight (kg) / (height in m)^2. Categories: &lt;18.5 underweight, 18.5–24.9 normal, 25–29.9 overweight, ≥30 obesity. Adults only.",
+    bmi_hint: "BMI = weight (kg) / (height in m)^2. Categories: <18.5 underweight, 18.5–24.9 normal, 25–29.9 overweight, ≥30 obesity. Adults only.",
     pleaseEnterSizeAndWeight: "Please enter height and at least one weight.",
     tooFewData: "Too few data",
     ok: "OK",
