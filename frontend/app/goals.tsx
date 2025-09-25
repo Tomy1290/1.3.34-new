@@ -224,7 +224,7 @@ export default function GoalsScreen() {
         const plannedVal = effectiveStartWeight + (targetW - effectiveStartWeight) * (dayPos / totalDaysAll);
         const isToday = k === todayKey;
         planned.push({ value: plannedVal });
-        actual.push({ value: lastKnown, ...(isToday ? { customDataPoint: () => (&lt;View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary, borderWidth: 2, borderColor: '#fff' }} /&gt;) } : {}) });
+        actual.push({ value: lastKnown, ...(isToday ? { customDataPoint: () => (<View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary, borderWidth: 2, borderColor: '#fff' }} /&gt;) } : {}) });
         const dt = d; const lbl = `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}`;
         if (idx % labelEvery === 0 || isToday || idx===dates.length-1 || idx===0) labels.push(lbl); else labels.push('');
       });
@@ -273,154 +273,154 @@ export default function GoalsScreen() {
   }, [effectiveStartDate, effectiveStartWeight, targetDateInput, targetWInput, weights, metrics.pace, lastW, ewma, state.theme]);
 
   return (
-    &lt;SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}&gt;
-      &lt;View style={{ backgroundColor: colors.card, paddingVertical: 12, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
-        &lt;TouchableOpacity onPress={() =&gt; router.back()} style={{ padding: 8 }} accessibilityLabel={t('common.back')}&gt;
-          &lt;Ionicons name='chevron-back' size={26} color={colors.text} /&gt;
-        &lt;/TouchableOpacity&gt;
-        &lt;View style={{ alignItems: 'center' }}&gt;
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-            &lt;Ionicons name='star' size={16} color={colors.primary} /&gt;
-            &lt;Text style={{ color: colors.text, fontWeight: '800', marginHorizontal: 6 }}&gt;{t('goals.title')}&lt;/Text&gt;
-            &lt;Ionicons name='star' size={16} color={colors.primary} /&gt;
-          &lt;/View&gt;
-          &lt;Text style={{ color: colors.muted, marginTop: 2 }}&gt;{t('goals.subtitle')}&lt;/Text&gt;
-        &lt;/View&gt;
-        &lt;View style={{ width: 40 }} /&gt;
-      &lt;/View&gt;
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}&gt;
+      <View style={{ backgroundColor: colors.card, paddingVertical: 12, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+        <TouchableOpacity onPress={() =&gt; router.back()} style={{ padding: 8 }} accessibilityLabel={t('common.back')}&gt;
+          <Ionicons name='chevron-back' size={26} color={colors.text} /&gt;
+        </TouchableOpacity&gt;
+        <View style={{ alignItems: 'center' }}&gt;
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            <Ionicons name='star' size={16} color={colors.primary} /&gt;
+            <Text style={{ color: colors.text, fontWeight: '800', marginHorizontal: 6 }}&gt;{t('goals.title')}</Text&gt;
+            <Ionicons name='star' size={16} color={colors.primary} /&gt;
+          </View&gt;
+          <Text style={{ color: colors.muted, marginTop: 2 }}&gt;{t('goals.subtitle')}</Text&gt;
+        </View&gt;
+        <View style={{ width: 40 }} /&gt;
+      </View&gt;
 
-      &lt;ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}&gt;
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}&gt;
         {/* Info */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}&gt;
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-              &lt;Ionicons name='information-circle' size={18} color={colors.primary} /&gt;
-              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.infoTitle')}&lt;/Text&gt;
-            &lt;/View&gt;
-            &lt;TouchableOpacity onPress={()=> setInfo(v=&gt;!v)}&gt;
-              &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} /&gt;
-            &lt;/TouchableOpacity&gt;
-          &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}&gt;
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              <Ionicons name='information-circle' size={18} color={colors.primary} /&gt;
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.infoTitle')}</Text&gt;
+            </View&gt;
+            <TouchableOpacity onPress={()=> setInfo(v=&gt;!v)}&gt;
+              <Ionicons name='information-circle-outline' size={18} color={colors.muted} /&gt;
+            </TouchableOpacity&gt;
+          </View&gt;
           {info ? (
-            &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;
+            <Text style={{ color: colors.muted, marginTop: 6 }}&gt;
               {t('goals.infoText')}
-            &lt;/Text&gt;
+            </Text&gt;
           ) : null}
-        &lt;/View&gt;
+        </View&gt;
 
         {/* Goal form */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-            &lt;Ionicons name='flag' size={18} color={colors.primary} /&gt;
-            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.goalFormTitle')}&lt;/Text&gt;
-          &lt;/View&gt;
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}&gt;
-            &lt;Text style={{ color: colors.text, width: 120 }}&gt;{t('goals.targetWeight')}&lt;/Text&gt;
-            &lt;TextInput value={targetWInput} onChangeText={setTargetWInput} keyboardType='decimal-pad' placeholder={t('goals.targetWeightPlaceholder')} placeholderTextColor={colors.muted} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text }} /&gt;
-            &lt;Text style={{ color: colors.muted, marginLeft: 8 }}&gt;{t('common.kg')}&lt;/Text&gt;
-          &lt;/View&gt;
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}&gt;
-            &lt;Text style={{ color: colors.text, width: 120 }}&gt;{t('goals.targetDate')}&lt;/Text&gt;
-            &lt;TouchableOpacity onPress={() =&gt; setShowDatePicker(true)} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
-              &lt;Text style={{ color: colors.text }}&gt;{selectedTargetDate ? selectedTargetDate.toLocaleDateString() : t('goals.pickDate')}&lt;/Text&gt;
-              &lt;Ionicons name='calendar' size={18} color={colors.muted} /&gt;
-            &lt;/TouchableOpacity&gt;
-          &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            <Ionicons name='flag' size={18} color={colors.primary} /&gt;
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.goalFormTitle')}</Text&gt;
+          </View&gt;
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}&gt;
+            <Text style={{ color: colors.text, width: 120 }}&gt;{t('goals.targetWeight')}</Text&gt;
+            <TextInput value={targetWInput} onChangeText={setTargetWInput} keyboardType='decimal-pad' placeholder={t('goals.targetWeightPlaceholder')} placeholderTextColor={colors.muted} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, color: colors.text }} /&gt;
+            <Text style={{ color: colors.muted, marginLeft: 8 }}&gt;{t('common.kg')}</Text&gt;
+          </View&gt;
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}&gt;
+            <Text style={{ color: colors.text, width: 120 }}&gt;{t('goals.targetDate')}</Text&gt;
+            <TouchableOpacity onPress={() =&gt; setShowDatePicker(true)} style={{ flex: 1, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+              <Text style={{ color: colors.text }}&gt;{selectedTargetDate ? selectedTargetDate.toLocaleDateString() : t('goals.pickDate')}</Text&gt;
+              <Ionicons name='calendar' size={18} color={colors.muted} /&gt;
+            </TouchableOpacity&gt;
+          </View&gt;
           {showDatePicker ? (
-            &lt;DateTimePicker
+            <DateTimePicker
               value={selectedTargetDate || new Date()}
               mode='date'
               display='calendar'
               onChange={(e, d) => { setShowDatePicker(false); if (d) setTargetDateInput(toKey(d)); }}
             /&gt;
           ) : null}
-          &lt;View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}&gt;
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}&gt;
             {state.goal ? (
-              &lt;TouchableOpacity onPress={()=> state.removeGoal()} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted }}&gt;
-                &lt;Text style={{ color: colors.text }}&gt;{t('goals.remove')}&lt;/Text&gt;
-              &lt;/TouchableOpacity&gt;
+              <TouchableOpacity onPress={()=> state.removeGoal()} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted }}&gt;
+                <Text style={{ color: colors.text }}&gt;{t('goals.remove')}</Text&gt;
+              </TouchableOpacity&gt;
             ) : null}
-            &lt;TouchableOpacity onPress={saveGoal} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, backgroundColor: colors.primary }}&gt;
-              &lt;Text style={{ color: '#fff' }}&gt;{t('goals.save')}&lt;/Text&gt;
-            &lt;/TouchableOpacity&gt;
-          &lt;/View&gt;
-        &lt;/View&gt;
+            <TouchableOpacity onPress={saveGoal} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, backgroundColor: colors.primary }}&gt;
+              <Text style={{ color: '#fff' }}&gt;{t('goals.save')}</Text&gt;
+            </TouchableOpacity&gt;
+          </View&gt;
+        </View&gt;
 
         {/* BMI block (wie Profil) */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-              &lt;Ionicons name='scale' size={18} color={colors.primary} /&gt;
-              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.bmiTitle')}&lt;/Text&gt;
-            &lt;/View&gt;
-          &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              <Ionicons name='scale' size={18} color={colors.primary} /&gt;
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.bmiTitle')}</Text&gt;
+            </View&gt;
+          </View&gt;
           {(!state.profile.heightCm || !lastW) ? (
-            &lt;Text style={{ color: colors.muted, marginTop: 8 }}&gt;{t('goals.enterHeightAndWeight')}&lt;/Text&gt;
+            <Text style={{ color: colors.muted, marginTop: 8 }}&gt;{t('goals.enterHeightAndWeight')}</Text&gt;
           ) : (
-            &lt;View style={{ marginTop: 8 }}&gt;
-              &lt;Text style={{ color: colors.text }}&gt;{t('analysis.lastWeightAndHeight', { weight: lastW?.toFixed(1), heightCm: state.profile.heightCm })}&lt;/Text&gt;
-              &lt;Text style={{ color: colors.text, marginTop: 2 }}&gt;BMI: {bmi?.toFixed(1)}&lt;/Text&gt;
-              &lt;View style={{ height: 10, backgroundColor: colors.bg, borderRadius: 5, overflow: 'hidden', marginTop: 8 }}&gt;
-                &lt;View style={{ width: '100%', height: '100%', flexDirection: 'row' }}&gt;
-                  &lt;View style={{ flex: 185, backgroundColor: '#2196F3' }} /&gt;
-                  &lt;View style={{ flex: 250-185, backgroundColor: '#4CAF50' }} /&gt;
-                  &lt;View style={{ flex: 300-250, backgroundColor: '#FFC107' }} /&gt;
-                  &lt;View style={{ flex: 400-300, backgroundColor: '#F44336' }} /&gt;
-                &lt;/View&gt;
-              &lt;/View&gt;
+            <View style={{ marginTop: 8 }}&gt;
+              <Text style={{ color: colors.text }}&gt;{t('analysis.lastWeightAndHeight', { weight: lastW?.toFixed(1), heightCm: state.profile.heightCm })}</Text&gt;
+              <Text style={{ color: colors.text, marginTop: 2 }}&gt;BMI: {bmi?.toFixed(1)}</Text&gt;
+              <View style={{ height: 10, backgroundColor: colors.bg, borderRadius: 5, overflow: 'hidden', marginTop: 8 }}&gt;
+                <View style={{ width: '100%', height: '100%', flexDirection: 'row' }}&gt;
+                  <View style={{ flex: 185, backgroundColor: '#2196F3' }} /&gt;
+                  <View style={{ flex: 250-185, backgroundColor: '#4CAF50' }} /&gt;
+                  <View style={{ flex: 300-250, backgroundColor: '#FFC107' }} /&gt;
+                  <View style={{ flex: 400-300, backgroundColor: '#F44336' }} /&gt;
+                </View&gt;
+              </View&gt;
               {bmi ? (
-                &lt;View style={{ position: 'relative', height: 16, marginTop: 2 }}&gt;
-                  &lt;View style={{ position: 'absolute', left: Math.min(100, Math.max(0, (bmi/40)*100)) + '%' , top: 0 }}&gt;
-                    &lt;Ionicons name='caret-down' size={16} color={colors.primary} /&gt;
-                  &lt;/View&gt;
-                &lt;/View&gt;
+                <View style={{ position: 'relative', height: 16, marginTop: 2 }}&gt;
+                  <View style={{ position: 'absolute', left: Math.min(100, Math.max(0, (bmi/40)*100)) + '%' , top: 0 }}&gt;
+                    <Ionicons name='caret-down' size={16} color={colors.primary} /&gt;
+                  </View&gt;
+                </View&gt;
               ) : null}
-            &lt;/View&gt;
+            </View&gt;
           )}
-        &lt;/View&gt;
+        </View&gt;
 
         {/* Plan vs. Ist (heutiger Vergleich) */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-            &lt;Ionicons name='stats-chart' size={18} color={colors.primary} /&gt;
-            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.planVsActual')}&lt;/Text&gt;
-          &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            <Ionicons name='stats-chart' size={18} color={colors.primary} /&gt;
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.planVsActual')}</Text&gt;
+          </View&gt;
           {!planVsActual ? (
-            &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.notEnoughData')}&lt;/Text&gt;
+            <Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.notEnoughData')}</Text&gt;
           ) : (
-            &lt;View style={{ marginTop: 6 }}&gt;
-              &lt;Text style={{ color: colors.muted }}&gt;{t('goals.plannedToday')}: {planVsActual.plannedToday.toFixed(1)} {t('common.kg')}&lt;/Text&gt;
-              &lt;Text style={{ color: colors.muted }}&gt;{t('goals.actual')}: {planVsActual.actual.toFixed(1)} {t('common.kg')} ({planVsActual.delta&gt;=0?'+':''}{planVsActual.delta.toFixed(1)} {t('common.kg')})&lt;/Text&gt;
-              &lt;View style={{ height: 8, backgroundColor: colors.bg, borderRadius: 4, overflow: 'hidden', marginTop: 6 }}&gt;
-                &lt;View style={{ width: `${Math.min(100, Math.max(0, (planVsActual.actual - (state.goal?.targetWeight||planVsActual.actual)) / ((effectiveStartWeight||planVsActual.actual) - (state.goal?.targetWeight||planVsActual.actual) || 1) * 100))}%`, height: 8, backgroundColor: colors.primary }} /&gt;
-              &lt;/View&gt;
-            &lt;/View&gt;
+            <View style={{ marginTop: 6 }}&gt;
+              <Text style={{ color: colors.muted }}&gt;{t('goals.plannedToday')}: {planVsActual.plannedToday.toFixed(1)} {t('common.kg')}</Text&gt;
+              <Text style={{ color: colors.muted }}&gt;{t('goals.actual')}: {planVsActual.actual.toFixed(1)} {t('common.kg')} ({planVsActual.delta&gt;=0?'+':''}{planVsActual.delta.toFixed(1)} {t('common.kg')})</Text&gt;
+              <View style={{ height: 8, backgroundColor: colors.bg, borderRadius: 4, overflow: 'hidden', marginTop: 6 }}&gt;
+                <View style={{ width: `${Math.min(100, Math.max(0, (planVsActual.actual - (state.goal?.targetWeight||planVsActual.actual)) / ((effectiveStartWeight||planVsActual.actual) - (state.goal?.targetWeight||planVsActual.actual) || 1) * 100))}%`, height: 8, backgroundColor: colors.primary }} /&gt;
+              </View&gt;
+            </View&gt;
           )}
-        &lt;/View&gt;
+        </View&gt;
 
         {/* Verlauf (Soll vs. Ist – Ist nur bis heute) */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-              &lt;Ionicons name='trending-down' size={18} color={colors.primary} /&gt;
-              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.historyTitle')}&lt;/Text&gt;
-            &lt;/View&gt;
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}&gt;
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-                &lt;View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
-                &lt;Text style={{ color: colors.muted }}&gt;{t('goals.plannedLabel')}&lt;/Text&gt;
-              &lt;/View&gt;
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-                &lt;View style={{ width: 10, height: 3, backgroundColor: colors.primary, marginRight: 6 }} /&gt;
-                &lt;Text style={{ color: colors.muted }}&gt;{t('goals.actual')}&lt;/Text&gt;
-              &lt;/View&gt;
-            &lt;/View&gt;
-          &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              <Ionicons name='trending-down' size={18} color={colors.primary} /&gt;
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.historyTitle')}</Text&gt;
+            </View&gt;
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}&gt;
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+                <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
+                <Text style={{ color: colors.muted }}&gt;{t('goals.plannedLabel')}</Text&gt;
+              </View&gt;
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+                <View style={{ width: 10, height: 3, backgroundColor: colors.primary, marginRight: 6 }} /&gt;
+                <Text style={{ color: colors.muted }}&gt;{t('goals.actual')}</Text&gt;
+              </View&gt;
+            </View&gt;
+          </View&gt;
           {!chartHist ? (
-            &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.needData')}&lt;/Text&gt;
+            <Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.needData')}</Text&gt;
           ) : (
-            &lt;View style={{ marginTop: 8 }}&gt;
-              &lt;LineChart
+            <View style={{ marginTop: 8 }}&gt;
+              <LineChart
                 data={chartHist.actual}
                 data2={chartHist.planned}
                 color={colors.primary}
@@ -456,50 +456,50 @@ export default function GoalsScreen() {
                       const ist = items?.[0]?.value ?? undefined;
                       const soll = items?.[1]?.value ?? undefined;
                       return (
-                        &lt;View style={{ backgroundColor: colors.card, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted, minWidth: 140 }}&gt;
-                          &lt;Text style={{ color: colors.text, fontWeight: '700' }}&gt;{label}&lt;/Text&gt;
-                          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}&gt;
-                            &lt;View style={{ width: 10, height: 3, backgroundColor: colors.primary, marginRight: 6 }} /&gt;
-                            &lt;Text style={{ color: colors.text }}&gt;{t('goals.actual')}: {typeof ist==='number'? ist.toFixed(1): '—'} {t('common.kg')}&lt;/Text&gt;
-                          &lt;/View&gt;
-                          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}&gt;
-                            &lt;View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
-                            &lt;Text style={{ color: colors.text }}&gt;{t('goals.plannedLabel')}: {typeof soll==='number'? soll.toFixed(1): '—'} {t('common.kg')}&lt;/Text&gt;
-                          &lt;/View&gt;
-                        &lt;/View&gt;
+                        <View style={{ backgroundColor: colors.card, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted, minWidth: 140 }}&gt;
+                          <Text style={{ color: colors.text, fontWeight: '700' }}&gt;{label}</Text&gt;
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}&gt;
+                            <View style={{ width: 10, height: 3, backgroundColor: colors.primary, marginRight: 6 }} /&gt;
+                            <Text style={{ color: colors.text }}&gt;{t('goals.actual')}: {typeof ist==='number'? ist.toFixed(1): '—'} {t('common.kg')}</Text&gt;
+                          </View&gt;
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}&gt;
+                            <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
+                            <Text style={{ color: colors.text }}&gt;{t('goals.plannedLabel')}: {typeof soll==='number'? soll.toFixed(1): '—'} {t('common.kg')}</Text&gt;
+                          </View&gt;
+                        </View&gt;
                       );
-                    } catch { return &lt;View /&gt;; }
+                    } catch { return <View /&gt;; }
                   },
                 }}
               /&gt;
-              &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.actualEndsToday')}&lt;/Text&gt;
-            &lt;/View&gt;
+              <Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.actualEndsToday')}</Text&gt;
+            </View&gt;
           )}
-        &lt;/View&gt;
+        </View&gt;
 
         {/* Prognose ab heute (Erwartet vs. Soll) */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-              &lt;Ionicons name='trending-up' size={18} color={colors.primary} /&gt;
-              &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.futureTitle')}&lt;/Text&gt;
-            &lt;/View&gt;
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}&gt;
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-                &lt;View style={{ width: 10, height: 3, backgroundColor: '#00bcd4', marginRight: 6 }} /&gt;
-                &lt;Text style={{ color: colors.muted }}&gt;{t('goals.expectedLabel')} (EWMA)&lt;/Text&gt;
-              &lt;/View&gt;
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-                &lt;View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
-                &lt;Text style={{ color: colors.muted }}&gt;{t('goals.plannedLabel')}&lt;/Text&gt;
-              &lt;/View&gt;
-            &lt;/View&gt;
-          &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}&gt;
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+              <Ionicons name='trending-up' size={18} color={colors.primary} /&gt;
+              <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.futureTitle')}</Text&gt;
+            </View&gt;
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}&gt;
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+                <View style={{ width: 10, height: 3, backgroundColor: '#00bcd4', marginRight: 6 }} /&gt;
+                <Text style={{ color: colors.muted }}&gt;{t('goals.expectedLabel')} (EWMA)</Text&gt;
+              </View&gt;
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+                <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
+                <Text style={{ color: colors.muted }}&gt;{t('goals.plannedLabel')}</Text&gt;
+              </View&gt;
+            </View&gt;
+          </View&gt;
           {!chartFuture ? (
-            &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.notEnoughData')} {t('goals.orGoalMissing') || ''}&lt;/Text&gt;
+            <Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.notEnoughData')} {t('goals.orGoalMissing') || ''}</Text&gt;
           ) : (
-            &lt;View style={{ marginTop: 8 }}&gt;
-              &lt;LineChart
+            <View style={{ marginTop: 8 }}&gt;
+              <LineChart
                 data={chartFuture.expected}
                 data2={chartFuture.planned}
                 data3={chartFuture.upper}
@@ -541,54 +541,54 @@ export default function GoalsScreen() {
                       const low = typeof exp==='number' ? exp - 1.0*sig : undefined;
                       const up = typeof exp==='number' ? exp + 1.0*sig : undefined;
                       return (
-                        &lt;View style={{ backgroundColor: colors.card, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted, minWidth: 160 }}&gt;
-                          &lt;Text style={{ color: colors.text, fontWeight: '700' }}&gt;{label}&lt;/Text&gt;
-                          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}&gt;
-                            &lt;View style={{ width: 10, height: 3, backgroundColor: '#00bcd4', marginRight: 6 }} /&gt;
-                            &lt;Text style={{ color: colors.text }}&gt;{t('goals.expectedLabel')}: {typeof exp==='number'? exp.toFixed(1): '—'} {t('common.kg')}&lt;/Text&gt;
-                          &lt;/View&gt;
-                          &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}&gt;
-                            &lt;View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
-                            &lt;Text style={{ color: colors.text }}&gt;{t('goals.plannedLabel')}: {typeof soll==='number'? soll.toFixed(1): '—'} {t('common.kg')}&lt;/Text&gt;
-                          &lt;/View&gt;
-                          &lt;Text style={{ color: colors.muted, marginTop: 4 }}&gt;{t('goals.expectedBand')}: {typeof low==='number' &amp;&amp; typeof up==='number' ? `${low.toFixed(1)}–${up.toFixed(1)} ${t('common.kg')}` : '—'}&lt;/Text&gt;
-                        &lt;/View&gt;
+                        <View style={{ backgroundColor: colors.card, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.muted, minWidth: 160 }}&gt;
+                          <Text style={{ color: colors.text, fontWeight: '700' }}&gt;{label}</Text&gt;
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}&gt;
+                            <View style={{ width: 10, height: 3, backgroundColor: '#00bcd4', marginRight: 6 }} /&gt;
+                            <Text style={{ color: colors.text }}&gt;{t('goals.expectedLabel')}: {typeof exp==='number'? exp.toFixed(1): '—'} {t('common.kg')}</Text&gt;
+                          </View&gt;
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}&gt;
+                            <View style={{ width: 10, height: 3, backgroundColor: '#2bb673', marginRight: 6 }} /&gt;
+                            <Text style={{ color: colors.text }}&gt;{t('goals.plannedLabel')}: {typeof soll==='number'? soll.toFixed(1): '—'} {t('common.kg')}</Text&gt;
+                          </View&gt;
+                          <Text style={{ color: colors.muted, marginTop: 4 }}&gt;{t('goals.expectedBand')}: {typeof low==='number' &amp;&amp; typeof up==='number' ? `${low.toFixed(1)}–${up.toFixed(1)} ${t('common.kg')}` : '—'}</Text&gt;
+                        </View&gt;
                       );
-                    } catch { return &lt;View /&gt;; }
+                    } catch { return <View /&gt;; }
                   },
                 }}
               /&gt;
-              &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.futureTitle')}: {t('goals.expectedLabel')} = EWMA; {t('goals.expectedBand')}.&lt;/Text&gt;
-            &lt;/View&gt;
+              <Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('goals.futureTitle')}: {t('goals.expectedLabel')} = EWMA; {t('goals.expectedBand')}.</Text&gt;
+            </View&gt;
           )}
-        &lt;/View&gt;
+        </View&gt;
 
         {/* Pace/ETA/Trend/BMI */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-            &lt;Ionicons name='pulse' size={18} color={colors.primary} /&gt;
-            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.metricsTitle')}&lt;/Text&gt;
-          &lt;/View&gt;
-          &lt;View style={{ marginTop: 6, gap: 4 }}&gt;
-            &lt;Text style={{ color: colors.muted }}&gt;{t('goals.paceLabel')}: {metrics.pace.toFixed(3)} {t('common.kg')}/Tag&lt;/Text&gt;
-            &lt;Text style={{ color: colors.muted }}&gt;{t('goals.trendLabel')}: {metrics.trend}{metrics.plateau?' · Plateau':''}&lt;/Text&gt;
-            &lt;Text style={{ color: colors.muted }}&gt;{t('goals.etaLabel')}: {metrics.eta ? metrics.eta.toLocaleDateString() : '—'}&lt;/Text&gt;
-            &lt;Text style={{ color: colors.muted }}&gt;BMI: {bmi?bmi.toFixed(1):'—'}&lt;/Text&gt;
-          &lt;/View&gt;
-        &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            <Ionicons name='pulse' size={18} color={colors.primary} /&gt;
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.metricsTitle')}</Text&gt;
+          </View&gt;
+          <View style={{ marginTop: 6, gap: 4 }}&gt;
+            <Text style={{ color: colors.muted }}&gt;{t('goals.paceLabel')}: {metrics.pace.toFixed(3)} {t('common.kg')}/Tag</Text&gt;
+            <Text style={{ color: colors.muted }}&gt;{t('goals.trendLabel')}: {metrics.trend}{metrics.plateau?' · Plateau':''}</Text&gt;
+            <Text style={{ color: colors.muted }}&gt;{t('goals.etaLabel')}: {metrics.eta ? metrics.eta.toLocaleDateString() : '—'}</Text&gt;
+            <Text style={{ color: colors.muted }}&gt;BMI: {bmi?bmi.toFixed(1):'—'}</Text&gt;
+          </View&gt;
+        </View&gt;
 
         {/* Analyse + Kurztipps */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
-            &lt;Ionicons name='bulb' size={18} color={colors.primary} /&gt;
-            &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.tipsTitle')}&lt;/Text&gt;
-          &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+            <Ionicons name='bulb' size={18} color={colors.primary} /&gt;
+            <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}&gt;{t('goals.tipsTitle')}</Text&gt;
+          </View&gt;
           {tips.map((tip, i)=&gt; (
-            &lt;Text key={i} style={{ color: colors.muted, marginTop: 4 }}&gt;• {tip}&lt;/Text&gt;
+            <Text key={i} style={{ color: colors.muted, marginTop: 4 }}&gt;• {tip}</Text&gt;
           ))}
-        &lt;/View&gt;
-      &lt;/ScrollView&gt;
-    &lt;/SafeAreaView&gt;
+        </View&gt;
+      </ScrollView&gt;
+    </SafeAreaView&gt;
   );
 }
 
