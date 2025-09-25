@@ -100,33 +100,33 @@ export default function CycleDayScreen() {
         </TouchableOpacity>
       );
     });
-    return &lt;View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginVertical: 4 }}>{items}&lt;/View>;
+    return <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginVertical: 4 }}>{items}</View>;
   };
 
   const renderIconScale = (value: number, icon: keyof typeof Ionicons.glyphMap, field: 'energy'|'pain'|'sleep'|'appetite'|'cravings'|'focus'|'libido') => {
     const items = Array.from({ length: 10 }).map((_, i) => {
       const idx = i + 1;
-      const active = idx &lt;= value;
+      const active = idx <= value;
       return (
-        &lt;TouchableOpacity key={`${field}-${idx}`} onPress={() => setDraft((d)=>({ ...d, [field]: idx }))} style={{ padding: 2 }}>
-          &lt;Ionicons name={icon} size={16} color={active ? colors.primary : colors.muted} />
-        &lt;/TouchableOpacity>
+        <TouchableOpacity key={`${field}-${idx}`} onPress={() => setDraft((d)=>({ ...d, [field]: idx }))} style={{ padding: 2 }}>
+          <Ionicons name={icon} size={16} color={active ? colors.primary : colors.muted} />
+        </TouchableOpacity>
       );
     });
-    return &lt;View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginVertical: 4 }}>{items}&lt;/View>;
+    return <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginVertical: 4 }}>{items}</View>;
   };
 
   const renderBleedingScale = (value?: number) => {
     const items = Array.from({ length: 10 }).map((_, i) => {
       const idx = i + 1; // 1..10
-      const active = typeof value === 'number' ? idx &lt;= value : false;
+      const active = typeof value === 'number' ? idx <= value : false;
       return (
-        &lt;TouchableOpacity key={`flow-${idx}`} onPress={() => setFlow(idx)} style={{ padding: 2 }}>
-          &lt;Ionicons name='water' size={16} color={active ? colors.primary : colors.muted} />
-        &lt;/TouchableOpacity>
+        <TouchableOpacity key={`flow-${idx}`} onPress={() => setFlow(idx)} style={{ padding: 2 }}>
+          <Ionicons name='water' size={16} color={active ? colors.primary : colors.muted} />
+        </TouchableOpacity>
       );
     });
-    return &lt;View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginVertical: 4 }}>{items}&lt;/View>;
+    return <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginVertical: 4 }}>{items}</View>;
   };
 
   const saveDraft = () => {
@@ -156,339 +156,339 @@ export default function CycleDayScreen() {
       const dtOnly = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
       if (+dtOnly &gt; +dayOnly) return false; // future
       const diffDays = Math.floor((+dayOnly - +dtOnly)/(24*60*60*1000));
-      return diffDays &lt;= 7;
+      return diffDays <= 7;
     } catch { return true; }
   })();
 
   return (
-    &lt;SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      &lt;View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}> 
-        &lt;TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }} accessibilityLabel={t('common.back')}>
-          &lt;Ionicons name='chevron-back' size={26} color={colors.text} />
-        &lt;/TouchableOpacity>
-        &lt;View style={{ alignItems: 'center' }}>
-          &lt;Text style={[styles.appTitle, { color: colors.text }]}>{t('common.appTitle')}&lt;/Text>
-          &lt;Text style={[styles.title, { color: colors.muted }]}>{t('cycle.dayTitle')}&lt;/Text>
-        &lt;/View>
-        &lt;View style={{ width: 40 }} />
-      &lt;/View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
+      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}> 
+        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }} accessibilityLabel={t('common.back')}>
+          <Ionicons name='chevron-back' size={26} color={colors.text} />
+        </TouchableOpacity>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={[styles.appTitle, { color: colors.text }]}>{t('common.appTitle')}</Text>
+          <Text style={[styles.title, { color: colors.muted }]}>{t('cycle.dayTitle')}</Text>
+        </View>
+        <View style={{ width: 40 }} />
+      </View>
 
-      &lt;KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':'height'} style={{ flex: 1 }}>
-        &lt;ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32 }}>
-          &lt;Text style={{ color: colors.text, textAlign: 'center', fontWeight: '700' }}>{formattedDate}&lt;/Text>
+      <KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':'height'} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32 }}>
+          <Text style={{ color: colors.text, textAlign: 'center', fontWeight: '700' }}>{formattedDate}</Text>
 
           {/* Mood */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'happy'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.moodTitle')}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('mood')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.mood ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.moodHelp')}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity testID={`cycle-mood-minus`} onPress={() => setVal('mood', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderMoodScale(draft.mood)}&lt;/View>
-              &lt;TouchableOpacity testID={`cycle-mood-plus`} onPress={() => setVal('mood', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'happy'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.moodTitle')}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('mood')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.mood ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.moodHelp')}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity testID={`cycle-mood-minus`} onPress={() => setVal('mood', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderMoodScale(draft.mood)}</View>
+              <TouchableOpacity testID={`cycle-mood-plus`} onPress={() => setVal('mood', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Energy */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'flash'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.energyTitle')}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('energy')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.energy ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.energyHelp')}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity testID={`cycle-energy-minus`} onPress={() => setVal('energy', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.energy, 'flash', 'energy')}&lt;/View>
-              &lt;TouchableOpacity testID={`cycle-energy-plus`} onPress={() => setVal('energy', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'flash'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.energyTitle')}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('energy')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.energy ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.energyHelp')}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity testID={`cycle-energy-minus`} onPress={() => setVal('energy', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.energy, 'flash', 'energy')}</View>
+              <TouchableOpacity testID={`cycle-energy-plus`} onPress={() => setVal('energy', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Appetite */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'fast-food'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.appetiteTitle') || 'Appetit'}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('appetite')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.appetite ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.appetiteHelp') || '1–10; höher = mehr Appetit.'}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity onPress={() => setVal('appetite', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.appetite, 'fast-food', 'appetite')}&lt;/View>
-              &lt;TouchableOpacity onPress={() => setVal('appetite', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'fast-food'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.appetiteTitle') || 'Appetit'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('appetite')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.appetite ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.appetiteHelp') || '1–10; höher = mehr Appetit.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('appetite', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.appetite, 'fast-food', 'appetite')}</View>
+              <TouchableOpacity onPress={() => setVal('appetite', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Cravings */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'ice-cream'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.cravingsTitle') || 'Heißhunger'}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('cravings')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.cravings ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.cravingsHelp') || '1–10; höher = stärkerer Heißhunger.'}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity onPress={() => setVal('cravings', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.cravings, 'ice-cream', 'cravings')}&lt;/View>
-              &lt;TouchableOpacity onPress={() => setVal('cravings', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'ice-cream'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.cravingsTitle') || 'Heißhunger'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('cravings')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.cravings ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.cravingsHelp') || '1–10; höher = stärkerer Heißhunger.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('cravings', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.cravings, 'ice-cream', 'cravings')}</View>
+              <TouchableOpacity onPress={() => setVal('cravings', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Focus/Concentration */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'book'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.focusTitle') || 'Fokus/Konzentration'}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('focus')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.focus ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.focusHelp') || '1–10; höher = bessere Konzentration.'}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity onPress={() => setVal('focus', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.focus, 'book', 'focus')}&lt;/View>
-              &lt;TouchableOpacity onPress={() => setVal('focus', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'book'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.focusTitle') || 'Fokus/Konzentration'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('focus')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.focus ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.focusHelp') || '1–10; höher = bessere Konzentration.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('focus', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.focus, 'book', 'focus')}</View>
+              <TouchableOpacity onPress={() => setVal('focus', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Libido */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'flame'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.libidoTitle') || 'Libido'}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('libido')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.libido ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.libidoHelp') || '1–10; höher = stärkere Libido.'}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity onPress={() => setVal('libido', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.libido, 'flame', 'libido')}&lt;/View>
-              &lt;TouchableOpacity onPress={() => setVal('libido', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'flame'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.libidoTitle') || 'Libido'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('libido')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.libido ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.libidoHelp') || '1–10; höher = stärkere Libido.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setVal('libido', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.libido, 'flame', 'libido')}</View>
+              <TouchableOpacity onPress={() => setVal('libido', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Pain */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'medkit'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.painTitle')}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('pain')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.pain ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.painHelp')}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity testID={`cycle-pain-minus`} onPress={() => setVal('pain', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.pain, 'medkit', 'pain')}&lt;/View>
-              &lt;TouchableOpacity testID={`cycle-pain-plus`} onPress={() => setVal('pain', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'medkit'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.painTitle')}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('pain')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.pain ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.painHelp')}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity testID={`cycle-pain-minus`} onPress={() => setVal('pain', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.pain, 'medkit', 'pain')}</View>
+              <TouchableOpacity testID={`cycle-pain-plus`} onPress={() => setVal('pain', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Sleep */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'moon'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.sleepTitle')}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('sleep')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.sleep ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.sleepHelp')}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity testID={`cycle-sleep-minus`} onPress={() => setVal('sleep', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.sleep, 'moon', 'sleep')}&lt;/View>
-              &lt;TouchableOpacity testID={`cycle-sleep-plus`} onPress={() => setVal('sleep', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'moon'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.sleepTitle')}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('sleep')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.sleep ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.sleepHelp')}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity testID={`cycle-sleep-minus`} onPress={() => setVal('sleep', -1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.sleep, 'moon', 'sleep')}</View>
+              <TouchableOpacity testID={`cycle-sleep-plus`} onPress={() => setVal('sleep', +1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Stress */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name={'alert'} size={18} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.stressTitle') || 'Stress'}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('stress')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.stress ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.stressHelp') || '1–10; höher = mehr Stress.'}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity testID={`cycle-stress-minus`} onPress={() => setDraft((d)=>({ ...d, stress: clamp((d.stress||5)-1,1,10) }))} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.stress||5, 'alert', 'energy')}&lt;/View>
-              &lt;TouchableOpacity testID={`cycle-stress-plus`} onPress={() => setDraft((d)=>({ ...d, stress: clamp((d.stress||5)+1,1,10) }))} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'alert'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.stressTitle') || 'Stress'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('stress')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.stress ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.stressHelp') || '1–10; höher = mehr Stress.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity testID={`cycle-stress-minus`} onPress={() => setDraft((d)=>({ ...d, stress: clamp((d.stress||5)-1,1,10) }))} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.stress||5, 'alert', 'energy')}</View>
+              <TouchableOpacity testID={`cycle-stress-plus`} onPress={() => setDraft((d)=>({ ...d, stress: clamp((d.stress||5)+1,1,10) }))} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Bleeding intensity (1..10), no toggle */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                &lt;Ionicons name='water' size={16} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, fontWeight: '700', marginLeft: 6 }}>{t('cycle.bleedingTitle')}&lt;/Text>
-              &lt;/View>
-              &lt;TouchableOpacity onPress={() => toggleHelp('bleeding')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.bleeding ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.bleedingHelp')}&lt;/Text>) : null}
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name='water' size={16} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 6 }}>{t('cycle.bleedingTitle')}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('bleeding')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.bleeding ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.bleedingHelp')}</Text>) : null}
 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
-              &lt;Text style={{ color: colors.text }}>{t('cycle.fields.flow')}&lt;/Text>
-              &lt;TouchableOpacity onPress={clearFlow} style={[styles.chip, { borderColor: colors.primary, backgroundColor: 'transparent' }]}> 
-                &lt;Text style={{ color: colors.text }}>{t('common.cancel')}&lt;/Text>
-              &lt;/TouchableOpacity>
-            &lt;/View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
+              <Text style={{ color: colors.text }}>{t('cycle.fields.flow')}</Text>
+              <TouchableOpacity onPress={clearFlow} style={[styles.chip, { borderColor: colors.primary, backgroundColor: 'transparent' }]}> 
+                <Text style={{ color: colors.text }}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Always show scale; selecting sets period=true */}
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              &lt;TouchableOpacity onPress={() => setFlow((draft.flow||5) - 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='remove' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-              &lt;View style={{ flex: 1, alignItems: 'center' }}>{renderBleedingScale(draft.flow)}&lt;/View>
-              &lt;TouchableOpacity onPress={() => setFlow((draft.flow||5) + 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
-                &lt;Ionicons name='add' size={16} color={colors.primary} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity onPress={() => setFlow((draft.flow||5) - 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderBleedingScale(draft.flow)}</View>
+              <TouchableOpacity onPress={() => setFlow((draft.flow||5) + 1)} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Additional: toggles */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.additionalTitle')}&lt;/Text>
-              &lt;TouchableOpacity onPress={() => toggleHelp('additional')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.additional ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.additionalHelp')}&lt;/Text>) : null}
-            &lt;View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, sex: !d.sex }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.sex ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='heart' size={14} color={draft.sex ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.sex ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.sex')}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, cramps: !d.cramps }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.cramps ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='body' size={14} color={draft.cramps ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.cramps ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.cramps')}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, backPain: !d.backPain }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.backPain ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='fitness' size={14} color={draft.backPain ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.backPain ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.backPain') || 'Rückenschmerzen'}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, breastTenderness: !d.breastTenderness }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.breastTenderness ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='female' size={14} color={draft.breastTenderness ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.breastTenderness ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.breastTenderness') || 'Brustspannen'}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, waterRetention: !d.waterRetention }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.waterRetention ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='water' size={14} color={draft.waterRetention ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.waterRetention ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.waterRetention') || 'Wassereinlagerungen'}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, dizziness: !d.dizziness }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.dizziness ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='swap-vertical' size={14} color={draft.dizziness ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.dizziness ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.dizziness') || 'Schwindel'}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, headache: !d.headache }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.headache ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='medkit' size={14} color={draft.headache ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.headache ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.headache')}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity onPress={() => setDraft((d)=>({ ...d, nausea: !d.nausea }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.nausea ? colors.primary : 'transparent' }]}> 
-                &lt;Ionicons name='restaurant' size={14} color={draft.nausea ? '#fff' : colors.primary} />
-                &lt;Text style={{ color: draft.nausea ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.nausea')}&lt;/Text>
-              &lt;/TouchableOpacity>
-            &lt;/View>
-          &lt;/View>
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.additionalTitle')}</Text>
+              <TouchableOpacity onPress={() => toggleHelp('additional')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.additional ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.additionalHelp')}</Text>) : null}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, sex: !d.sex }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.sex ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='heart' size={14} color={draft.sex ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.sex ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.sex')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, cramps: !d.cramps }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.cramps ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='body' size={14} color={draft.cramps ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.cramps ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.cramps')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, backPain: !d.backPain }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.backPain ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='fitness' size={14} color={draft.backPain ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.backPain ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.backPain') || 'Rückenschmerzen'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, breastTenderness: !d.breastTenderness }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.breastTenderness ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='female' size={14} color={draft.breastTenderness ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.breastTenderness ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.breastTenderness') || 'Brustspannen'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, waterRetention: !d.waterRetention }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.waterRetention ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='water' size={14} color={draft.waterRetention ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.waterRetention ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.waterRetention') || 'Wassereinlagerungen'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, dizziness: !d.dizziness }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.dizziness ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='swap-vertical' size={14} color={draft.dizziness ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.dizziness ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.dizziness') || 'Schwindel'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, headache: !d.headache }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.headache ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='medkit' size={14} color={draft.headache ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.headache ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.headache')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setDraft((d)=>({ ...d, nausea: !d.nausea }))} style={[styles.chip, { borderColor: colors.primary, backgroundColor: draft.nausea ? colors.primary : 'transparent' }]}> 
+                <Ionicons name='restaurant' size={14} color={draft.nausea ? '#fff' : colors.primary} />
+                <Text style={{ color: draft.nausea ? '#fff' : colors.text, marginLeft: 6 }}>{t('cycle.fields.nausea')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Notes + Save/Delete */}
-          &lt;View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
-            &lt;View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              &lt;Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.notesTitle')}&lt;/Text>
-              &lt;TouchableOpacity onPress={() => toggleHelp('notes')}>
-                &lt;Ionicons name='information-circle-outline' size={18} color={colors.muted} />
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {help.notes ? (&lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.notesHelp')}&lt;/Text>) : null}
-            &lt;TextInput testID='cycle-notes' style={{ marginTop: 8, minHeight: 100, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, padding: 10, color: colors.text, backgroundColor: colors.input }} placeholder={t('cycle.notesPlaceholder')} placeholderTextColor={colors.muted} value={draft.notes} onChangeText={(v) => setDraft((d)=>({ ...d, notes: v }))} multiline />
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}> 
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{t('cycle.notesTitle')}</Text>
+              <TouchableOpacity onPress={() => toggleHelp('notes')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.notes ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.notesHelp')}</Text>) : null}
+            <TextInput testID='cycle-notes' style={{ marginTop: 8, minHeight: 100, borderWidth: 1, borderColor: colors.muted, borderRadius: 8, padding: 10, color: colors.text, backgroundColor: colors.input }} placeholder={t('cycle.notesPlaceholder')} placeholderTextColor={colors.muted} value={draft.notes} onChangeText={(v) => setDraft((d)=>({ ...d, notes: v }))} multiline />
             {!canModify ? (
-              &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.editDisabled7d')}&lt;/Text>
+              <Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.editDisabled7d')}</Text>
             ) : null}
-            &lt;View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 10 }}>
-              &lt;TouchableOpacity disabled={!canModify} onPress={deleteDraft} style={[styles.chip, { borderColor: colors.primary, opacity: canModify?1:0.4 }]}> 
-                &lt;Ionicons name='trash' size={16} color={colors.primary} />
-                &lt;Text style={{ color: colors.text, marginLeft: 6 }}>{t('common.delete')}&lt;/Text>
-              &lt;/TouchableOpacity>
-              &lt;TouchableOpacity disabled={!canModify} onPress={saveDraft} style={[styles.chip, { backgroundColor: colors.primary, borderColor: colors.primary, opacity: canModify?1:0.4 }]}> 
-                &lt;Ionicons name='save' size={16} color={'#fff'} />
-                &lt;Text style={{ color: '#fff', marginLeft: 6 }}>{t('common.save')}&lt;/Text>
-              &lt;/TouchableOpacity>
-            &lt;/View>
-            {savedVisible ? (&lt;Text style={{ color: colors.muted, marginTop: 6, textAlign: 'right' }}>{t('common.saved') || 'Saved'}&lt;/Text>) : null}
-          &lt;/View>
-        &lt;/ScrollView>
-      &lt;/KeyboardAvoidingView>
-    &lt;/SafeAreaView>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 10 }}>
+              <TouchableOpacity disabled={!canModify} onPress={deleteDraft} style={[styles.chip, { borderColor: colors.primary, opacity: canModify?1:0.4 }]}> 
+                <Ionicons name='trash' size={16} color={colors.primary} />
+                <Text style={{ color: colors.text, marginLeft: 6 }}>{t('common.delete')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity disabled={!canModify} onPress={saveDraft} style={[styles.chip, { backgroundColor: colors.primary, borderColor: colors.primary, opacity: canModify?1:0.4 }]}> 
+                <Ionicons name='save' size={16} color={'#fff'} />
+                <Text style={{ color: '#fff', marginLeft: 6 }}>{t('common.save')}</Text>
+              </TouchableOpacity>
+            </View>
+            {savedVisible ? (<Text style={{ color: colors.muted, marginTop: 6, textAlign: 'right' }}>{t('common.saved') || 'Saved'}</Text>) : null}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
