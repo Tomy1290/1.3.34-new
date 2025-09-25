@@ -234,6 +234,30 @@ export default function CycleDayScreen() {
                 <Ionicons name={'moon'} size={18} color={colors.primary} />
                 <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.sleepTitle')}</Text>
               </View>
+
+          {/* Stress */}
+          <View style={[styles.card, { backgroundColor: colors.card, marginTop: 12 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name={'alert'} size={18} color={colors.primary} />
+                <Text style={{ color: colors.text, fontWeight: '700', marginLeft: 8 }}>{t('cycle.stressTitle') || 'Stress'}</Text>
+              </View>
+              <TouchableOpacity onPress={() => toggleHelp('stress')}>
+                <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
+              </TouchableOpacity>
+            </View>
+            {help.stress ? (<Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.stressHelp') || '1–10; höher = mehr Stress.'}</Text>) : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+              <TouchableOpacity testID={`cycle-stress-minus`} onPress={() => setDraft((d)=>({ ...d, stress: clamp((d.stress||5)-1,1,10) }))} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='remove' size={16} color={colors.primary} />
+              </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: 'center' }}>{renderIconScale(draft.stress||5, 'alert', 'energy')}</View>
+              <TouchableOpacity testID={`cycle-stress-plus`} onPress={() => setDraft((d)=>({ ...d, stress: clamp((d.stress||5)+1,1,10) }))} style={[styles.stepBtnSmall, { borderColor: colors.primary }]}> 
+                <Ionicons name='add' size={16} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
               <TouchableOpacity onPress={() => toggleHelp('sleep')}>
                 <Ionicons name='information-circle-outline' size={18} color={colors.muted} />
               </TouchableOpacity>
