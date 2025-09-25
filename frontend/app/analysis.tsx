@@ -253,8 +253,8 @@ export default function AnalysisScreen() {
               lastForInsights.map((d, i) => {
                 const dt = new Date(d.date);
                 const label = `${String(dt.getDate()).padStart(2,'0')}.${String(dt.getMonth()+1).padStart(2,'0')}`;
-                const prev = lastForInsights[i-1] as any;
-                const diff = i===0 ? 0 : ((Number((d as any).weight)||0) - (Number(prev?.weight)||0));
+                const next = lastForInsights[i+1] as any;
+                const diff = i===lastForInsights.length-1 ? 0 : ((Number(next?.weight)||0) - (Number((d as any).weight)||0));
                 const { text: diffText, color } = fmtDiff(diff);
                 return (
                   <View key={(d as any).date} style={{ paddingVertical: 4 }}>
@@ -262,8 +262,8 @@ export default function AnalysisScreen() {
                       <Text style={{ color: colors.muted, width: 64 }}>{label}</Text>
                       <Text style={{ color: colors.text, width: 80, textAlign: 'right' }}>{Number((d as any).weight).toFixed(1)} {t('common.kg')}</Text>
                     </View>
-                    {i>0 ? (
-                      <Text style={{ marginLeft: 64, color, fontWeight: '700' }}>{diffText}</Text>
+                    {i<lastForInsights.length-1 ? (
+                      <Text style={{ marginLeft: 64, width: 80, textAlign: 'right', color, fontWeight: '700' }}>{diffText}</Text>
                     ) : null}
                   </View>
                 );
