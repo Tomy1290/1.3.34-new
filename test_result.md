@@ -178,6 +178,18 @@ frontend:
   - agent: "main"
     message: "Added Metro aliases (Option B) to map react-native-linear-gradient -> src/shims/LinearGradientShim.tsx and @react-native-masked-view/masked-view -> src/shims/MaskedViewShim.tsx. No native packages installed. Please rebuild APK in Codemagic to verify."
 
+  - task: "Fix logical operators in settings.tsx (and/or -> &&/||)"
+    implemented: true
+    working: NA
+    file: "/app/frontend/app/settings.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: NA
+        agent: "main"
+        comment: "Replaced Python-style logical operators (and/or) with JS (&&/||); fixed related conditions in reminders and backend URL test. Please rerun Codemagic APK build."
+
   - task: "Fix HTML entities in Expo app (gallery.tsx, goals.tsx)"
     implemented: true
     working: NA
