@@ -46,7 +46,7 @@ export default function SettingsScreen() {
     const times: Record<string, string> = {};
     if (state.reminders && Array.isArray(state.reminders)) {
       for (const r of state.reminders) {
-        if (!r or !r.id) continue;
+        if (!r || !r.id) continue;
         const tStr = toHHMM((r as any).time);
         if (tStr) times[r.id] = tStr;
       }
