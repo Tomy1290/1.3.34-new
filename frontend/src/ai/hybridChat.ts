@@ -1,5 +1,5 @@
 import { localGreeting, localReply } from './localChat';
-import { computeAISummary } from './summary';
+import { buildCompactSummary } from './summary';
 import { apiFetch } from '../utils/api';
 
 export interface CloudChatResponse { text: string; }
@@ -60,7 +60,7 @@ export async function hybridGreeting(state: any): Promise<string> {
     const isConnected = await testCloudConnection();
     if (!isConnected) throw new Error('Backend not reachable');
 
-    const summary = computeAISummary(state);
+    const summary = buildCompactSummary(state);
     const request: CloudChatRequest = {
       mode: 'greeting',
       language: state.language || 'de',
@@ -81,7 +81,7 @@ export async function hybridReply(state: any, userMessage: string): Promise<stri
     const isConnected = await testCloudConnection();
     if (!isConnected) throw new Error('Backend not reachable');
 
-    const summary = computeAISummary(state);
+    const summary = buildCompactSummary(state);
     const recentChat = (state.chat || []).slice(-6).map((msg: any) => ({
       role: msg.sender === 'user' ? 'user' as const : 'assistant' as const,
       content: msg.text
