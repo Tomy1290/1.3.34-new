@@ -303,6 +303,9 @@ const en = {
     sleepHelp: "Choose 1–10: higher number = better sleep.",
     bleedingTitle: "Bleeding (intensity)",
     bleedingHelp: "Choose 0–10 drops; more drops = stronger bleeding.",
+    stressTitle: "Stress",
+    stressHelp: "Scale 1–10; 1 = very relaxed, 10 = extremely stressed.",
+
     additionalTitle: "Additional",
     additionalHelp: "Useful markers: cramps, headache, nausea.",
     notesTitle: "Notes",
