@@ -327,6 +327,15 @@ const de = {
     },
     none: "Keine Erinnerungen angelegt.",
     actionTime: "Zeit für eine Aktion",
+  },
+  leaderboard: {
+    title: "Rangliste",
+    myPoints: "Meine Punkte",
+    thisWeek: "Diese Woche",
+    total: "Gesamt",
+    you: "Du",
+    week: "Woche",
+    offlineHint: "Offline‑Modus: Nur eigene Werte. Online‑Sync kann später ergänzt werden."
   }
 };
 

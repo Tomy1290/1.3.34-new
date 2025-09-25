@@ -326,6 +326,15 @@ const en = {
     },
     none: "No reminders yet.",
     actionTime: "Time for an action",
+  },
+  leaderboard: {
+    title: "Leaderboard",
+    myPoints: "My points",
+    thisWeek: "This week",
+    total: "Total",
+    you: "You",
+    week: "Week",
+    offlineHint: "Offline mode: Only your own stats. Online sync can be added later."
   }
 };
 

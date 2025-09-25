@@ -326,6 +326,15 @@ const pl = {
     },
     none: "Brak przypomnień.",
     actionTime: "Czas na działanie",
+  },
+  leaderboard: {
+    title: "Ranking",
+    myPoints: "Moje punkty",
+    thisWeek: "Ten tydzień",
+    total: "Razem",
+    you: "Ty",
+    week: "Tydzień",
+    offlineHint: "Tryb offline: tylko Twoje statystyki. Synchronizację online można dodać później."
   }
 };
 

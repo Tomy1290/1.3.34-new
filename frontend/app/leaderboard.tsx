@@ -23,44 +23,44 @@ export default function LeaderboardScreen() {
   const week = useMemo(() => getWeekRange(new Date()), []);
   const weeklyXp = useMemo(() => {
     const start = +week.start; const end = +week.end + 24*60*60*1000 - 1;
-    return (state.xpLog||[]).filter(e => e.ts &gt;= start &amp;&amp; e.ts &lt;= end).reduce((a,b)=&gt;a+b.amount,0);
+    return (state.xpLog||[]).filter(e => e.ts >= start && e.ts <= end).reduce((a,b)=>a+b.amount,0);
   }, [state.xpLog]);
 
   const profileName = (state.profile?.name || '').trim();
 
   return (
-    &lt;SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}&gt;
-      &lt;View style={[styles.header, { backgroundColor: colors.card }]}&gt; 
-        &lt;TouchableOpacity onPress={() =&gt; router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}&gt;
-          &lt;Ionicons name='chevron-back' size={24} color={colors.text} /&gt;
-        &lt;/TouchableOpacity&gt;
-        &lt;View style={{ alignItems: 'center' }}&gt;
-          &lt;Text style={[styles.appTitle, { color: colors.text }]}&gt;{t('common.appTitle')}&lt;/Text&gt;
-          &lt;Text style={[styles.title, { color: colors.muted }]}&gt;{t('leaderboard.title')}&lt;/Text&gt;
-        &lt;/View&gt;
-        &lt;View style={{ width: 40 }} /&gt;
-      &lt;/View&gt;
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
+      <View style={[styles.header, { backgroundColor: colors.card }]}> 
+        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}>
+          <Ionicons name='chevron-back' size={24} color={colors.text} />
+        </TouchableOpacity>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={[styles.appTitle, { color: colors.text }]}>{t('common.appTitle')}</Text>
+          <Text style={[styles.title, { color: colors.muted }]}>{t('leaderboard.title')}</Text>
+        </View>
+        <View style={{ width: 40 }} />
+      </View>
 
-      &lt;ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}&gt;
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* My points */}
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;Text style={{ color: colors.text, fontWeight: '700' }}&gt;{t('leaderboard.myPoints')}&lt;/Text&gt;
-          &lt;Text style={{ color: colors.muted, marginTop: 6 }}&gt;{t('leaderboard.thisWeek')}: {weeklyXp} {t('common.xp')}&lt;/Text&gt;
-          &lt;Text style={{ color: colors.muted, marginTop: 2 }}&gt;{t('leaderboard.total')}: {state.xp} {t('common.xp')}&lt;/Text&gt;
-        &lt;/View&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={{ color: colors.text, fontWeight: '700' }}>{t('leaderboard.myPoints')}</Text>
+          <Text style={{ color: colors.muted, marginTop: 6 }}>{t('leaderboard.thisWeek')}: {weeklyXp} {t('common.xp')}</Text>
+          <Text style={{ color: colors.muted, marginTop: 2 }}>{t('leaderboard.total')}: {state.xp} {t('common.xp')}</Text>
+        </View>
 
-        &lt;View style={[styles.card, { backgroundColor: colors.card }]}&gt; 
-          &lt;Text style={{ color: colors.text, fontWeight: '700' }}&gt;{t('leaderboard.title')}&lt;/Text&gt;
-          &lt;View style={{ marginTop: 6 }}&gt;
-            &lt;View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 }}&gt;
-              &lt;Text style={{ color: colors.text, fontWeight: '700' }}&gt;{profileName || t('leaderboard.you')}&lt;/Text&gt;
-              &lt;Text style={{ color: colors.muted }}&gt;{weeklyXp} {t('common.xp')} ({t('leaderboard.week')}) · {state.xp} {t('common.xp')} ({t('leaderboard.total')})&lt;/Text&gt;
-            &lt;/View&gt;
-            &lt;Text style={{ color: colors.muted, marginTop: 8 }}&gt;{t('leaderboard.offlineHint')}&lt;/Text&gt;
-          &lt;/View&gt;
-        &lt;/View&gt;
-      &lt;/ScrollView&gt;
-    &lt;/SafeAreaView&gt;
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={{ color: colors.text, fontWeight: '700' }}>{t('leaderboard.title')}</Text>
+          <View style={{ marginTop: 6 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 }}>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{profileName || t('leaderboard.you')}</Text>
+              <Text style={{ color: colors.muted }}>{weeklyXp} {t('common.xp')} ({t('leaderboard.week')}) · {state.xp} {t('common.xp')} ({t('leaderboard.total')})</Text>
+            </View>
+            <Text style={{ color: colors.muted, marginTop: 8 }}>{t('leaderboard.offlineHint')}</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
