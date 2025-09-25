@@ -91,7 +91,7 @@ export function computeNextOccurrence(hour: number, minute: number): Date {
 }
 
 // Schedule a ONE-TIME reminder at the next occurrence – prevents immediate firing on some devices
-function isHyperOSLike() {
+export function isHyperOSLike() {
   const brand = (Device?.brand || '').toLowerCase();
   const manufacturer = (Device?.manufacturer || '').toLowerCase();
   // Xiaomi / Redmi / POCO patterns
