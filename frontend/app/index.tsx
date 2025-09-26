@@ -14,6 +14,7 @@ import PillIcon from "../src/components/icons/PillIcon";
 import ScaleIcon from "../src/components/icons/ScaleIcon";
 import { safeDateLabel } from "../src/utils/locale";
 import { useI18n } from "../src/i18n";
+import { computeDailyWaterTargetMl, getLatestWeightKg } from "../src/utils/water";
 
 function useThemeColors(theme: string) {
   if (theme === "pink_pastel") return { bg: "#fff0f5", card: "#ffe4ef", primary: "#d81b60", text: "#3a2f33", muted: "#8a6b75" };
