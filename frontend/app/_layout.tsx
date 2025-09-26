@@ -7,6 +7,8 @@ import { initializeNotifications, computeNextOccurrence, scheduleOneTimeNotifica
 import { scheduleCycleNotifications } from '../src/utils/cycleNotifications';
 import { useAppStore } from "../src/store/useStore";
 import { warmupBackend } from "../src/utils/api";
+import { AppState } from 'react-native';
+
 
 
 export default function RootLayout() {
