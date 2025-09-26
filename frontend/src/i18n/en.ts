@@ -83,7 +83,7 @@ const en = {
     evening: "Evening",
     takeMorning: "Take in the morning",
     takeEvening: "Take in the evening",
-    drinksSport: "Drinks &amp; Sport",
+    drinksSport: "Drinks & Sport",
     drinksHelp: "Set cup size in Settings. Bar shows goal (35 ml/kg + 0.5 L if sport). Water cure adds +1.0 L to intake.",
     water: "Water",
     coffee: "Coffee",
