@@ -65,6 +65,20 @@ function highSleepDays(s: AchState, threshold = 7) {
   return Object.values(logs).reduce((acc, v) => acc + ((typeof v?.sleep === 'number' && v.sleep >= threshold) ? 1 : 0), 0);
 }
 
+// Rolling N-days photo count (default 30 days)
+function photosLastNDaysCount(s: AchState, days = 30) {
+  const gal = s.gallery || {} as Record<string, PhotoEntry[]>;
+  const since = Date.now() - days * 24 * 60 * 60 * 1000;
+  let total = 0;
+  for (const arr of Object.values(gal)) {
+    if (!Array.isArray(arr)) continue;
+    for (const ph of arr) {
+      if (typeof ph?.ts === 'number' && ph.ts >= since) total += 1;
+    }
+  }
+  return total;
+}
+
 // New helpers for requested achievements
 // Photos per month (YYYY-MM)
 function photosPerMonthCount(s: AchState, ym: string) {
