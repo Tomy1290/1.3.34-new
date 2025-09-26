@@ -47,6 +47,17 @@ export default function RootLayout() {
       try {
         await warmupBackend(3500);
       } catch {}
+
+  // Re-warmup when app returns to foreground
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        try { warmupBackend(2500); } catch {}
+      }
+    });
+    return () => { try { sub.remove(); } catch {} };
+  }, []);
+
     })();
   }, []);
 
