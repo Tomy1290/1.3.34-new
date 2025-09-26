@@ -181,6 +181,26 @@ const A: AchievementConfig[] = [
   { id: 'period_track_20', xp: 300, progress: (s) => Math.min(100, Math.round((periodTrackedCount(s)/20)*100)), title:(l)=> l==='de'?'Periode 20x':'Period 20x', description:(l)=> l==='de'?'Periode an 20 Tagen markiert.':'Mark period on 20 days.' },
   { id: 'period_track_50', xp: 700, progress: (s) => Math.min(100, Math.round((periodTrackedCount(s)/50)*100)), title:(l)=> l==='de'?'Periode 50x':'Period 50x', description:(l)=> l==='de'?'Periode an 50 Tagen markiert.':'Mark period on 50 days.' },
 
+  // NEW: Low stress days
+  { id: 'low_stress_1', xp: 40, progress: (s) => Math.min(100, Math.round((lowStressDays(s,3)/1)*100)), title:(l)=> l==='de'?'Wenig Stress 1':'Low stress 1', description:(l)=> l==='de'?'1 Tag mit wenig Stress (≤3).':'1 day low stress (≤3).' },
+  { id: 'low_stress_10', xp: 120, progress: (s) => Math.min(100, Math.round((lowStressDays(s,3)/10)*100)), title:(l)=> l==='de'?'Wenig Stress 10':'Low stress 10', description:(l)=> l==='de'?'10 Tage mit wenig Stress (≤3).':'10 days low stress (≤3).' },
+  { id: 'low_stress_25', xp: 260, progress: (s) => Math.min(100, Math.round((lowStressDays(s,3)/25)*100)), title:(l)=> l==='de'?'Wenig Stress 25':'Low stress 25', description:(l)=> l==='de'?'25 Tage mit wenig Stress (≤3).':'25 days low stress (≤3).' },
+  { id: 'low_stress_50', xp: 520, progress: (s) => Math.min(100, Math.round((lowStressDays(s,3)/50)*100)), title:(l)=> l==='de'?'Wenig Stress 50':'Low stress 50', description:(l)=> l==='de'?'50 Tage mit wenig Stress (≤3).':'50 days low stress (≤3).' },
+  { id: 'low_stress_100', xp: 1100, progress: (s) => Math.min(100, Math.round((lowStressDays(s,3)/100)*100)), title:(l)=> l==='de'?'Wenig Stress 100':'Low stress 100', description:(l)=> l==='de'?'100 Tage mit wenig Stress (≤3).':'100 days low stress (≤3).' },
+
+  // NEW: Sleep distributions (few vs. much) via cycle logs' sleep 1..10 scale
+  { id: 'low_sleep_1', xp: 40, progress: (s) => Math.min(100, Math.round((lowSleepDays(s,4)/1)*100)), title:(l)=> l==='de'?'Wenig Schlaf 1':'Low sleep 1', description:(l)=> l==='de'?'1 Tag mit wenig Schlaf (≤4).':'1 day low sleep (≤4).' },
+  { id: 'low_sleep_10', xp: 120, progress: (s) => Math.min(100, Math.round((lowSleepDays(s,4)/10)*100)), title:(l)=> l==='de'?'Wenig Schlaf 10':'Low sleep 10', description:(l)=> l==='de'?'10 Tage mit wenig Schlaf (≤4).':'10 days low sleep (≤4).' },
+  { id: 'low_sleep_25', xp: 260, progress: (s) => Math.min(100, Math.round((lowSleepDays(s,4)/25)*100)), title:(l)=> l==='de'?'Wenig Schlaf 25':'Low sleep 25', description:(l)=> l==='de'?'25 Tage mit wenig Schlaf (≤4).':'25 days low sleep (≤4).' },
+  { id: 'low_sleep_50', xp: 520, progress: (s) => Math.min(100, Math.round((lowSleepDays(s,4)/50)*100)), title:(l)=> l==='de'?'Wenig Schlaf 50':'Low sleep 50', description:(l)=> l==='de'?'50 Tage mit wenig Schlaf (≤4).':'50 days low sleep (≤4).' },
+  { id: 'low_sleep_100', xp: 1100, progress: (s) => Math.min(100, Math.round((lowSleepDays(s,4)/100)*100)), title:(l)=> l==='de'?'Wenig Schlaf 100':'Low sleep 100', description:(l)=> l==='de'?'100 Tage mit wenig Schlaf (≤4).':'100 days low sleep (≤4).' },
+
+  { id: 'high_sleep_1', xp: 40, progress: (s) => Math.min(100, Math.round((highSleepDays(s,7)/1)*100)), title:(l)=> l==='de'?'Viel Schlaf 1':'High sleep 1', description:(l)=> l==='de'?'1 Tag mit viel Schlaf (≥7).':'1 day high sleep (≥7).' },
+  { id: 'high_sleep_10', xp: 120, progress: (s) => Math.min(100, Math.round((highSleepDays(s,7)/10)*100)), title:(l)=> l==='de'?'Viel Schlaf 10':'High sleep 10', description:(l)=> l==='de'?'10 Tage mit viel Schlaf (≥7).':'10 days high sleep (≥7).' },
+  { id: 'high_sleep_25', xp: 260, progress: (s) => Math.min(100, Math.round((highSleepDays(s,7)/25)*100)), title:(l)=> l==='de'?'Viel Schlaf 25':'High sleep 25', description:(l)=> l==='de'?'25 Tage mit viel Schlaf (≥7).':'25 days high sleep (≥7).' },
+  { id: 'high_sleep_50', xp: 520, progress: (s) => Math.min(100, Math.round((highSleepDays(s,7)/50)*100)), title:(l)=> l==='de'?'Viel Schlaf 50':'High sleep 50', description:(l)=> l==='de'?'50 Tage mit viel Schlaf (≥7).':'50 days high sleep (≥7).' },
+  { id: 'high_sleep_100', xp: 1100, progress: (s) => Math.min(100, Math.round((highSleepDays(s,7)/100)*100)), title:(l)=> l==='de'?'Viel Schlaf 100':'High sleep 100', description:(l)=> l==='de'?'100 Tage mit viel Schlaf (≥7).':'100 days high sleep (≥7).' },
+
   // NEW: Weight-loss streaks (consecutive days losing weight)
   { id: 'weight_loss_streak_2', xp: 120, progress: (s) => Math.min(100, Math.round((longestWeightLossStreak(s)/2)*100)), title:(l)=> l==='de'?'Abnahme-Kette 2':'Loss streak 2', description:(l)=> l==='de'?'2 Tage in Folge abgenommen.':'Lose weight 2 days in a row.' },
   { id: 'weight_loss_streak_5', xp: 250, progress: (s) => Math.min(100, Math.round((longestWeightLossStreak(s)/5)*100)), title:(l)=> l==='de'?'Abnahme-Kette 5':'Loss streak 5', description:(l)=> l==='de'?'5 Tage in Folge abgenommen.':'Lose weight 5 days in a row.' },
