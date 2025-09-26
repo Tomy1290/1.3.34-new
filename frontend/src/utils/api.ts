@@ -26,34 +26,15 @@ export async function apiFetch(path: string, init?: RequestInit) {
   return fetch(url, init);
 }
 
-export async function warmupBackend(timeoutMs: number = 3500) {
+export async function warmupBackend(_: number = 3500) {
+  // Ultra-safe warmup: no AbortController, no timers — just fire-and-forget
   try {
     const base = getBackendBaseUrl();
     if (!base) return false; // no URL configured -> skip
-
-    const AC: any = (globalThis as any)?.AbortController;
-    if (!AC) {
-      // Fallback: fire-and-forget without abort support
-      try { await fetch(`${base}/api/`, { method: 'GET', headers: { 'x-warmup': '1' } }); } catch {}
-      return true;
-    }
-
-    const controller = new AC();
-    const t = setTimeout(() => {
-      try { controller.abort(); } catch {}
-    }, Math.max(1000, timeoutMs));
     try {
-      await fetch(`${base}/api/`, {
-        method: 'GET',
-        headers: { 'x-warmup': '1' },
-        signal: controller.signal,
-      } as any);
-      return true;
-    } catch {
-      return false;
-    } finally {
-      clearTimeout(t);
-    }
+      await fetch(`${base}/api/`, { method: 'GET', headers: { 'x-warmup': '1' } });
+    } catch {}
+    return true;
   } catch {
     return false;
   }
