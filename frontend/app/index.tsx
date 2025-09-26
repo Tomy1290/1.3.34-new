@@ -377,7 +377,7 @@ export default function Home() {
               <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
-          {help.chains ? &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.chainsHelp")}&lt;/Text> : null}
+          {help.chains ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.chainsHelp")}</Text> : null}
           {topChain ? (
             <View style={{ marginTop: 6 }}>
               <Text style={{ color: colors.muted }}>{topChain.title}</Text>
