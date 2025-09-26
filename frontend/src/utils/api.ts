@@ -25,3 +25,27 @@ export async function apiFetch(path: string, init?: RequestInit) {
   const url = `${base}/api${path.startsWith('/') ? path : '/' + path}`;
   return fetch(url, init);
 }
+
+export async function warmupBackend(timeoutMs: number = 3500) {
+  try {
+    const base = getBackendBaseUrl();
+    if (!base) return false; // no URL configured -> skip
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), Math.max(1000, timeoutMs));
+    try {
+      await fetch(`${base}/api/`, {
+        method: 'GET',
+        headers: { 'x-warmup': '1' },
+        cache: 'no-store',
+        signal: controller.signal as any,
+      });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      clearTimeout(t);
+    }
+  } catch {
+    return false;
+  }
+}
