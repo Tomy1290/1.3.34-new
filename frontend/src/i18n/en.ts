@@ -124,7 +124,7 @@ const en = {
     weightModalTitle: "Log weight",
     weightPlaceholder: "e.g. 62.3",
     slimCoffee: "Slim coffee",
-    gingerGarlicTea: "Ginger &amp; garlic tea",
+    gingerGarlicTea: "Ginger & garlic tea",
     waterCure: "Water cure",
     sport: "Sport",
     levelUp: "Level {level}",
