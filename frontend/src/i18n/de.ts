@@ -144,6 +144,54 @@ const de = {
       vipChat: "VIP-Chat (Level {level})",
       goldenPinkTheme: "Golden-Pink-Theme (Level {level})",
       legendaryStatus: "Legendärer Status (Level {level})"
+    },
+    catalog: {
+      photos_month_1: { title: "Fotos (Monat) 1", description: "1 Foto in den letzten 30 Tagen." },
+      photos_month_3: { title: "Fotos (Monat) 3", description: "3 Fotos in den letzten 30 Tagen." },
+      photos_month_5: { title: "Fotos (Monat) 5", description: "5 Fotos in den letzten 30 Tagen." },
+      photos_month_10: { title: "Fotos (Monat) 10", description: "10 Fotos in den letzten 30 Tagen." },
+
+      photos_total_1: { title: "Fotos gesamt 1", description: "Füge 1 Foto hinzu." },
+      photos_total_5: { title: "Fotos gesamt 5", description: "Füge 5 Fotos hinzu." },
+      photos_total_10: { title: "Fotos gesamt 10", description: "Füge 10 Fotos hinzu." },
+      photos_total_25: { title: "Fotos gesamt 25", description: "Füge 25 Fotos hinzu." },
+      photos_total_50: { title: "Fotos gesamt 50", description: "Füge 50 Fotos hinzu." },
+      photos_total_100: { title: "Fotos gesamt 100", description: "Füge 100 Fotos hinzu." },
+
+      photo_days_1: { title: "Foto‑Tage 1", description: "An 1 Tag Fotos hinzugefügt." },
+      photo_days_5: { title: "Foto‑Tage 5", description: "An 5 Tagen Fotos hinzugefügt." },
+      photo_days_10: { title: "Foto‑Tage 10", description: "An 10 Tagen Fotos hinzugefügt." },
+      photo_days_25: { title: "Foto‑Tage 25", description: "An 25 Tagen Fotos hinzugefügt." },
+      photo_days_50: { title: "Foto‑Tage 50", description: "An 50 Tagen Fotos hinzugefügt." },
+
+      period_track_1: { title: "Periode getrackt 1", description: "Periode an 1 Tag markiert." },
+      period_track_5: { title: "Periode getrackt 5", description: "Periode an 5 Tagen markiert." },
+      period_track_10: { title: "Periode getrackt 10", description: "Periode an 10 Tagen markiert." },
+      period_track_20: { title: "Periode getrackt 20", description: "Periode an 20 Tagen markiert." },
+      period_track_50: { title: "Periode getrackt 50", description: "Periode an 50 Tagen markiert." },
+
+      low_stress_1: { title: "Wenig Stress 1", description: "1 Tag mit wenig Stress (≤3)." },
+      low_stress_10: { title: "Wenig Stress 10", description: "10 Tage mit wenig Stress (≤3)." },
+      low_stress_25: { title: "Wenig Stress 25", description: "25 Tage mit wenig Stress (≤3)." },
+      low_stress_50: { title: "Wenig Stress 50", description: "50 Tage mit wenig Stress (≤3)." },
+      low_stress_100: { title: "Wenig Stress 100", description: "100 Tage mit wenig Stress (≤3)." },
+
+      low_sleep_1: { title: "Wenig Schlaf 1", description: "1 Tag mit wenig Schlaf (≤4)." },
+      low_sleep_10: { title: "Wenig Schlaf 10", description: "10 Tage mit wenig Schlaf (≤4)." },
+      low_sleep_25: { title: "Wenig Schlaf 25", description: "25 Tage mit wenig Schlaf (≤4)." },
+      low_sleep_50: { title: "Wenig Schlaf 50", description: "50 Tage mit wenig Schlaf (≤4)." },
+      low_sleep_100: { title: "Wenig Schlaf 100", description: "100 Tage mit wenig Schlaf (≤4)." },
+
+      high_sleep_1: { title: "Viel Schlaf 1", description: "1 Tag mit viel Schlaf (≥7)." },
+      high_sleep_10: { title: "Viel Schlaf 10", description: "10 Tage mit viel Schlaf (≥7)." },
+      high_sleep_25: { title: "Viel Schlaf 25", description: "25 Tage mit viel Schlaf (≥7)." },
+      high_sleep_50: { title: "Viel Schlaf 50", description: "50 Tage mit viel Schlaf (≥7)." },
+      high_sleep_100: { title: "Viel Schlaf 100", description: "100 Tage mit viel Schlaf (≥7)." },
+
+      wasserdrache_streak_3: { title: "Wasserdrache – Kette 3 (+Joker)", description: "Wasserziel 3 Tage in Folge (1 Joker / 7 Tage)." },
+      wasserdrache_streak_7: { title: "Wasserdrache – Kette 7 (+Joker)", description: "Wasserziel 7 Tage in Folge (1 Joker / 7 Tage)." },
+      wasserdrache_streak_14: { title: "Wasserdrache – Kette 14 (+Joker)", description: "Wasserziel 14 Tage in Folge (1 Joker / 7 Tage)." },
+      wasserdrache_streak_30: { title: "Wasserdrache – Kette 30 (+Joker)", description: "Wasserziel 30 Tage in Folge (1 Joker / 7 Tage)." },
     }
   },
   analysis: {
@@ -404,7 +452,6 @@ const de = {
       cy2: { q: "Was bedeuten die Farben im Kalender?", a: "Voll: Periode. Hell: bevorstehend. Umrandet: fruchtbar. Punkt: Ovulation." },
       cy3: { q: "Kann ich zukünftige Tage öffnen?", a: "Zukünftige Tage sind gesperrt. Tippe auf vergangene/heutige zum Eintragen." },
       cy4: { q: "Was ist die 7‑Tage‑Regel?", a: "Einträge älter als 7 Tage (und zukünftige) können nicht gespeichert/gelöscht werden." },
-      cy5: { q: "Wie trage ich die Periodenstärke ein?", a: "Am Zyklustag: \"Blutung (Intensität)\" 1–10 per Tipp oder –/+." },
       w1: { q: "Wie trage ich mein Gewicht ein?", a: "Dashboard → \"Gewicht\" Karte → \"Eintragen\"." },
       w2: { q: "Was zeigt die Analyse?", a: "Trends, Filter und Hinweise (erweiterte Statistiken ab Level 10; Premium Insights optional)." },
       w3: { q: "Wie wird das Wasserkontingent berechnet?", a: "Automatisch aus Gewicht (35 ml/kg) + 500 ml bei Sport; Bechergröße in den Einstellungen." },
@@ -418,35 +465,6 @@ const de = {
       ai2: { q: "Wie speichere ich Tipps aus dem Chat?", a: "Im Chat: per Lesezeichen speichern. Später unter \"Gespeichert\"." },
       ai3: { q: "Was sind \"Premium insights\"?", a: "Optionale KI‑Hinweise in Analyse/Chat (Einstellungen → Premium insights)." }
     }
-  },
-  chat: {
-    a11y: { knowledge: "Wissen", filter: "Rezepte filtern", saved: "Gespeichert", saveTip: "Tipp speichern" },
-    placeholder: "Nachricht eingeben…",
-    send: "Senden",
-    noMessages: "Keine Nachrichten",
-    recipesListTitle: "Rezepte:",
-    shareToChat: "In Chat teilen",
-    filter: {
-      title: "Rezepte filtern",
-      help: "Wähle Küche, Kategorie, Mahlzeit oder nutze Suche.",
-      cuisine: "Küche",
-      category: "Kategorie",
-      category_fleisch: "Fleisch",
-      category_abnehmen: "Abnehmen",
-      category_vegetarisch: "Vegetarisch",
-      category_kuchen: "Kuchen",
-      category_suesses: "Süßes",
-      meal: "Mahlzeit",
-      meal_breakfast: "Frühstück",
-      meal_lunch: "Mittag",
-      meal_dinner: "Abend",
-      search: "Suche",
-      keywordPlaceholder: "Stichwort...",
-      searchBtn: "Suchen",
-      resultsCount: "{count} Ergebnisse"
-    },
-    knowledge: { title: "Wissen", help: "Wähle ein Thema und poste es in den Chat." },
-    recipe: { ingredients: "Zutaten", instructions: "Zubereitung" }
   }
 };
 

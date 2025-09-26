@@ -1,4 +1,5 @@
 import { differenceInCalendarDays } from "date-fns";
+import { tDirect } from "../i18n";
 
 // Lightweight duplicates of shapes we need (avoid deep imports to keep module standalone)
 export type DayData = { date: string; pills: { morning: boolean; evening: boolean }; drinks: { water: number; coffee: number; slimCoffee: boolean; gingerGarlicTea: boolean; waterCure: boolean; sport: boolean }; weight?: number; weightTime?: number };
@@ -30,8 +31,8 @@ export type AchievementConfig = {
   id: string;
   xp: number;
   progress: (s: AchState) => number; // 0..100
-  title: (lng: 'de'|'en') => string;
-  description: (lng: 'de'|'en') => string;
+  title: (lng: 'de'|'en') => string; // fallback title
+  description: (lng: 'de'|'en') => string; // fallback description
   requires?: string[];
   icon?: string;
 };
@@ -222,13 +223,6 @@ const A: AchievementConfig[] = [
   { id: 'high_sleep_50', xp: 520, progress: (s) => Math.min(100, Math.round((highSleepDays(s,7)/50)*100)), title:(l)=> l==='de'?'Viel Schlaf 50':'High sleep 50', description:(l)=> l==='de'?'50 Tage mit viel Schlaf (≥7).':'50 days high sleep (≥7).' },
   { id: 'high_sleep_100', xp: 1100, progress: (s) => Math.min(100, Math.round((highSleepDays(s,7)/100)*100)), title:(l)=> l==='de'?'Viel Schlaf 100':'High sleep 100', description:(l)=> l==='de'?'100 Tage mit viel Schlaf (≥7).':'100 days high sleep (≥7).' },
 
-  // NEW: Weight-loss streaks (consecutive days losing weight)
-  { id: 'weight_loss_streak_2', xp: 120, progress: (s) => Math.min(100, Math.round((longestWeightLossStreak(s)/2)*100)), title:(l)=> l==='de'?'Abnahme-Kette 2':'Loss streak 2', description:(l)=> l==='de'?'2 Tage in Folge abgenommen.':'Lose weight 2 days in a row.' },
-  { id: 'weight_loss_streak_5', xp: 250, progress: (s) => Math.min(100, Math.round((longestWeightLossStreak(s)/5)*100)), title:(l)=> l==='de'?'Abnahme-Kette 5':'Loss streak 5', description:(l)=> l==='de'?'5 Tage in Folge abgenommen.':'Lose weight 5 days in a row.' },
-  { id: 'weight_loss_streak_10', xp: 500, progress: (s) => Math.min(100, Math.round((longestWeightLossStreak(s)/10)*100)), title:(l)=> l==='de'?'Abnahme-Kette 10':'Loss streak 10', description:(l)=> l==='de'?'10 Tage in Folge abgenommen.':'Lose weight 10 days in a row.' },
-  { id: 'weight_loss_streak_20', xp: 900, progress: (s) => Math.min(100, Math.round((longestWeightLossStreak(s)/20)*100)), title:(l)=> l==='de'?'Abnahme-Kette 20':'Loss streak 20', description:(l)=> l==='de'?'20 Tage in Folge abgenommen.':'Lose weight 20 days in a row.' },
-  { id: 'weight_loss_streak_30', xp: 1400, progress: (s) => Math.min(100, Math.round((longestWeightLossStreak(s)/30)*100)), title:(l)=> l==='de'?'Abnahme-Kette 30':'Loss streak 30', description:(l)=> l==='de'?'30 Tage in Folge abgenommen.':'Lose weight 30 days in a row.' },
-
   // NEW: Extended water streaks with Joker
   { id: 'wasserdrache_streak_3', xp: 120, progress: (s) => Math.min(100, Math.round((longestWaterStreakWithJoker(s)/3)*100)), title:(l)=> l==='de'?'Wasserdrache – Kette 3 (+Joker)':'Water dragon – streak 3 (+joker)', description:(l)=> l==='de'?'Wasserziel 3 Tage in Folge (1 Joker / 7 Tage).':'Water goal 3 days in a row (1 joker / 7 days).'},
   { id: 'wasserdrache_streak_7', xp: 300, progress: (s) => Math.min(100, Math.round((longestWaterStreakWithJoker(s)/7)*100)), title:(l)=> l==='de'?'Wasserdrache – Kette 7 (+Joker)':'Water dragon – streak 7 (+joker)', description:(l)=> l==='de'?'Wasserziel 7 Tage in Folge (1 Joker / 7 Tage).':'Water goal 7 days in a row (1 joker / 7 days).'},
@@ -248,7 +242,14 @@ export function computeAchievements(state: AchState) {
     const gated = depsOk ? raw : 0;
     const percent = Math.min(100, Math.max(0, Math.round(gated)));
     const completed = depsOk && percent >= 100;
-    return { id: cfg.id, title: cfg.title(state.language), description: cfg.description(state.language), percent, xp: cfg.xp, completed };
+    const keyTitle = `achievements.catalog.${cfg.id}.title`;
+    const keyDesc = `achievements.catalog.${cfg.id}.description`;
+    const tTitle = tDirect(state.language as any, keyTitle);
+    const tDesc = tDirect(state.language as any, keyDesc);
+    const useKey = (val: string) => (val && !val.endsWith(cfg.id + ".title") && !val.endsWith(cfg.id + ".description")) ? val : undefined;
+    const title = useKey(tTitle) || cfg.title(state.language);
+    const description = useKey(tDesc) || cfg.description(state.language);
+    return { id: cfg.id, title, description, percent, xp: cfg.xp, completed };
   });
   const unlockedIds = new Set<string>(state.achievementsUnlocked);
   let xp = 0;
