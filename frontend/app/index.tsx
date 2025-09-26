@@ -426,7 +426,7 @@ export default function Home() {
               <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
-          {help.rewards ? &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.rewardsHelp")}&lt;/Text> : null}
+          {help.rewards ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.rewardsHelp")}</Text> : null}
           <View style={{ flexDirection: "row", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
             <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/achievements"); }}>
               <Ionicons name="trophy" size={16} color="#fff" />
