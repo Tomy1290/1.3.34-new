@@ -410,7 +410,7 @@ export default function Home() {
               <View style={{ height: 6, backgroundColor: colors.bg, borderRadius: 3, overflow: "hidden", marginTop: 6 }}>
                 <View style={{ width: `${Math.round(eventProgress.percent || 0)}%`, height: 6, backgroundColor: (eventProgress.percent || 0) >= 100 ? "#2bb673" : colors.primary }} />
               </View>
-              <Text style={{ color: colors.muted, marginTop: 4 }}>{Math.round(eventProgress.percent || 0)}% {(eventProgress.percent || 0) &gt;= 100 ? t("index.completed") : ""}</Text>
+              <Text style={{ color: colors.muted, marginTop: 4 }}>{Math.round(eventProgress.percent || 0)}% {(eventProgress.percent || 0) >= 100 ? t("index.completed") : ""}</Text>
             </View>
           )}
         </View>
