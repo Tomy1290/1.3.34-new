@@ -139,7 +139,7 @@ export default function Home() {
 
   const lng2 = state.language === "en" ? "en" : "de";
 
-  // Helpers for pill actions (one-way from X -&gt; Check)
+  // Helpers for pill actions (one-way from X -> Check)
   const markMorning = () => {
     if (!day.pills.morning) {
       try { togglePill(currentDate, "morning"); } catch (e) { console.warn("toggle morning pill failed", e); }
