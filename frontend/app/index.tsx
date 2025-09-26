@@ -491,7 +491,7 @@ export default function Home() {
                     try {
                       const normalized = (weightInput || "").replace(",", ".");
                       const val = parseFloat(normalized);
-                      if (!isNaN(val) && val &gt; 0) {
+                      if (!isNaN(val) && val > 0) {
                         setWeight(currentDate, val);
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                         setWeightModal(false);
