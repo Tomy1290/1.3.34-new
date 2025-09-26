@@ -66,6 +66,12 @@ function highSleepDays(s: AchState, threshold = 7) {
 }
 
 // New helpers for requested achievements
+// Photos per month (YYYY-MM)
+function photosPerMonthCount(s: AchState, ym: string) {
+  const gal = s.gallery || {} as Record<string, PhotoEntry[]>;
+  return Object.entries(gal).reduce((acc, [dateKey, arr]) => acc + (dateKey.startsWith(ym) ? (arr?.length || 0) : 0), 0);
+}
+
 function profileCompleted(s: AchState) {
   const p = s.profile || {} as Profile;
   return !!(p.name && p.dob && p.gender && typeof p.heightCm === 'number' && p.heightCm > 0);
