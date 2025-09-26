@@ -231,7 +231,7 @@ const en = {
   },
   gallery: {
     title: "Gallery",
-    subTitle: "Compare photos &amp; milestones",
+    subTitle: "Compare photos & milestones",
     infoText: "Max 5 photos per day (camera/gallery). Images are stored locally. Storage currently ~{storageMB} MB.",
     startCompare: "Start compare",
     endCompare: "End compare",
