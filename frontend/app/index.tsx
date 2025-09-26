@@ -341,7 +341,7 @@ export default function Home() {
               <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
-          {help.cycle ? &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.cycleHelp")}&lt;/Text> : null}
+          {help.cycle ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.cycleHelp")}</Text> : null}
           {expectedNext ? (
             &lt;Text style={{ color: colors.muted, marginTop: 6 }}>
               {t("index.expectedNextPrefix")} {new Date(expectedNext).toDateString()}
