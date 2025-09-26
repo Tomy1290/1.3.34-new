@@ -180,7 +180,7 @@ export default function Home() {
             <TouchableOpacity accessibilityLabel={t("common.today")} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); state.goToday(); }}>
               <Text style={{ color: colors.text, fontWeight: "700" }}>{dateLabel}</Text>
             </TouchableOpacity>
-            <TouchableOpacity accessibilityLabel={t("common.nextDay")} onPress={() => { const canGoNext = currentDate &lt;= toKey(new Date()); if (canGoNext) { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); state.goNextDay(); } }} style={styles.iconBtn}>
+            <TouchableOpacity accessibilityLabel={t("common.nextDay")} onPress={() => { const canGoNext = currentDate <= toKey(new Date()); if (canGoNext) { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); state.goNextDay(); } }} style={styles.iconBtn}>
               <Ionicons name="chevron-forward" size={22} color={colors.text} />
             </TouchableOpacity>
           </View>
