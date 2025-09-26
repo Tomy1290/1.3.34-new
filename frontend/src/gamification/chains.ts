@@ -19,6 +19,7 @@ export const CHAIN_DEFS: ChainDef[] = [
   // New: Photos & Period & Profile
   { id: 'photos', title: (l)=> l==='de'? 'Fotos' : 'Photos', steps: ['photos_1','photos_5','photos_20','photos_50','photos_100','photo_days_5','photo_days_10','photo_days_25','photo_days_50'] },
   { id: 'period', title: (l)=> l==='de'? 'Periode' : 'Period', steps: ['period_track_1','period_track_5','period_track_10','period_track_20','period_track_50'] },
+  { id: 'wellbeing', title: (l)=> l==='de'? 'Stress & Schlaf' : 'Stress & Sleep', steps: ['low_stress_1','low_stress_10','low_stress_25','low_stress_50','low_stress_100','low_sleep_1','low_sleep_10','low_sleep_25','low_sleep_50','low_sleep_100','high_sleep_1','high_sleep_10','high_sleep_25','high_sleep_50','high_sleep_100'] },
   { id: 'profile', title: (l)=> l==='de'? 'Profil' : 'Profile', steps: ['profile_complete'] },
 ];
 
