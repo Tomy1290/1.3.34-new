@@ -447,7 +447,7 @@ export default function Home() {
               <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
-          {help.quick ? &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.quickHelp")}&lt;/Text> : null}
+          {help.quick ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.quickHelp")}</Text> : null}
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 10 }}>
             <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/chat"); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel={t("index.chat")}>
               <Ionicons name="chatbubbles" size={18} color={colors.primary} />
