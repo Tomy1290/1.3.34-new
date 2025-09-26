@@ -6,7 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { initializeNotifications, computeNextOccurrence, scheduleOneTimeNotification, cancelNotification } from '../src/utils/notifications';
 import { scheduleCycleNotifications } from '../src/utils/cycleNotifications';
 import { useAppStore } from "../src/store/useStore";
-import { warmupBackend } from "../src/utils/api";
+// import { warmupBackend } from "../src/utils/api";
 import { AppState } from 'react-native';
 
 
