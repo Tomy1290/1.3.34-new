@@ -343,9 +343,9 @@ export default function Home() {
           </View>
           {help.cycle ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.cycleHelp")}</Text> : null}
           {expectedNext ? (
-            &lt;Text style={{ color: colors.muted, marginTop: 6 }}>
+            <Text style={{ color: colors.muted, marginTop: 6 }}>
               {t("index.expectedNextPrefix")} {new Date(expectedNext).toDateString()}
-            &lt;/Text>
+            </Text>
           ) : null}
           <View style={{ flexDirection: "row", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
             {state.cycles.find((c: any) => !c.end) ? (
