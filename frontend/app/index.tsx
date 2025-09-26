@@ -308,7 +308,7 @@ export default function Home() {
               <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
-          {help.weight ? &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.weightHelp")}&lt;/Text> : null}
+          {help.weight ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.weightHelp")}</Text> : null}
           <View style={{ flexDirection: "row", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
             <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => setWeightModal(true)}>
               <Ionicons name="fitness" size={16} color={"#fff"} />
