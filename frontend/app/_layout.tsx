@@ -41,12 +41,12 @@ export default function RootLayout() {
       }
     })();
 
-  // Warm up backend (render.com) at app start so chat KI ist direkt bereit
-  useEffect(() => {
-    (async () => {
-      try {
-        await warmupBackend(3500);
-      } catch {}
+  // Warm up backend (render.com) disabled temporarily for crash debugging
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       await warmupBackend(3500);
+  //     } catch {}
 
   // Re-warmup when app returns to foreground
   useEffect(() => {
