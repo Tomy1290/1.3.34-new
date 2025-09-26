@@ -23,20 +23,6 @@ function useThemeColors(theme: string) {
   return { bg: "#fde7ef", card: "#ffd0e0", primary: "#e91e63", text: "#2a1e22", muted: "#7c5866" };
 }
 
-function getLatestWeightKg(days: Record<string, any>): number | undefined {
-  const arr = Object.values(days)
-    .filter((d: any) => typeof d.weight === "number" && d.date)
-    .sort((a: any, b: any) => String(a.date).localeCompare(String(b.date)));
-  const w = arr.length ? Number(arr[arr.length - 1].weight) : undefined;
-  return isNaN(w as any) ? undefined : (w as number);
-}
-
-function computeDailyWaterTargetMl(weightKg?: number, didSport?: boolean): number {
-  const base = weightKg ? Math.round(weightKg * 35) : 2000;
-  const sportExtra = didSport ? 500 : 0;
-  return base + sportExtra; // ml
-}
-
 export default function Home() {
   const router = useRouter();
   const state = useAppStore();
