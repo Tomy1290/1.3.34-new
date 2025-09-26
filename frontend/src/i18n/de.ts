@@ -1,6 +1,6 @@
 const de = {
   common: {
-    appTitle: "Scarletts Gesundheit",
+    appTitle: "Scarletts Gesundheitstracking",
     back: "Zurück",
     open: "Öffnen",
     cancel: "Abbrechen",
