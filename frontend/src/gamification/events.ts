@@ -1,4 +1,6 @@
 import { toKey } from "../utils/date";
+import { computeDailyWaterTargetMl } from "../utils/water";
+
 import { AppState } from "../store/useStore";
 
 export type WeeklyEvent = {
