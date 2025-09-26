@@ -37,6 +37,16 @@ export default function RootLayout() {
 
       }
     })();
+
+  // Warm up backend (render.com) at app start so chat KI ist direkt bereit
+  useEffect(() => {
+    (async () => {
+      try {
+        await warmupBackend(3500);
+      } catch {}
+    })();
+  }, []);
+
   }, []);
 
   return (
