@@ -327,7 +327,7 @@ export default function Home() {
               <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.gallery")}</Text>
             </TouchableOpacity>
           </View>
-          {typeof day.weight === "number" ? &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t("common.today")}: {day.weight} {t("common.kg")}&lt;/Text> : null}
+          {typeof day.weight === "number" ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("common.today")}: {day.weight} {t("common.kg")}</Text> : null}
         </View>
 
         {/* Cycle */}
