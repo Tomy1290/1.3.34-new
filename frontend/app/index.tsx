@@ -234,7 +234,7 @@ export default function Home() {
               <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
             </TouchableOpacity>
           </View>
-          {help.drinks ? &lt;Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.drinksHelp")}&lt;/Text> : null}
+          {help.drinks ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.drinksHelp")}</Text> : null}
 
           {/* Hydration progress */}
           <View style={{ marginTop: 8 }}>
