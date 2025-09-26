@@ -30,15 +30,24 @@ export async function warmupBackend(timeoutMs: number = 3500) {
   try {
     const base = getBackendBaseUrl();
     if (!base) return false; // no URL configured -> skip
-    const controller = new AbortController();
-    const t = setTimeout(() => controller.abort(), Math.max(1000, timeoutMs));
+
+    const AC: any = (globalThis as any)?.AbortController;
+    if (!AC) {
+      // Fallback: fire-and-forget without abort support
+      try { await fetch(`${base}/api/`, { method: 'GET', headers: { 'x-warmup': '1' } }); } catch {}
+      return true;
+    }
+
+    const controller = new AC();
+    const t = setTimeout(() => {
+      try { controller.abort(); } catch {}
+    }, Math.max(1000, timeoutMs));
     try {
       await fetch(`${base}/api/`, {
         method: 'GET',
         headers: { 'x-warmup': '1' },
-        cache: 'no-store',
-        signal: controller.signal as any,
-      });
+        signal: controller.signal,
+      } as any);
       return true;
     } catch {
       return false;
