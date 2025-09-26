@@ -6,14 +6,12 @@ import { useAppStore, useLevel } from "../src/store/useStore";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { computeChains } from "../src/gamification/chains";
-import { EVENTS, getWeekRange, getCurrentWeeklyEvent, computeEventProgress } from "../src/gamification/events";
+import { getWeekRange, getCurrentWeeklyEvent, computeEventProgress } from "../src/gamification/events";
 import { toKey } from "../src/utils/date";
 import CelebrationOverlay from "../src/components/CelebrationOverlay";
 import { predictNextStart } from "../src/utils/cycle";
 import PillIcon from "../src/components/icons/PillIcon";
 import ScaleIcon from "../src/components/icons/ScaleIcon";
-import SunIcon from "../src/components/icons/SunIcon";
-import MoonIcon from "../src/components/icons/MoonIcon";
 import { safeDateLabel } from "../src/utils/locale";
 import { useI18n } from "../src/i18n";
 
@@ -41,7 +39,7 @@ function computeDailyWaterTargetMl(weightKg?: number, didSport?: boolean): numbe
 export default function Home() {
   const router = useRouter();
   const state = useAppStore();
-  const { theme, days, eventHistory, currentDate, ensureDay, language, togglePill, incDrink, toggleFlag, setWeight } = state as any;
+  const { theme, days, currentDate, ensureDay, language, togglePill, incDrink, toggleFlag, setWeight } = state as any;
   const { level, xp } = useLevel();
   const colors = useThemeColors(theme);
   const t = useI18n();
@@ -101,9 +99,12 @@ export default function Home() {
   // Chains (unchanged)
   const chainsAll = computeChains(state);
   const chainIdx = Math.abs(weekKey.split("").reduce((a, c) => a + c.charCodeAt(0), 0)) % Math.max(1, chainsAll.length);
-  const currentChain = chainsAll[chainIdx];
+  const topChain = useMemo(() => {
+    const chains = computeChains(state);
+    return chains.sort((a, b) => b.nextPercent - a.nextPercent)[0];
+  }, [state.days, state.goal, state.reminders, state.chat, state.saved, state.achievementsUnlocked, state.xp, state.language, state.theme]);
 
-  // Weekly Event (1.1.3 style) based on events config
+  // Weekly Event (1.1.3 style)
   const currentEvent = getCurrentWeeklyEvent(now);
   const eventProgress = computeEventProgress(dayKeys, state, currentEvent);
   useEffect(() => {
@@ -136,12 +137,21 @@ export default function Home() {
   // Next expected cycle
   const expectedNext = predictNextStart(state.cycles);
 
-  const topChain = useMemo(() => {
-    const chains = computeChains(state);
-    return chains.sort((a, b) => b.nextPercent - a.nextPercent)[0];
-  }, [state.days, state.goal, state.reminders, state.chat, state.saved, state.achievementsUnlocked, state.xp, state.language, state.theme]);
-
   const lng2 = state.language === "en" ? "en" : "de";
+
+  // Helpers for pill actions (one-way from X -&gt; Check)
+  const markMorning = () => {
+    if (!day.pills.morning) {
+      try { togglePill(currentDate, "morning"); } catch (e) { console.warn("toggle morning pill failed", e); }
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
+  const markEvening = () => {
+    if (!day.pills.evening) {
+      try { togglePill(currentDate, "evening"); } catch (e) { console.warn("toggle evening pill failed", e); }
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -170,7 +180,7 @@ export default function Home() {
             <TouchableOpacity accessibilityLabel={t("common.today")} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); state.goToday(); }}>
               <Text style={{ color: colors.text, fontWeight: "700" }}>{dateLabel}</Text>
             </TouchableOpacity>
-            <TouchableOpacity accessibilityLabel={t("common.nextDay")} onPress={() => { const canGoNext = currentDate <= toKey(new Date()); if (canGoNext) { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); state.goNextDay(); } }} style={styles.iconBtn}>
+            <TouchableOpacity accessibilityLabel={t("common.nextDay")} onPress={() => { const canGoNext = currentDate &lt;= toKey(new Date()); if (canGoNext) { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); state.goNextDay(); } }} style={styles.iconBtn}>
               <Ionicons name="chevron-forward" size={22} color={colors.text} />
             </TouchableOpacity>
           </View>
@@ -178,67 +188,42 @@ export default function Home() {
 
         {/* Pills Section */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <PillIcon size={20} color={colors.primary} />
-            <Text style={{ color: colors.text, fontWeight: "700", marginLeft: 8 }}>{t("index.pillsTitle")}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <PillIcon size={20} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: "700", marginLeft: 8 }}>{t("index.pillsTitle")}</Text>
+            </View>
           </View>
 
-          <View style={{ flexDirection: "row", gap: 12, marginTop: 10 }}>
-            {/* Morning Button */}
-            <TouchableOpacity
-              accessibilityLabel={t("index.takeMorning")}
-              onPress={() => {
-                try {
-                  togglePill(currentDate, "morning");
-                } catch (e) {
-                  console.warn("toggle morning pill failed", e);
-                }
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              style={[styles.toggle, {
-                borderColor: colors.primary,
-                backgroundColor: day.pills.morning ? colors.primary : "transparent",
-              }]}
-            >
-              <SunIcon size={18} color={day.pills.morning ? "#fff" : colors.primary} />
-              <Text style={{ color: day.pills.morning ? "#fff" : colors.text, marginLeft: 6 }}>{t("index.morning")}</Text>
-              <View style={{ flex: 1 }} />
-              <Ionicons
-                name={day.pills.morning ? "checkmark-circle" : "close-circle"}
-                size={18}
-                color={day.pills.morning ? "#fff" : colors.primary}
-              />
-            </TouchableOpacity>
+          <View style={{ flexDirection: "row", marginTop: 10, alignItems: "flex-start", justifyContent: "space-between" }}>
+            {/* Left: original toggles but one-way */}
+            <View style={{ flexDirection: "row", gap: 12, flexWrap: "wrap", flex: 1 }}>
+              <TouchableOpacity accessibilityLabel={t("index.takeMorning")} onPress={markMorning} style={[styles.toggle, { borderColor: colors.primary, backgroundColor: day.pills.morning ? colors.primary : "transparent" }]}>
+                <Ionicons name="sunny" size={18} color={day.pills.morning ? "#fff" : colors.primary} />
+                <Text style={{ color: day.pills.morning ? "#fff" : colors.text, marginLeft: 6 }}>{t("index.morning")}</Text>
+              </TouchableOpacity>
 
-            {/* Evening Button */}
-            <TouchableOpacity
-              accessibilityLabel={t("index.takeEvening")}
-              onPress={() => {
-                try {
-                  togglePill(currentDate, "evening");
-                } catch (e) {
-                  console.warn("toggle evening pill failed", e);
-                }
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              style={[styles.toggle, {
-                borderColor: colors.primary,
-                backgroundColor: day.pills.evening ? colors.primary : "transparent",
-              }]}
-            >
-              <MoonIcon size={18} color={day.pills.evening ? "#fff" : colors.primary} />
-              <Text style={{ color: day.pills.evening ? "#fff" : colors.text, marginLeft: 6 }}>{t("index.evening")}</Text>
-              <View style={{ flex: 1 }} />
-              <Ionicons
-                name={day.pills.evening ? "checkmark-circle" : "close-circle"}
-                size={18}
-                color={day.pills.evening ? "#fff" : colors.primary}
-              />
-            </TouchableOpacity>
+              <TouchableOpacity accessibilityLabel={t("index.takeEvening")} onPress={markEvening} style={[styles.toggle, { borderColor: colors.primary, backgroundColor: day.pills.evening ? colors.primary : "transparent" }]}>
+                <Ionicons name="moon" size={18} color={day.pills.evening ? "#fff" : colors.primary} />
+                <Text style={{ color: day.pills.evening ? "#fff" : colors.text, marginLeft: 6 }}>{t("index.evening")}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Right: vertical status with X -> Check buttons as requested */}
+            <View style={{ width: 150, marginLeft: 8 }}>
+              <TouchableOpacity onPress={markMorning} style={styles.statusRow} accessibilityLabel={t("index.takeMorning")}>
+                <Text style={{ color: colors.text, marginRight: 8 }}>{t("index.morning")}</Text>
+                <Ionicons name={day.pills.morning ? "checkmark-circle" : "close-circle"} size={22} color={day.pills.morning ? "#2bb673" : "#e57373"} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={markEvening} style={[styles.statusRow, { marginTop: 8 }]} accessibilityLabel={t("index.takeEvening")}>
+                <Text style={{ color: colors.text, marginRight: 8 }}>{t("index.evening")}</Text>
+                <Ionicons name={day.pills.evening ? "checkmark-circle" : "close-circle"} size={22} color={day.pills.evening ? "#2bb673" : "#e57373"} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
-        {/* Drinks & Sport */}
+        {/* Drinks &amp; Sport */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -312,18 +297,158 @@ export default function Home() {
           </View>
         </View>
 
-        {/* Quick */}
+        {/* Weight */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={{ color: colors.text, fontWeight: "700" }}>{t("index.quickAccess")}</Text>
-          <View style={{ marginTop: 10, flexDirection: "row", gap: 12, flexWrap: "wrap", justifyContent: "space-between" }}>
-            <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/analysis"); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel={t("index.analysis")}>
-              <Ionicons name="analytics" size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, marginTop: 6 }}>{t("index.analysis")}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <ScaleIcon size={20} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: "700", marginLeft: 8 }}>{t("index.weight")}</Text>
+            </View>
+            <TouchableOpacity onPress={() => toggleHelp("weight")}>
+              <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/events"); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel={t("index.events")}>
-              <Ionicons name="trophy" size={18} color={colors.primary} />
-              <Text style={{ color: colors.text, marginTop: 6 }}>{t("index.events")}</Text>
+          </View>
+          {help.weight ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.weightHelp")}</Text> : null}
+          <View style={{ flexDirection: "row", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+            <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => setWeightModal(true)}>
+              <Ionicons name="fitness" size={16} color={"#fff"} />
+              <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.log")}</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => router.push("/analysis")}>
+              <Ionicons name="stats-chart" size={16} color={"#fff"} />
+              <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.analysis")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => router.push("/goals")}>
+              <Ionicons name="flag" size={16} color={"#fff"} />
+              <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.goal")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => router.push("/gallery")}>
+              <Ionicons name="images" size={16} color={"#fff"} />
+              <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.gallery")}</Text>
+            </TouchableOpacity>
+          </View>
+          {typeof day.weight === "number" ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("common.today")}: {day.weight} {t("common.kg")}</Text> : null}
+        </View>
+
+        {/* Cycle */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name="water" size={20} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: "700", marginLeft: 8 }}>{t("index.cycle")}</Text>
+            </View>
+            <TouchableOpacity onPress={() => toggleHelp("cycle")}>
+              <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
+            </TouchableOpacity>
+          </View>
+          {help.cycle ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.cycleHelp")}</Text> : null}
+          {expectedNext ? (
+            <Text style={{ color: colors.muted, marginTop: 6 }}>
+              {t("index.expectedNextPrefix")} {new Date(expectedNext).toDateString()}
+            </Text>
+          ) : null}
+          <View style={{ flexDirection: "row", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
+            {state.cycles.find((c: any) => !c.end) ? (
+              <TouchableOpacity onPress={() => { state.endCycle(currentDate); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); }} style={[styles.cta, { backgroundColor: colors.primary }]}>
+                <Ionicons name="stop" size={16} color={"#fff"} />
+                <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.endCycle")}</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={() => { state.startCycle(currentDate); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); }} style={[styles.cta, { backgroundColor: colors.primary }]}>
+                <Ionicons name="play" size={16} color={"#fff"} />
+                <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.startCycle")}</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={() => router.push("/cycle")} style={[styles.cta, { backgroundColor: colors.primary }]}>
+              <Ionicons name="calendar" size={16} color={"#fff"} />
+              <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.calendar")}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Chains */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name="link" size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: "700", marginLeft: 8 }}>{t("index.chainsTitle")}</Text>
+            </View>
+            <TouchableOpacity onPress={() => toggleHelp("chains")}>
+              <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
+            </TouchableOpacity>
+          </View>
+          {help.chains ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.chainsHelp")}</Text> : null}
+          {topChain ? (
+            <View style={{ marginTop: 6 }}>
+              <Text style={{ color: colors.muted }}>{topChain.title}</Text>
+              <View style={{ height: 6, backgroundColor: colors.bg, borderRadius: 3, overflow: "hidden", marginTop: 6 }}>
+                <View style={{ width: `${Math.round(topChain.nextPercent)}%`, height: 6, backgroundColor: colors.primary }} />
+              </View>
+              {topChain.nextTitle ? <Text style={{ color: colors.muted, marginTop: 4 }}>{t("index.next")}: {topChain.nextTitle}</Text> : null}
+            </View>
+          ) : (
+            <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.allChainsDone")}</Text>
+          )}
+        </View>
+
+        {/* Weekly Event (1.1.3 style) */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name="calendar" size={18} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: "700", marginLeft: 8 }}>{t("index.weeklyEvent")}</Text>
+            </View>
+            <TouchableOpacity onPress={() => router.push("/events")}>
+              <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+            </TouchableOpacity>
+          </View>
+          {state.eventsEnabled === false ? (
+            <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.eventsDisabled")}</Text>
+          ) : (
+            <View style={{ marginTop: 6 }}>
+              <Text style={{ color: colors.text }}>{currentEvent.title(lng2 as any)}</Text>
+              <View style={{ height: 6, backgroundColor: colors.bg, borderRadius: 3, overflow: "hidden", marginTop: 6 }}>
+                <View style={{ width: `${Math.round(eventProgress.percent || 0)}%`, height: 6, backgroundColor: (eventProgress.percent || 0) >= 100 ? "#2bb673" : colors.primary }} />
+              </View>
+              <Text style={{ color: colors.muted, marginTop: 4 }}>{Math.round(eventProgress.percent || 0)}% {(eventProgress.percent || 0) >= 100 ? t("index.completed") : ""}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Rewards */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons name="gift" size={20} color={colors.primary} />
+              <Text style={{ color: colors.text, fontWeight: "700", marginLeft: 8 }}>{t("index.rewardsTitle")}</Text>
+            </View>
+            <TouchableOpacity onPress={() => toggleHelp("rewards")}>
+              <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
+            </TouchableOpacity>
+          </View>
+          {help.rewards ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.rewardsHelp")}</Text> : null}
+          <View style={{ flexDirection: "row", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
+            <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/achievements"); }}>
+              <Ionicons name="trophy" size={16} color="#fff" />
+              <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.achievements")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/leaderboard"); }}>
+              <Ionicons name="podium" size={16} color={"#fff"} />
+              <Text style={{ color: "#fff", marginLeft: 6 }}>{t("index.leaderboard")}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Quick access */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <Text style={{ color: colors.text, fontWeight: "700" }}>{t("index.quickAccess")}</Text>
+            <TouchableOpacity onPress={() => toggleHelp("quick")}>
+              <Ionicons name="information-circle-outline" size={18} color={colors.muted} />
+            </TouchableOpacity>
+          </View>
+          {help.quick ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.quickHelp")}</Text> : null}
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 10 }}>
             <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/chat"); }} style={[styles.quick, { backgroundColor: colors.bg }]} accessibilityLabel={t("index.chat")}>
               <Ionicons name="chatbubbles" size={18} color={colors.primary} />
               <Text style={{ color: colors.text, marginTop: 6 }}>{t("index.chat")}</Text>
@@ -366,7 +491,7 @@ export default function Home() {
                     try {
                       const normalized = (weightInput || "").replace(",", ".");
                       const val = parseFloat(normalized);
-                      if (!isNaN(val) && val > 0) {
+                      if (!isNaN(val) &amp;&amp; val &gt; 0) {
                         setWeight(currentDate, val);
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                         setWeightModal(false);
@@ -399,4 +524,5 @@ const styles = StyleSheet.create({
   counterBtnSm: { paddingHorizontal: 8, paddingVertical: 8, borderRadius: 8, borderWidth: 1, minWidth: 36, alignItems: "center", justifyContent: "center" },
   chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, borderWidth: 1 },
   quick: { width: "47%", borderRadius: 12, padding: 12, alignItems: "center", justifyContent: "center" },
+  statusRow: { flexDirection: "row", alignItems: "center", justifyContent: "flex-end" },
 });
