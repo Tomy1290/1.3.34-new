@@ -1,6 +1,6 @@
 const pl = {
   common: {
-    appTitle: "Zdrowie Scarlett",
+    appTitle: "Śledzenie zdrowia Scarlett",
     back: "Wstecz",
     open: "Otwórz",
     cancel: "Anuluj",
