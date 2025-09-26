@@ -223,13 +223,16 @@ export const useAppStore = create<AppState>()(
       setAiInsightsEnabled: (v) => set({ aiInsightsEnabled: v }),
       feedbackAI: (id, delta) => { const map = { ...(get().aiFeedback||{}) }; map[id] = (map[id]||0) + delta; set({ aiFeedback: map }); },
       setEventsEnabled: (v) => set({ eventsEnabled: v }),
-      setWaterCupMl: (ml) => set({ waterCupMl: Math.max(0, Math.min(1000, Math.round(ml))) }),
+      setWaterCupMl: (ml) => set({ waterCupMl: ml }),
       setLastChatLeaveAt: (ts) => set({ lastChatLeaveAt: ts }),
 
-      startCycle: async (dateKey) => { const cycles = [...get().cycles]; const active = cycles.find(c => !c.end); if (active) return; cycles.push({ start: dateKey }); set({ cycles }); await get().scheduleCycleNotifications(); },
-      endCycle: async (dateKey) => { const cycles = [...get().cycles]; const activeIdx = cycles.findIndex(c => !c.end); if (activeIdx === -1) return; cycles[activeIdx] = { ...cycles[activeIdx], end: dateKey }; set({ cycles }); await get().scheduleCycleNotifications(); },
+      startCycle: (dateKey) => { const cycles = [...get().cycles]; if (!cycles.find(c => c.start === dateKey)) cycles.push({ start: dateKey }); set({ cycles }); },
+      endCycle: (dateKey) => { const cycles = [...get().cycles]; const idx = cycles.findIndex(c => c.start && !c.end); if (idx >= 0) { cycles[idx] = { ...cycles[idx], end: dateKey }; set({ cycles }); } },
 
-      setCycleLog: (dateKey, patch) => { const all = { ...(get().cycleLogs || {}) }; const prev = all[dateKey] || {}; const merged: any = { ...prev };
+      setCycleLog: (dateKey, patch) => {
+        const all = { ...(get().cycleLogs || {}) };
+        const prev = all[dateKey] || {} as any;
+        const merged = { ...prev } as any;
         if (typeof patch.mood === 'number') merged.mood = clamp(patch.mood, 1, 10);
         if (typeof patch.energy === 'number') merged.energy = clamp(patch.energy, 1, 10);
         if (typeof patch.pain === 'number') merged.pain = clamp(patch.pain, 1, 10);
@@ -256,7 +259,43 @@ export const useAppStore = create<AppState>()(
         all[dateKey] = merged; set({ cycleLogs: all }); },
       clearCycleLog: (dateKey) => { const all = { ...(get().cycleLogs || {}) }; delete all[dateKey]; set({ cycleLogs: all }); },
 
-      recalcAchievements: () => { const state = get(); const base = computeAchievements({ days: state.days, goal: state.goal, reminders: state.reminders, chat: state.chat, saved: state.saved, achievementsUnlocked: state.achievementsUnlocked, xp: state.xp, language: state.language, theme: state.theme }); const prevSet = new Set(state.achievementsUnlocked); const newUnlocks = base.unlocked.filter((id) => !prevSet.has(id)); let xpDelta = 0; const comboBonus = newUnlocks.length >= 2 ? (newUnlocks.length - 1) * 50 : 0; if (newUnlocks.length > 0) { try { const { getAchievementConfigById } = require('../achievements'); const sum = newUnlocks.reduce((acc: number, id: string) => { const cfg = getAchievementConfigById(id); return acc + (cfg?.xp || 0); }, 0); xpDelta += sum; if (sum > 0) { const addLog = { id: `ach:${Date.now()}`, ts: Date.now(), amount: sum, source: 'achievement', note: `${newUnlocks.length} unlocks` } as XpLogEntry; set({ xpLog: [...(state.xpLog||[]), addLog] }); } } catch {} } if (comboBonus > 0) { const addLog = { id: `combo:${Date.now()}`, ts: Date.now(), amount: comboBonus, source: 'combo', note: `${newUnlocks.length} unlocks combo` } as XpLogEntry; set({ xpLog: [...(get().xpLog||[]), addLog] }); } set({ achievementsUnlocked: base.unlocked, xp: state.xp + xpDelta + comboBonus }); },
+      recalcAchievements: () => {
+        const state = get();
+        const base = computeAchievements({
+          days: state.days,
+          goal: state.goal,
+          reminders: state.reminders,
+          chat: state.chat,
+          saved: state.saved,
+          achievementsUnlocked: state.achievementsUnlocked,
+          xp: state.xp,
+          language: state.language,
+          theme: state.theme,
+          profile: state.profile,
+          gallery: state.gallery,
+          cycleLogs: state.cycleLogs,
+        } as any);
+        const prevSet = new Set(state.achievementsUnlocked);
+        const newUnlocks = base.unlocked.filter((id) => !prevSet.has(id));
+        let xpDelta = 0;
+        const comboBonus = newUnlocks.length >= 2 ? (newUnlocks.length - 1) * 50 : 0;
+        if (newUnlocks.length > 0) {
+          try {
+            const { getAchievementConfigById } = require('../achievements');
+            const sum = newUnlocks.reduce((acc: number, id: string) => { const cfg = getAchievementConfigById(id); return acc + (cfg?.xp || 0); }, 0);
+            xpDelta += sum;
+            if (sum > 0) {
+              const addLog = { id: `ach:${Date.now()}`, ts: Date.now(), amount: sum, source: 'achievement', note: `${newUnlocks.length} unlocks` } as XpLogEntry;
+              set({ xpLog: [...(state.xpLog||[]), addLog] });
+            }
+          } catch {}
+        }
+        if (comboBonus > 0) {
+          const addLog = { id: `combo:${Date.now()}`, ts: Date.now(), amount: comboBonus, source: 'combo', note: `${newUnlocks.length} unlocks combo` } as XpLogEntry;
+          set({ xpLog: [...(get().xpLog||[]), addLog] });
+        }
+        set({ achievementsUnlocked: base.unlocked, xp: state.xp + xpDelta + comboBonus });
+      },
 
       scheduleCycleNotifications: async () => {
         try {
@@ -273,6 +312,8 @@ export const useAppStore = create<AppState>()(
         arr.push(entry);
         all[dateKey] = arr;
         set({ gallery: all });
+        // Recalc to update photo-based achievements immediately
+        get().recalcAchievements();
       },
       deletePhoto: (dateKey, id) => {
         const all = { ...(get().gallery || {}) };
@@ -283,6 +324,7 @@ export const useAppStore = create<AppState>()(
           all[dateKey] = arr;
         }
         set({ gallery: all });
+        get().recalcAchievements();
       },
     }),
     { name: "scarlett-app-state", storage: createJSONStorage(() => mmkvAdapter), partialize: (s) => s, version: 23, onRehydrateStorage: () => (state) => {

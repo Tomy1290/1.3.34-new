@@ -25,9 +25,19 @@ export default function AchievementsScreen() {
   const [query, setQuery] = useState("");
 
   const { list } = useMemo(() => computeAchievements({
-    days: state.days, goal: state.goal, reminders: state.reminders, chat: state.chat, saved: state.saved,
-    achievementsUnlocked: state.achievementsUnlocked, xp: state.xp, language: state.language, theme: state.theme,
-  }), [state.days, state.goal, state.reminders, state.chat, state.saved, state.achievementsUnlocked, state.xp, state.language, state.theme]);
+    days: state.days,
+    goal: state.goal,
+    reminders: state.reminders,
+    chat: state.chat,
+    saved: state.saved,
+    achievementsUnlocked: state.achievementsUnlocked,
+    xp: state.xp,
+    language: state.language,
+    theme: state.theme,
+    profile: state.profile,
+    gallery: state.gallery,
+    cycleLogs: state.cycleLogs,
+  } as any), [state.days, state.goal, state.reminders, state.chat, state.saved, state.achievementsUnlocked, state.xp, state.language, state.theme, state.profile, state.gallery, state.cycleLogs]);
 
   const filtered = useMemo(() => {
     let arr = list;
@@ -37,7 +47,7 @@ export default function AchievementsScreen() {
     return arr.sort((a,b) => (a.completed === b.completed) ? (b.percent - a.percent) : (a.completed ? 1 : -1));
   }, [list, filter, query]);
 
-  const chainsRaw = useMemo(() => computeChains(state), [state.days, state.goal, state.reminders, state.chat, state.saved, state.achievementsUnlocked, state.xp, state.language, state.theme]);
+  const chainsRaw = useMemo(() => computeChains(state as any), [state.days, state.goal, state.reminders, state.chat, state.saved, state.achievementsUnlocked, state.xp, state.language, state.theme, state.profile, state.gallery, state.cycleLogs]);
   const chains = useMemo(() => {
     let arr = chainsRaw;
     if (filter === 'progress') arr = arr.filter(c => c.completed < c.total);
@@ -60,7 +70,7 @@ export default function AchievementsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, paddingVertical: 16 }]}> 
         <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn} accessibilityLabel={t('common.back')}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -93,7 +103,7 @@ export default function AchievementsScreen() {
         </View>
 
         {/* Achievements list – collapsible, show first 3 by default */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.title')}</Text>
             <TouchableOpacity onPress={() => setShowAch(v=>!v)}>
@@ -127,7 +137,7 @@ export default function AchievementsScreen() {
         </View>
 
         {/* Chains – collapsible, first 3; filter and sort by progress */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={{ color: colors.text, fontWeight: '700' }}>{t('index.chainsTitle')}</Text>
             <TouchableOpacity onPress={() => setShowChains(v=>!v)}>
@@ -159,7 +169,7 @@ export default function AchievementsScreen() {
         </View>
 
         {/* Unlock previews – collapsible */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={{ color: colors.text, fontWeight: '700' }}>{t('achievements.unlocks.title')}</Text>
             <TouchableOpacity onPress={() => setShowUnlocks(v=>!v)}>
