@@ -209,7 +209,7 @@ const en = {
     insights_help: "Selected range with daily difference.",
     bmiTitle: "BMI",
     heatmapPain: "Heatmap pain (cycle days)",
-    aiultra: "AI Pro+++ (cycle &amp; correlations)",
+    aiultra: "AI Pro+++ (cycle & correlations)",
     aiultra_help: "Heatmap by cycle days and correlations between metrics.",
     lastWeightAndHeight: "Last weight: {weight} kg · Height: {heightCm} cm",
     correlations: "Correlations",
