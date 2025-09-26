@@ -32,7 +32,7 @@ export default function SettingsScreen() {
   const t = useI18n();
 
   const appTitle = t("common.appTitle");
-  const version = Constants?.expoConfig?.version || "—";
+  const version = (Constants?.expoConfig?.version || useAppStore.getState().appVersion || "—") as string;
 
   const [customMode, setCustomMode] = useState(false);
   const [customLabel, setCustomLabel] = useState("");
