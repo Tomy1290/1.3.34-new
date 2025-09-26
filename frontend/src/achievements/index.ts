@@ -1,4 +1,5 @@
 import { differenceInCalendarDays } from "date-fns";
+import { tDirect } from "../i18n";
 
 // Lightweight duplicates of shapes we need (avoid deep imports to keep module standalone)
 export type DayData = { date: string; pills: { morning: boolean; evening: boolean }; drinks: { water: number; coffee: number; slimCoffee: boolean; gingerGarlicTea: boolean; waterCure: boolean; sport: boolean }; weight?: number; weightTime?: number };
