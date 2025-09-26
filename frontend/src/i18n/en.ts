@@ -277,7 +277,7 @@ const en = {
     pointer: { expected: "Expected", planned: "Planned", band: "Band (±1σ)" },
     metricsTitle: "Pace · ETA · Trend · BMI",
     metrics: { pace7d: "Pace (7d)", trend: "Trend", eta: "ETA", bmi: "BMI" },
-    tipsTitle: "Analysis &amp; quick tips",
+    tipsTitle: "Analysis & quick tips",
     tips: {
       onCourse: "On course: forecast within ±0.5 kg at target date.",
       paceOk: "Pace OK: With current trend the goal is reachable.",
