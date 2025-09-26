@@ -175,11 +175,12 @@ const A: AchievementConfig[] = [
   { id: 'profile_complete', xp: 80, progress: (s) => profileCompleted(s) ? 100 : 0, title: (l)=> l==='de'?'Profil komplett':'Profile complete', description:(l)=> l==='de'?'Name, Geburtstag, Geschlecht, Größe gesetzt.':'Set name, DOB, gender, height.' },
 
   // NEW: Photos added (total)
-  { id: 'photos_1', xp: 30, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/1)*100)), title:(l)=> l==='de'?'Erstes Foto':'First photo', description:(l)=> l==='de'?'Füge ein Foto hinzu.':'Add one photo.' },
-  { id: 'photos_5', xp: 60, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/5)*100)), title:(l)=> l==='de'?'5 Fotos':'5 photos', description:(l)=> l==='de'?'Füge 5 Fotos hinzu.':'Add 5 photos.' },
-  { id: 'photos_20', xp: 120, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/20)*100)), title:(l)=> l==='de'?'20 Fotos':'20 photos', description:(l)=> l==='de'?'Füge 20 Fotos hinzu.':'Add 20 photos.' },
-  { id: 'photos_50', xp: 250, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/50)*100)), title:(l)=> l==='de'?'50 Fotos':'50 photos', description:(l)=> l==='de'?'Füge 50 Fotos hinzu.':'Add 50 photos.' },
-  { id: 'photos_100', xp: 500, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/100)*100)), title:(l)=> l==='de'?'100 Fotos':'100 photos', description:(l)=> l==='de'?'Füge 100 Fotos hinzu.':'Add 100 photos.' },
+  { id: 'photos_total_1', xp: 30, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/1)*100)), title:(l)=> l==='de'?'Erstes Foto':'First photo', description:(l)=> l==='de'?'Füge ein Foto hinzu.':'Add one photo.' },
+  { id: 'photos_total_5', xp: 60, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/5)*100)), title:(l)=> l==='de'?'5 Fotos':'5 photos', description:(l)=> l==='de'?'Füge 5 Fotos hinzu.':'Add 5 photos.' },
+  { id: 'photos_total_10', xp: 90, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/10)*100)), title:(l)=> l==='de'?'10 Fotos':'10 photos', description:(l)=> l==='de'?'Füge 10 Fotos hinzu.':'Add 10 photos.' },
+  { id: 'photos_total_25', xp: 160, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/25)*100)), title:(l)=> l==='de'?'25 Fotos':'25 photos', description:(l)=> l==='de'?'Füge 25 Fotos hinzu.':'Add 25 photos.' },
+  { id: 'photos_total_50', xp: 250, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/50)*100)), title:(l)=> l==='de'?'50 Fotos':'50 photos', description:(l)=> l==='de'?'Füge 50 Fotos hinzu.':'Add 50 photos.' },
+  { id: 'photos_total_100', xp: 500, progress: (s) => Math.min(100, Math.round((totalPhotos(s)/100)*100)), title:(l)=> l==='de'?'100 Fotos':'100 photos', description:(l)=> l==='de'?'Füge 100 Fotos hinzu.':'Add 100 photos.' },
 
   // NEW: Photo days (unique days with any photo)
   { id: 'photo_days_1', xp: 40, progress: (s) => Math.min(100, Math.round((photoDays(s)/1)*100)), title:(l)=> l==='de'?'Foto-Tag':'Photo day', description:(l)=> l==='de'?'An 1 Tag Fotos hinzugefügt.':'Add photos on 1 day.' },
