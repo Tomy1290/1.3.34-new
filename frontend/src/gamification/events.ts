@@ -1,5 +1,7 @@
 import { toKey } from "../utils/date";
 import { computeDailyWaterTargetMl } from "../utils/water";
+import { getLatestWeightKg } from "../utils/water";
+
 
 import { AppState } from "../store/useStore";
 
