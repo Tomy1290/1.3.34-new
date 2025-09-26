@@ -189,6 +189,12 @@ const A: AchievementConfig[] = [
   { id: 'photo_days_25', xp: 300, progress: (s) => Math.min(100, Math.round((photoDays(s)/25)*100)), title:(l)=> l==='de'?'25 Foto-Tage':'25 photo days', description:(l)=> l==='de'?'An 25 Tagen Fotos hinzugefügt.':'Add photos on 25 days.' },
   { id: 'photo_days_50', xp: 600, progress: (s) => Math.min(100, Math.round((photoDays(s)/50)*100)), title:(l)=> l==='de'?'50 Foto-Tage':'50 photo days', description:(l)=> l==='de'?'An 50 Tagen Fotos hinzugefügt.':'Add photos on 50 days.' },
 
+  // NEW: Photos per rolling 30 days (monatsnah)
+  { id: 'photos_month_1', xp: 30, progress: (s) => Math.min(100, Math.round((photosLastNDaysCount(s,30)/1)*100)), title:(l)=> l==='de'?'Monat Fotos 1':'Month photos 1', description:(l)=> l==='de'?'1 Foto in den letzten 30 Tagen.':'1 photo in the last 30 days.' },
+  { id: 'photos_month_3', xp: 50, progress: (s) => Math.min(100, Math.round((photosLastNDaysCount(s,30)/3)*100)), title:(l)=> l==='de'?'Monat Fotos 3':'Month photos 3', description:(l)=> l==='de'?'3 Fotos in den letzten 30 Tagen.':'3 photos in the last 30 days.' },
+  { id: 'photos_month_5', xp: 80, progress: (s) => Math.min(100, Math.round((photosLastNDaysCount(s,30)/5)*100)), title:(l)=> l==='de'?'Monat Fotos 5':'Month photos 5', description:(l)=> l==='de'?'5 Fotos in den letzten 30 Tagen.':'5 photos in the last 30 days.' },
+  { id: 'photos_month_10', xp: 120, progress: (s) => Math.min(100, Math.round((photosLastNDaysCount(s,30)/10)*100)), title:(l)=> l==='de'?'Monat Fotos 10':'Month photos 10', description:(l)=> l==='de'?'10 Fotos in den letzten 30 Tagen.':'10 photos in the last 30 days.' },
+
   // NEW: Period tracked counts
   { id: 'period_track_1', xp: 40, progress: (s) => Math.min(100, Math.round((periodTrackedCount(s)/1)*100)), title:(l)=> l==='de'?'Periode getrackt 1x':'Period tracked 1x', description:(l)=> l==='de'?'Periode einmal markiert.':'Mark period once.' },
   { id: 'period_track_5', xp: 100, progress: (s) => Math.min(100, Math.round((periodTrackedCount(s)/5)*100)), title:(l)=> l==='de'?'Periode 5x':'Period 5x', description:(l)=> l==='de'?'Periode an 5 Tagen markiert.':'Mark period on 5 days.' },
