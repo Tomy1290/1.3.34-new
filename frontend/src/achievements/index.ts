@@ -51,6 +51,20 @@ function weightDelta(s: AchState) { const arr = Object.values(s.days).filter((d)
 function weighedBeforeHourCount(s: AchState, hour = 8) { return count(Object.values(s.days), (d) => typeof d.weight === 'number' && typeof d.weightTime === 'number' && new Date(d.weightTime).getHours() < hour); }
 function trackedAfterHourCount(s: AchState, hour = 22) { return count(Object.values(s.days), (d) => typeof d.weightTime === 'number' && new Date(d.weightTime).getHours() >= hour); }
 
+// Additional helpers (stress & sleep from cycle logs)
+function lowStressDays(s: AchState, threshold = 3) {
+  const logs = (s.cycleLogs || {}) as Record<string, CycleLog>;
+  return Object.values(logs).reduce((acc, v) => acc + ((typeof v?.stress === 'number' && v.stress <= threshold) ? 1 : 0), 0);
+}
+function lowSleepDays(s: AchState, threshold = 4) {
+  const logs = (s.cycleLogs || {}) as Record<string, CycleLog>;
+  return Object.values(logs).reduce((acc, v) => acc + ((typeof v?.sleep === 'number' && v.sleep <= threshold) ? 1 : 0), 0);
+}
+function highSleepDays(s: AchState, threshold = 7) {
+  const logs = (s.cycleLogs || {}) as Record<string, CycleLog>;
+  return Object.values(logs).reduce((acc, v) => acc + ((typeof v?.sleep === 'number' && v.sleep >= threshold) ? 1 : 0), 0);
+}
+
 // New helpers for requested achievements
 function profileCompleted(s: AchState) {
   const p = s.profile || {} as Profile;
