@@ -5,7 +5,7 @@ export type WeeklyEvent = {
   id: string;
   title: (lng: 'de'|'en') => string;
   description: (lng: 'de'|'en') => string;
-  progress: (dayKeys: string[], state: Pick<AppState, 'days'>) => number; // returns 0..100
+  progress: (dayKeys: string[], state: Pick<AppState, 'days'|'waterCupMl'|'chat'>) => number; // returns 0..100
   xp: number;
   bonusPercent: number;
 };
