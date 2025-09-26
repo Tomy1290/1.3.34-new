@@ -6,7 +6,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { initializeNotifications, computeNextOccurrence, scheduleOneTimeNotification, cancelNotification } from '../src/utils/notifications';
 import { scheduleCycleNotifications } from '../src/utils/cycleNotifications';
 import { useAppStore } from "../src/store/useStore";
-import { warmupBackend } from "../src/utils/api";
+let warmupBackend: undefined | ((t?: number) => Promise<boolean>);
+try { warmupBackend = require("../src/utils/api").warmupBackend; } catch {}
+
 
 export default function RootLayout() {
   const theme = useAppStore((s) => s.theme);
