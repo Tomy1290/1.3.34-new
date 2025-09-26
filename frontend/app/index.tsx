@@ -223,7 +223,7 @@ export default function Home() {
           </View>
         </View>
 
-        {/* Drinks &amp; Sport */}
+        {/* Drinks & Sport */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
