@@ -161,7 +161,7 @@ export default function CycleScreen() {
               const blanks = Array.from({ length: pad });
               return (
                 <>
-                  {blanks.map((_, i) => (&lt;View key={`b${i}`} style={{ width: `${100/7}%`, height: 44 }} /&gt;))}
+                  {blanks.map((_, i) => (<View key={`b${i}`} style={{ width: `${100/7}%`, height: 44 }} /&gt;))}
                   {monthDays.map((d, i) => {
                     const key = dateKey(d);
                     const isPeriod = period.has(key);
@@ -172,15 +172,15 @@ export default function CycleScreen() {
                     const has = hasLog.has(key);
                     const isFuture = key > todayKey;
                     return (
-                      &lt;TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture &amp;&amp; router.push(`/cycle/${key}`)} accessibilityLabel={t('cycle.dayA11y', { key })} testID={`cycle-day-${key}`}>
-                        &lt;View style={{ width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center',
+                      <TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture &amp;&amp; router.push(`/cycle/${key}`)} accessibilityLabel={t('cycle.dayA11y', { key })} testID={`cycle-day-${key}`}>
+                        <View style={{ width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center',
                           backgroundColor: isPeriod ? colors.primary : (isUpcoming ? `${colors.primary}33` : (isFertile ? `${colors.primary}22` : 'transparent')),
                           borderWidth: isExpected ? 2 : (isFertile ? 1 : 0), borderColor: isExpected ? colors.primary : (isFertile ? colors.primary : 'transparent') }}>
-                          &lt;Text style={{ color: (isPeriod ? '#fff' : colors.text) }}>{d.getDate()}&lt;/Text>
-                          {isOv ? &lt;View style={{ position: 'absolute', right: 2, top: 2, width: 6, height: 6, borderRadius: 3, backgroundColor: isPeriod ? '#fff' : colors.primary }} /&gt; : null}
-                          {has ? &lt;View style={{ position: 'absolute', bottom: 3, width: 18, height: 2, backgroundColor: isPeriod ? '#fff' : colors.primary, borderRadius: 1 }} /&gt; : null}
-                        &lt;/View>
-                      &lt;/TouchableOpacity>
+                          <Text style={{ color: (isPeriod ? '#fff' : colors.text) }}>{d.getDate()}</Text>
+                          {isOv ? <View style={{ position: 'absolute', right: 2, top: 2, width: 6, height: 6, borderRadius: 3, backgroundColor: isPeriod ? '#fff' : colors.primary }} /&gt; : null}
+                          {has ? <View style={{ position: 'absolute', bottom: 3, width: 18, height: 2, backgroundColor: isPeriod ? '#fff' : colors.primary, borderRadius: 1 }} /&gt; : null}
+                        </View>
+                      </TouchableOpacity>
                     );
                   })}
                 </>
