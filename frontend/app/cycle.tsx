@@ -161,7 +161,7 @@ export default function CycleScreen() {
               const blanks = Array.from({ length: pad });
               return (
                 <>
-                  {blanks.map((_, i) => (<View key={`b${i}`} style={{ width: `${100/7}%`, height: 44 }} /&gt;))}
+                  {blanks.map((_, i) => (<View key={`b${i}`} style={{ width: `${100/7}%`, height: 44 }} />))}
                   {monthDays.map((d, i) => {
                     const key = dateKey(d);
                     const isPeriod = period.has(key);
@@ -177,8 +177,8 @@ export default function CycleScreen() {
                           backgroundColor: isPeriod ? colors.primary : (isUpcoming ? `${colors.primary}33` : (isFertile ? `${colors.primary}22` : 'transparent')),
                           borderWidth: isExpected ? 2 : (isFertile ? 1 : 0), borderColor: isExpected ? colors.primary : (isFertile ? colors.primary : 'transparent') }}>
                           <Text style={{ color: (isPeriod ? '#fff' : colors.text) }}>{d.getDate()}</Text>
-                          {isOv ? <View style={{ position: 'absolute', right: 2, top: 2, width: 6, height: 6, borderRadius: 3, backgroundColor: isPeriod ? '#fff' : colors.primary }} /&gt; : null}
-                          {has ? <View style={{ position: 'absolute', bottom: 3, width: 18, height: 2, backgroundColor: isPeriod ? '#fff' : colors.primary, borderRadius: 1 }} /&gt; : null}
+                          {isOv ? <View style={{ position: 'absolute', right: 2, top: 2, width: 6, height: 6, borderRadius: 3, backgroundColor: isPeriod ? '#fff' : colors.primary }} /> : null}
+                          {has ? <View style={{ position: 'absolute', bottom: 3, width: 18, height: 2, backgroundColor: isPeriod ? '#fff' : colors.primary, borderRadius: 1 }} /> : null}
                         </View>
                       </TouchableOpacity>
                     );
