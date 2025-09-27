@@ -242,7 +242,7 @@ export default function CycleScreen() {
                 const len = e ? Math.max(1, Math.round((+e - +s)/(24*60*60*1000))+1) : undefined;
                 return (
                   <Text key={c.start+String(idx)} style={{ color: colors.muted, marginTop: idx===0?6:2 }}>
-                    {s.toLocaleDateString()} {e ? `– ${e.toLocaleDateString()} (${len} ${t('cycle.days', { count: len || 0 }).split(' ')[1]})` : `– ${t('cycle.ongoing')}`}
+                    {s.toLocaleDateString()} {e ? `– ${e.toLocaleDateString()} (${len} {t('cycle.days', { count: len || 0 }).split(' ')[1]})` : `– ${t('cycle.ongoing')}`}
                   </Text>
                 );
               })
@@ -250,7 +250,7 @@ export default function CycleScreen() {
           ) : null}
         </View>
 
-        {/* Highlights – top 5 intense days (last 6 months) with all attributes */}
+        {/* Highlights – top 10 intense days (last 6 months) with all attributes + trend */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -264,52 +264,79 @@ export default function CycleScreen() {
           {expanded.highlights ? (
             (() => {
               const now = new Date(); const six = new Date(); six.setMonth(six.getMonth()-6);
-              const entries = Object.entries(state.cycleLogs||{})
-                .map(([k,v]) => ({ key:k, date:new Date(k), v }))
-                .filter(x => +x.date >= +six && +x.date <= +now);
 
+              // Compute score (aligned with fields of /cycle/[date].tsx)
+              const scoreOf = (v: any) => {
+                let s = 0;
+                const flow = typeof v.flow==='number'? v.flow : 0; s += flow * 2; // period intensity
+                const pain = typeof v.pain==='number'? v.pain : 0; s += Math.max(0, pain - 5) * 2; // pain
+                if (v.cramps) s += 2; if (v.headache) s += 2; if (v.nausea) s += 2; // strong symptoms
+                if (v.backPain) s += 1.5; if (v.breastTenderness) s += 1.2; if (v.waterRetention) s += 1; if (v.dizziness) s += 1.5; // additional symptoms
+                const mood = typeof v.mood==='number'? v.mood : 0; s += mood <= 3 ? (4 - mood) * 2 : 0; // mood low
+                const energy = typeof v.energy==='number'? v.energy : 0; s += energy <= 3 ? (4 - energy) * 1.5 : 0; // energy low
+                const sleep = typeof v.sleep==='number'? v.sleep : 0; s += sleep <= 3 ? (4 - sleep) * 1.5 : 0; // sleep low
+                const stress = typeof v.stress==='number'? v.stress : 0; s += stress > 5 ? (stress - 5) * 1.5 : 0; // stress high
+                const appetite = typeof v.appetite==='number'? v.appetite : 0; s += Math.abs(appetite - 5) * 0.5; // appetite extremes
+                const cravings = typeof v.cravings==='number'? v.cravings : 0; s += cravings > 5 ? (cravings - 5) * 1.0 : 0; // cravings high
+                const focus = typeof v.focus==='number'? v.focus : 0; s += focus <= 3 ? (4 - focus) * 1.2 : 0; // focus low
+                const libido = typeof v.libido==='number'? v.libido : 0; s += libido >= 8 ? (libido - 7) * 0.8 : 0; // libido high
+                if (v.sex) s += 0.5; // minimal influence as requested
+                if (v.notes && v.notes.trim().length>=30) s += 2; else if (v.notes && v.notes.trim().length>0) s += 1; // notes length
+                return s;
+              };
+
+              // Build data sets
+              const allSorted = Object.entries(state.cycleLogs||{})
+                .map(([k,v]) => ({ key:k, date:new Date(k), v }))
+                .filter(x => !isNaN(+x.date))
+                .sort((a,b) => +a.date - +b.date);
+
+              const scoreMap: Record<string, number> = {};
+              for (const it of allSorted) scoreMap[it.key] = scoreOf(it.v || {});
+
+              // previous logged day map (over all time)
+              const prevMap: Record<string, string|undefined> = {};
+              for (let i=1;i<allSorted.length;i++) { prevMap[allSorted[i].key] = allSorted[i-1].key; }
+
+              // Window for highlights (last 6 months)
+              const entries = allSorted.filter(x => +x.date >= +six && +x.date <= +now);
+
+              // rank by severity (worst first)
+              const ranked = entries
+                .map(e => ({ ...e, s: scoreMap[e.key] || 0 }))
+                .filter(e => e.s > 0)
+                .sort((a,b) => (b.s - a.s) || (+b.date - +a.date))
+                .slice(0,10);
+
+              if (ranked.length === 0) return <Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.noHighlights')}</Text>;
+
+              // helper renderers
               function line(label: string, value: string | number | undefined) { return (value===undefined || value===null || value==='') ? null : (<Text style={{ color: colors.muted, marginTop: 2 }}>{label}: {value}</Text>); }
               function bool(label: string, on?: boolean) { return on ? <Text style={{ color: colors.muted, marginTop: 2 }}>• {label}</Text> : null; }
 
-              const arr = entries.map(e => ({ ...e, s: (() => {
-                const v: any = e.v || {}; let s = 0;
-                // Period intensity
-                const flow = typeof v.flow==='number'? v.flow : 0; s += flow * 2;
-                // Pain & symptoms (primary negative drivers)
-                const pain = typeof v.pain==='number'? v.pain : 0; s += Math.max(0, pain - 5) * 2;
-                if (v.cramps) s += 2; if (v.headache) s += 2; if (v.nausea) s += 2;
-                if (v.backPain) s += 1.5; if (v.breastTenderness) s += 1.2; if (v.waterRetention) s += 1; if (v.dizziness) s += 1.5;
-                // Mood, energy, sleep low
-                const mood = typeof v.mood==='number'? v.mood : 0; s += mood <= 3 ? (4 - mood) * 2 : 0;
-                const energy = typeof v.energy==='number'? v.energy : 0; s += energy <= 3 ? (4 - energy) * 1.5 : 0;
-                const sleep = typeof v.sleep==='number'? v.sleep : 0; s += sleep <= 3 ? (4 - sleep) * 1.5 : 0;
-                // Stress high
-                const stress = typeof v.stress==='number'? v.stress : 0; s += stress > 5 ? (stress - 5) * 1.5 : 0;
-                // Appetite & cravings: extremes and highs
-                const appetite = typeof v.appetite==='number'? v.appetite : 0; s += Math.abs(appetite - 5) * 0.5;
-                const cravings = typeof v.cravings==='number'? v.cravings : 0; s += cravings > 5 ? (cravings - 5) * 1.0 : 0;
-                // Focus low
-                const focus = typeof v.focus==='number'? v.focus : 0; s += focus <= 3 ? (4 - focus) * 1.2 : 0;
-                // Libido peaks (positive intensity but still a "highlight")
-                const libido = typeof v.libido==='number'? v.libido : 0; s += libido >= 8 ? (libido - 7) * 0.8 : 0;
-                // Notes length indicates noteworthy day
-                if (v.notes && v.notes.trim().length>=30) s += 2; else if (v.notes && v.notes.trim().length>0) s += 1;
-                return s;
-              })() }))
-                .filter(e => e.s > 0)
-                .sort((a,b) => (b.s - a.s) || (+b.date - +a.date))
-                .slice(0,5);
-
-              if (arr.length === 0) return <Text style={{ color: colors.muted, marginTop: 6 }}>{t('cycle.noHighlights')}</Text>;
-
               return (
                 <View style={{ marginTop: 6 }}>
-                  {arr.map((it) => {
+                  {ranked.map((it, idx) => {
                     const v: any = it.v || {};
                     const dateLabel = new Date(it.key).toLocaleDateString(state.language==='de'?'de-DE':(state.language==='pl'?'pl-PL':'en-GB'));
+                    const prevKey = prevMap[it.key];
+                    const prevScore = prevKey ? (scoreMap[prevKey] ?? 0) : undefined;
+                    const diff = prevScore===undefined ? 0 : (it.s - prevScore);
+                    const absDiff = Math.abs(diff);
+                    const threshold = 0.5; // avoid noise
+                    let trendIcon: keyof typeof Ionicons.glyphMap = 'remove';
+                    let trendColor = colors.muted;
+                    if (prevScore !== undefined && absDiff >= threshold) {
+                      if (diff < 0) { trendIcon = 'arrow-up'; trendColor = '#2e7d32'; } // improved (gentler) -> green up
+                      else { trendIcon = 'arrow-down'; trendColor = '#c62828'; } // worse -> red down
+                    }
+
                     return (
                       <View key={it.key} style={{ borderTopWidth: 1, borderTopColor: `${colors.muted}33`, paddingTop: 8, marginTop: 8 }}>
-                        <Text style={{ color: colors.text, fontWeight: '700' }}>{dateLabel}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Text style={{ color: colors.text, fontWeight: '700' }}>{`${idx+1}. ${dateLabel}`}</Text>
+                          <Ionicons name={trendIcon} size={16} color={trendColor} />
+                        </View>
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
                           {line(t('cycle.fields.flow'), typeof v.flow==='number'? v.flow : undefined)}
                           {line(t('cycle.fields.pain'), typeof v.pain==='number'? v.pain : undefined)}
