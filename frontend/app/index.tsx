@@ -331,7 +331,7 @@ export default function Home() {
           {help.cycle ? <Text style={{ color: colors.muted, marginTop: 6 }}>{t("index.cycleHelp")}</Text> : null}
           {expectedNext ? (
             <Text style={{ color: colors.muted, marginTop: 6 }}>
-              {t("index.expectedNextPrefix")} {new Date(expectedNext).toDateString()}
+              {t("index.expectedNextPrefix")} {(() => { try { const d = new Date(expectedNext as Date); const dd = String(d.getDate()).padStart(2,'0'); const mm = String(d.getMonth()+1).padStart(2,'0'); const yyyy = d.getFullYear(); return `${dd}.${mm}.${yyyy}`; } catch { return '' } })()}
             </Text>
           ) : null}
           <View style={{ flexDirection: "row", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
