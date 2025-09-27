@@ -161,7 +161,7 @@ export default function CycleScreen() {
               const blanks = Array.from({ length: pad });
               return (
                 <>
-                  {blanks.map((_, i) => (<View key={`b${i}`} style={{ width: `${100/7}%`, height: 44 }} />))}
+                  {blanks.map((_, i) => (&lt;View key={`b${i}`} style={{ width: `${100/7}%`, height: 44 }} /&gt;))}
                   {monthDays.map((d, i) => {
                     const key = dateKey(d);
                     const isPeriod = period.has(key);
@@ -172,15 +172,15 @@ export default function CycleScreen() {
                     const has = hasLog.has(key);
                     const isFuture = key > todayKey;
                     return (
-                      <TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture && router.push(`/cycle/${key}`)} accessibilityLabel={t('cycle.dayA11y', { key })} testID={`cycle-day-${key}`}>
-                        <View style={{ width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center',
+                      &lt;TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture &amp;&amp; router.push(`/cycle/${key}`)} accessibilityLabel={t('cycle.dayA11y', { key })} testID={`cycle-day-${key}`}>
+                        &lt;View style={{ width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center',
                           backgroundColor: isPeriod ? colors.primary : (isUpcoming ? `${colors.primary}33` : (isFertile ? `${colors.primary}22` : 'transparent')),
                           borderWidth: isExpected ? 2 : (isFertile ? 1 : 0), borderColor: isExpected ? colors.primary : (isFertile ? colors.primary : 'transparent') }}>
-                          <Text style={{ color: (isPeriod ? '#fff' : colors.text) }}>{d.getDate()}</Text>
-                          {isOv ? <View style={{ position: 'absolute', right: 2, top: 2, width: 6, height: 6, borderRadius: 3, backgroundColor: isPeriod ? '#fff' : colors.primary }} /> : null}
-                          {has ? <View style={{ position: 'absolute', bottom: 3, width: 18, height: 2, backgroundColor: isPeriod ? '#fff' : colors.primary, borderRadius: 1 }} /> : null}
-                        </View>
-                      </TouchableOpacity>
+                          &lt;Text style={{ color: (isPeriod ? '#fff' : colors.text) }}>{d.getDate()}&lt;/Text>
+                          {isOv ? &lt;View style={{ position: 'absolute', right: 2, top: 2, width: 6, height: 6, borderRadius: 3, backgroundColor: isPeriod ? '#fff' : colors.primary }} /&gt; : null}
+                          {has ? &lt;View style={{ position: 'absolute', bottom: 3, width: 18, height: 2, backgroundColor: isPeriod ? '#fff' : colors.primary, borderRadius: 1 }} /&gt; : null}
+                        &lt;/View>
+                      &lt;/TouchableOpacity>
                     );
                   })}
                 </>
@@ -273,12 +273,26 @@ export default function CycleScreen() {
 
               const arr = entries.map(e => ({ ...e, s: (() => {
                 const v: any = e.v || {}; let s = 0;
+                // Period intensity
                 const flow = typeof v.flow==='number'? v.flow : 0; s += flow * 2;
+                // Pain & symptoms (primary negative drivers)
                 const pain = typeof v.pain==='number'? v.pain : 0; s += Math.max(0, pain - 5) * 2;
+                if (v.cramps) s += 2; if (v.headache) s += 2; if (v.nausea) s += 2;
+                if (v.backPain) s += 1.5; if (v.breastTenderness) s += 1.2; if (v.waterRetention) s += 1; if (v.dizziness) s += 1.5;
+                // Mood, energy, sleep low
                 const mood = typeof v.mood==='number'? v.mood : 0; s += mood <= 3 ? (4 - mood) * 2 : 0;
                 const energy = typeof v.energy==='number'? v.energy : 0; s += energy <= 3 ? (4 - energy) * 1.5 : 0;
                 const sleep = typeof v.sleep==='number'? v.sleep : 0; s += sleep <= 3 ? (4 - sleep) * 1.5 : 0;
-                if (v.cramps) s += 2; if (v.headache) s += 2; if (v.nausea) s += 2;
+                // Stress high
+                const stress = typeof v.stress==='number'? v.stress : 0; s += stress > 5 ? (stress - 5) * 1.5 : 0;
+                // Appetite & cravings: extremes and highs
+                const appetite = typeof v.appetite==='number'? v.appetite : 0; s += Math.abs(appetite - 5) * 0.5;
+                const cravings = typeof v.cravings==='number'? v.cravings : 0; s += cravings > 5 ? (cravings - 5) * 1.0 : 0;
+                // Focus low
+                const focus = typeof v.focus==='number'? v.focus : 0; s += focus <= 3 ? (4 - focus) * 1.2 : 0;
+                // Libido peaks (positive intensity but still a "highlight")
+                const libido = typeof v.libido==='number'? v.libido : 0; s += libido >= 8 ? (libido - 7) * 0.8 : 0;
+                // Notes length indicates noteworthy day
                 if (v.notes && v.notes.trim().length>=30) s += 2; else if (v.notes && v.notes.trim().length>0) s += 1;
                 return s;
               })() }))
@@ -302,12 +316,21 @@ export default function CycleScreen() {
                           {line(t('cycle.fields.mood'), typeof v.mood==='number'? v.mood : undefined)}
                           {line(t('cycle.fields.energy'), typeof v.energy==='number'? v.energy : undefined)}
                           {line(t('cycle.fields.sleep'), typeof v.sleep==='number'? v.sleep : undefined)}
+                          {line(t('cycle.stressTitle') || 'Stress', typeof v.stress==='number'? v.stress : undefined)}
+                          {line(t('cycle.appetiteTitle') || 'Appetit', typeof v.appetite==='number'? v.appetite : undefined)}
+                          {line(t('cycle.cravingsTitle') || 'Heißhunger', typeof v.cravings==='number'? v.cravings : undefined)}
+                          {line(t('cycle.focusTitle') || 'Fokus', typeof v.focus==='number'? v.focus : undefined)}
+                          {line(t('cycle.libidoTitle') || 'Libido', typeof v.libido==='number'? v.libido : undefined)}
                         </View>
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
                           {bool(t('cycle.fields.cramps'), v.cramps)}
                           {bool(t('cycle.fields.headache'), v.headache)}
                           {bool(t('cycle.fields.nausea'), v.nausea)}
                           {bool(t('cycle.fields.sex'), v.sex)}
+                          {bool(t('cycle.fields.backPain') || 'Rückenschmerzen', v.backPain)}
+                          {bool(t('cycle.fields.breastTenderness') || 'Brustspannen', v.breastTenderness)}
+                          {bool(t('cycle.fields.waterRetention') || 'Wassereinlagerungen', v.waterRetention)}
+                          {bool(t('cycle.fields.dizziness') || 'Schwindel', v.dizziness)}
                         </View>
                         {v.notes ? <Text style={{ color: colors.muted, marginTop: 4 }} numberOfLines={3}>{v.notes}</Text> : null}
                       </View>
