@@ -232,6 +232,13 @@ export default function AnalysisScreen() {
                   <View style={{ flex: 400-300, backgroundColor: '#F44336' }} />
                 </View>
               </View>
+              {bmi ? (
+                <View style={{ position: 'relative', height: 16, marginTop: 2 }}>
+                  <View style={{ position: 'absolute', left: Math.min(100, Math.max(0, (bmi/40)*100)) + '%', top: 0 }}>
+                    <Ionicons name='caret-down' size={16} color={bmiCategory?.color || colors.primary} />
+                  </View>
+                </View>
+              ) : null}
             </View>
           )}
         </View>
