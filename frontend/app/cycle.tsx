@@ -172,7 +172,7 @@ export default function CycleScreen() {
                     const has = hasLog.has(key);
                     const isFuture = key > todayKey;
                     return (
-                      <TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture &amp;&amp; router.push(`/cycle/${key}`)} accessibilityLabel={t('cycle.dayA11y', { key })} testID={`cycle-day-${key}`}>
+                      <TouchableOpacity key={i} disabled={isFuture} style={{ width: `${100/7}%`, height: 44, alignItems: 'center', justifyContent: 'center', opacity: isFuture ? 0.5 : 1 }} onPress={() => !isFuture && router.push(`/cycle/${key}`)} accessibilityLabel={t('cycle.dayA11y', { key })} testID={`cycle-day-${key}`}>
                         <View style={{ width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center',
                           backgroundColor: isPeriod ? colors.primary : (isUpcoming ? `${colors.primary}33` : (isFertile ? `${colors.primary}22` : 'transparent')),
                           borderWidth: isExpected ? 2 : (isFertile ? 1 : 0), borderColor: isExpected ? colors.primary : (isFertile ? colors.primary : 'transparent') }}>
